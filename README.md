@@ -6,6 +6,14 @@ emphasizing the split between **human judgment** (plan, decide, review) and **AI
 
 **View it:** https://observerstudio.github.io/engineering-workflow/
 
+## Install the coordinator skill
+
+```bash
+npx skills add Observerstudio/engineering-workflow
+```
+
+One command; works for Claude Code and 15+ other agents ([skills.sh](https://www.skills.sh/)). Full details and alternatives below.
+
 It's a single self-contained `index.html` — no build, no dependencies. Open it locally
 by double-clicking, or share the link above.
 
