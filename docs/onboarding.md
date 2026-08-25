@@ -28,13 +28,18 @@ Your repo may add specifics in its own `docs/agents/` pages — read both.
 - [herdr-runbook.md](herdr-runbook.md) — spawn/boot/send/watch mechanics for lane
   panes.
 
-## The five rules that bite hardest
+## The rules that bite hardest
 
-1. **Gate everything.** Green checks are not readiness; unreviewed means unreviewed.
+1. **Cold-review every PR before merge.** Gate everything: green checks are not readiness; unreviewed means unreviewed.
 2. **Never force-push.** Amended history → fresh ref + new PR.
 3. **One integration run** per machine at a time.
 4. **Never over-engineer** — build what the spec asks, nothing around it.
 5. **Verify premises on the production-shaped copy** before declaring blockers.
+6. **Never repeat work.** Before dispatching anything, check the handoff, open PRs, and
+   recent merges — the task may already be done, in flight, or decided.
+7. **Never break what already works.** Shipped behaviour is a contract: mirror shipped
+   patterns instead of rewriting shipped screens, keep migrations additive, upgrade
+   pre-existing tests to name their fixtures — never weaken or delete them to go green.
 
 ## Memory vs. repo
 

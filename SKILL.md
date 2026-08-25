@@ -36,6 +36,14 @@ skill is the shared model, not a substitute for the repo's rules.
   a stuck queue. Check `gh pr view N --json mergeable` before blaming the queue.
   The fix is rebase onto base as a NEW branch + new PR — never force-push.
 
+## Do not repeat, do not regress
+
+- **Never repeat work**: before dispatching, check the handoff, open PRs, and recent
+  merges — done / in-flight / decided all look like "todo" from a cold start.
+- **Never break what already works**: mirror shipped patterns instead of rewriting
+  shipped surfaces; migrations stay additive; a red pre-existing test gets upgraded to
+  name its fixture, never weakened.
+
 ## Never force-push
 
 Amended history → fresh ref + new PR. Follow-up commits only. Branch names must respect

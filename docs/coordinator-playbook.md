@@ -65,6 +65,13 @@ database state. Treat that suite as **one slot per machine**, held like a lock:
 
 > **Example from selal-v2:** client-facing updates are written in plain Arabic;
 > everything in the terminal stays English.
+- **Never repeat work.** Before dispatching, check the handoff file, open PRs, recent
+  merges, and the issue — done, in-flight, and decided all look like "todo" from a cold
+  start.
+- **Never break what already works.** Shipped behaviour is a contract: mirror shipped
+  patterns rather than rewriting shipped surfaces in the same PR, keep migrations
+  additive, and when a pre-existing test goes red, upgrade it to name its fixture —
+  never weaken an assertion to get green.
 
 ## Evidence standards
 
