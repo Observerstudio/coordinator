@@ -1,0 +1,10 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "groupings": [
+    {
+      "title": "Coordination",
+      "description": "Run a whole work track as the coordinator — brief lanes, gate every PR, hold the one integration slot.",
+      "skills": ["coordinator"]
+    }
+  ]
+}
