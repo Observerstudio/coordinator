@@ -25,7 +25,10 @@ skill is the shared model, not a substitute for the repo's rules.
 
 ## The gate — every PR, no exceptions
 
-1. Cold review at the exact SHA — score all ten items of `docs/review-rubric.md`; ONE reviewer (you), a single second-reader subagent only for >800-line or money PRs, never a fan-out.
+1. Cold review at the exact SHA, scoring all ten items of
+   [`docs/review-rubric.md`](docs/review-rubric.md). ONE reviewer — you. A single
+   second-reader subagent only for a PR over ~800 lines or one that touches money;
+   never a fan-out, never one reader per dimension.
 2. CI green.
 3. YOUR own local run of the lane's touched integration suite.
 4. Squash-merge (merge-commit for back-merges).

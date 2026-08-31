@@ -23,7 +23,12 @@ body is not a review either.
 
 ## Metrics to keep per PR (one line in the merge comment)
 
-`review: 10/10 pass · N/A=<n> · reworks=<k> · reviewer=coordinator · second-reader=<none|1>`
+`review: <passed>/10 pass · N/A=<n> · reworks=<k> · reviewer=coordinator · second-reader=<none|1>`
+
+Record the score you actually gave, never a rounded-up 10. An N/A item counts as passed for this
+line (say so via `N/A=<n>`); an accepted FAIL — items 1, 6, 8 or 10, stated in the PR body and
+accepted in the review comment — still lowers the score, and the point of the number is that the
+accepted gaps stay visible after the merge.
 
 Track over time: reworks per PR (target ≤1), FAILs caught before merge vs after (any post-merge FAIL
 becomes a Bite in memory), and second-reader count (target: rare).
@@ -34,4 +39,6 @@ becomes a Bite in memory), and second-reader count (target: rare).
 - FAIL on 7 or 9 → rework (cheap, and it protects every other branch).
 - FAIL on 1, 6, 8, 10 → rework unless the gap is stated in the PR body and accepted in the review comment.
 
-Then `.scratch/merge-gate.sh <pr>` — the gate is a separate step and it is fail-closed; the rubric never replaces it.
+Then run the repo's own merge gate, if it has one (some keep a fail-closed `merge-gate` script; this
+repo ships none). The gate is a separate step from the review and the rubric never replaces it: a
+10/10 scorecard on a branch whose checks were never read is still an unreviewed merge.

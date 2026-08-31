@@ -30,7 +30,7 @@ Your repo may add specifics in its own `docs/agents/` pages — read both.
 
 ## The rules that bite hardest
 
-1. **Cold-review every PR before merge.** Gate everything: green checks are not readiness; unreviewed means unreviewed.
+1. **Cold-review every PR before merge**, scored against all ten items of [`review-rubric.md`](review-rubric.md) — one reviewer, not a fan-out. Green checks are not readiness; unreviewed means unreviewed.
 2. **Never force-push.** Amended history → fresh ref + new PR.
 3. **One integration run** per machine at a time.
 4. **Never over-engineer** — build what the spec asks, nothing around it.

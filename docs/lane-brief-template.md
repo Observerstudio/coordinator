@@ -64,6 +64,7 @@ the feature code was never wrong once. So the brief names, explicitly:
 A hardcoded date, a missing role, an unseeded row and a leaked session are all visible by eye in
 thirty seconds; the slot run costs minutes and is serialised machine-wide.
 
+## Simplicity
 Ponytail is ON for every code-writing lane: build the simplest thing that satisfies this brief —
 YAGNI → stdlib → native → one line → minimum. Before opening the PR run `/ponytail-review` on your
 own diff and fix what it names (or state in the PR body why not).
