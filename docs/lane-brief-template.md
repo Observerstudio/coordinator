@@ -37,6 +37,33 @@ by your own ids, never assert raw table counts.
 Integration files are WRITTEN not run: when done, print LANE-NEEDS-INTEGRATION-SLOT.
 Teardown deletes your own rows in FK order.
 
+### The fixture contract — write this section, don't leave it to the lane
+
+A lane forbidden from running the integration suite cannot discover fixture mistakes, and fixture
+mistakes are exactly the class only a real database reveals. Every one it makes costs a full
+round-trip through the coordinator and a serialised slot run. Four rounds on one test taught this;
+the feature code was never wrong once. So the brief names, explicitly:
+
+- **The seeding pattern file, by path and line range.** "Follow `<file>:60-105`" beats "create a
+  fixture". Every writer nature has a sibling test that already seats its rows correctly.
+- **Which rows the nature actually needs.** A `move_selected_boxes` nature needs real rows in the
+  source's bucket, plus the matching inventory-projection row — not just the parties. A
+  quantity-only nature needs neither. Say which.
+- **The shared-uniqueness helpers, and their semantics.** Name the reservation helper for any
+  globally-constrained fixture (season windows, codes, serials) and state what it returns — ours
+  reserves exactly ONE day, so dates come from its return value, never hand-picked. Hand-picked
+  values work until two files pick the same one, which has already happened.
+- **Slug vs legacy enum.** Say which representation the boundary takes, and name a sibling call
+  site. Two nearly-identical fields, one of which silently produces a wrong row, is a coin flip.
+- **Isolation per test.** One actor per test, sessions/grants closed or scoped, so test 2 cannot
+  inherit test 1's state — a leaked session makes a "no session" test pass for the wrong reason.
+- **Teardown that survives a failed setup.** Guard it: a throwing `afterAll` poisons every
+  neighbouring suite on the same worker, turning one fixture bug into a suite-wide red.
+
+**Coordinator's own half of this:** read the lane's test file BEFORE spending a slot run on it.
+A hardcoded date, a missing role, an unseeded row and a leaked session are all visible by eye in
+thirty seconds; the slot run costs minutes and is serialised machine-wide.
+
 Ponytail is ON for every code-writing lane: build the simplest thing that satisfies this brief —
 YAGNI → stdlib → native → one line → minimum. Before opening the PR run `/ponytail-review` on your
 own diff and fix what it names (or state in the PR body why not).
