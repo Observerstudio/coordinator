@@ -17,7 +17,9 @@ concrete shape, look for the **Example from selal-v2** blocks.
 
 ## The gate (every PR, no exceptions)
 
-1. Cold review at the exact SHA.
+1. Cold review at the exact SHA, scoring all ten items of
+   [`review-rubric.md`](review-rubric.md) — ONE reviewer (you); a single second reader
+   only for a >800-line or money PR, never a fan-out.
 2. CI green.
 3. The coordinator's **own** local run of the lane's integration suite (see
    [integration slot](#integration-slot)).

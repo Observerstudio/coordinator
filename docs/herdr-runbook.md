@@ -34,7 +34,12 @@ Before dispatching any work:
 
 - **Check the model line.** Never GLM; pick the cheapest adequate model (the
   `/models` picker).
-- `/new` between tasks on a reused pane.
+- `/new` between tasks on a reused pane — then send the brief pointer with `/ponytail full` on the
+  same message (e.g. `/ponytail full — cd <worktree> and read LANE-BRIEF.md …`). For an OpenCode
+  lane that command IS the activation: the plugin is installed via `opencode.json` and the command
+  sets the mode for that session, so there is no extra step and no pasted rule text. (A repo that
+  runs a Claude Code agent as a lane instead can activate the mode from a session-start hook; then
+  the command is redundant, not required.)
 - Close panes when a track ends.
 - Two live lanes max per tab.
 
