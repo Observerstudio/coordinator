@@ -34,7 +34,10 @@ Before dispatching any work:
 
 - **Check the model line.** Never GLM; pick the cheapest adequate model (the
   `/models` picker).
-- `/new` between tasks on a reused pane.
+- `/new` between tasks on a reused pane — then send the brief pointer with `/ponytail full` on the same
+  message (e.g. `/ponytail full — cd <worktree> and read LANE-BRIEF.md …`); the plugin is installed via
+  `opencode.json`, the command sets the mode for that session. No separate activation step, no pasted
+  rule text. Claude Code panes activate it automatically at session start.
 - Close panes when a track ends.
 - Two live lanes max per tab.
 

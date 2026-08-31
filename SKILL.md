@@ -25,7 +25,7 @@ skill is the shared model, not a substitute for the repo's rules.
 
 ## The gate — every PR, no exceptions
 
-1. Cold review at the exact SHA.
+1. Cold review at the exact SHA — score all ten items of `docs/review-rubric.md`; ONE reviewer (you), a single second-reader subagent only for >800-line or money PRs, never a fan-out.
 2. CI green.
 3. YOUR own local run of the lane's touched integration suite.
 4. Squash-merge (merge-commit for back-merges).
@@ -113,3 +113,4 @@ stall randomly — nudge with "continue", don't alert. Spawn/boot/mechanics deta
 | [`docs/coordinator-playbook.md`](docs/coordinator-playbook.md) | Full operating model: roles, gate, slot, standing rules, evidence standards, worked examples |
 | [`docs/lane-brief-template.md`](docs/lane-brief-template.md) | The exact brief format + worked example + teardown discipline for shared-ledger integration files |
 | [`docs/herdr-runbook.md`](docs/herdr-runbook.md) | Pane mechanics: split/rename, agent boot + model check, send/read discipline, cross-tab etiquette |
+| [`docs/review-rubric.md`](docs/review-rubric.md) | The ten-item cold-review scorecard, the per-PR metrics line, and what a non-10/10 score forces |

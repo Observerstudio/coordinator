@@ -37,6 +37,10 @@ by your own ids, never assert raw table counts.
 Integration files are WRITTEN not run: when done, print LANE-NEEDS-INTEGRATION-SLOT.
 Teardown deletes your own rows in FK order.
 
+Ponytail is ON for every code-writing lane: build the simplest thing that satisfies this brief —
+YAGNI → stdlib → native → one line → minimum. Before opening the PR run `/ponytail-review` on your
+own diff and fix what it names (or state in the PR body why not).
+
 ## Delivery
 Small commits. No push unless told. No PR unless told. NEVER amend pushed commits.
 Finish by printing EXACTLY one sentinel line:
