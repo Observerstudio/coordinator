@@ -8,7 +8,7 @@ integration run before merge, and database-backed suites run **one at a time
 machine-wide**.
 
 The generic model is defined org-wide in the
-[engineering-workflow docs](https://github.com/Observerstudio/engineering-workflow/tree/main/docs).
+[coordinator docs](https://github.com/Observerstudio/coordinator/tree/main/docs).
 Your repo may add specifics in its own `docs/agents/` pages — read both.
 
 ## First-session checklist
