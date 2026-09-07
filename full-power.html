@@ -4,135 +4,139 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Full power</title>
-<meta name="description" content="A mock replay of one day of coordinated agent work: a master, three coordinators, six lanes, one shared decision.">
+<meta name="description" content="A mock replay of one day of coordinated agent work, staged inside a faithful recreation of the terminal window it really happens in.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
 :root{
-  --bg:#f6f5f1; --ink:#1d2230; --muted:#6a7080; --line:#d9d8d2; --line-strong:#b9b8b0;
-  --accent:#2d4fb5; --term-bg:#1d2230; --term-ink:#e6eaf0; --term-muted:#8b93a8;
-  --sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
-  color-scheme:light;
+  --ground:#1a1c22; --pane:#22252d; --ink:#d4d7de; --dim:#7c8290; --border:#3a3f4b;
+  --accent:#e39a4a; --green:#5ec07a;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.4;-webkit-font-smoothing:antialiased}
-h1{margin:0;font-size:18px;font-weight:800;letter-spacing:-.02em}
-button{font:inherit;cursor:pointer;background:none;border:0;color:var(--ink);padding:4px 6px}
-button:disabled{opacity:.35;cursor:default}
-code{font-family:var(--mono)}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+body{background:var(--ground);color:var(--ink);font-family:var(--mono);font-size:13px;line-height:1.45;overflow:hidden}
+button{font:inherit;cursor:pointer;background:none;border:0;color:inherit;padding:0}
+:focus-visible{outline:1px solid var(--accent);outline-offset:1px}
 
-.app{display:grid;grid-template-rows:60px 44px 1fr;height:100dvh;overflow:hidden}
-@media (max-width:820px){.app{height:auto;overflow:visible}}
+.win{display:grid;grid-template-rows:30px 30px 22px 1fr;height:100dvh}
 
-/* header */
-.hdr{display:flex;align-items:center;gap:16px;padding:0 18px;border-bottom:1px solid var(--line)}
-.hdr .ctrls{display:flex;align-items:center;gap:10px;margin-left:auto;color:var(--muted);font-size:13px}
-.hdr input[type=range]{width:min(220px,30vw);accent-color:var(--accent);height:2px}
-.hdr .stationlbl{font-family:var(--mono);min-width:110px;text-align:right}
+/* title bar */
+.titlebar{display:flex;align-items:center;gap:10px;padding:0 10px;border-bottom:1px solid var(--border);color:var(--dim);font-size:12px}
+.dots{display:flex;gap:6px}
+.dots span{width:11px;height:11px;border-radius:50%;display:inline-block}
+.dots span:nth-child(1){background:#ff5f57}.dots span:nth-child(2){background:#febc2e}.dots span:nth-child(3){background:#28c840}
+.titlebar .wname{margin-left:2px}
+.titlebar .ctrls{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--dim)}
+.titlebar .ctrls button{color:var(--dim)}
+.titlebar .ctrls button:hover{color:var(--ink)}
+.titlebar input[type=range]{width:90px;height:2px;accent-color:var(--accent)}
+.titlebar .station{min-width:70px;text-align:right}
+.titlebar .follow{border:1px solid var(--border);border-radius:3px;padding:1px 6px}
+.titlebar .follow[data-on="true"]{color:var(--accent);border-color:var(--accent)}
 
-/* stations */
-.steps{display:grid;grid-template-columns:repeat(8,1fr);padding:0 18px;align-items:end;height:44px;border-bottom:1px solid var(--line)}
-.step{font-size:11.5px;color:var(--muted);padding-bottom:8px;border-bottom:2px solid transparent;margin-bottom:-1px}
-.step b{font-weight:700}
-.step[data-lit="past"]{color:var(--ink)}
-.step[data-lit="now"]{color:var(--accent);border-bottom-color:var(--accent)}
-@media (max-width:820px){.steps{grid-template-columns:repeat(4,1fr);height:auto;padding:8px}}
+/* tab bar */
+.tabbar{display:flex;align-items:stretch;border-bottom:1px solid var(--border)}
+.tabbtn{position:relative;padding:0 16px;border-right:1px solid var(--border);color:var(--dim);border-top:2px solid transparent}
+.tabbtn[data-active="true"]{color:var(--ink);border-top-color:var(--accent);background:var(--pane)}
+.tabbtn .dot{position:absolute;top:6px;right:5px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.tabbtn .dot[hidden]{display:none}
+.tabplus{padding:0 14px;color:var(--dim)}
 
-/* stage + rail */
-.stagewrap{display:grid;grid-template-columns:1fr 300px;overflow:hidden}
-@media (max-width:980px){.stagewrap{grid-template-columns:1fr;overflow:visible}}
-.stage{position:relative;padding:14px 18px;overflow:auto;transition:opacity .3s}
-.stage.dim{opacity:.5}
-.rail{border-left:1px solid var(--line);padding:14px;overflow:auto}
-.rail h2{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:0 0 10px}
-.rail .hint{color:var(--muted);font-size:13px}
-.msg{border:1px solid var(--line);border-radius:8px;padding:7px 9px;margin-top:8px;font-size:12.5px;background:#fff}
-.msg .from{font-weight:700;font-size:11px;color:var(--accent);display:block;margin-bottom:2px}
+/* station strip */
+.stations{display:flex;gap:18px;align-items:center;padding:0 14px;color:var(--dim);font-size:12px;border-bottom:1px solid var(--border)}
+.stations b{color:var(--dim);font-weight:500}
+.stations .st[data-now="true"]{color:var(--accent)}
 
-/* you bar */
-.youbar{font-family:var(--mono);font-size:14px;padding:6px 0}
-.youbar b{color:var(--accent)}
-.youbar .decision{margin-top:8px;font-family:var(--sans)}
-.pillbtn{display:inline-block;margin-right:8px;margin-top:4px;border:1px solid var(--accent);color:var(--accent);border-radius:999px;padding:5px 14px;font-weight:700;font-size:13px}
+/* body */
+.body{display:grid;grid-template-columns:230px 1fr;overflow:hidden}
+.sidebar{border-right:1px solid var(--border);padding:14px 12px;overflow:auto;color:var(--dim);font-size:12.5px}
+.sidebar h4{margin:0 0 6px;font-weight:500;color:var(--dim);font-size:11.5px;letter-spacing:.03em}
+.space{padding:5px 6px;border-radius:3px;display:flex;flex-direction:column;gap:1px;margin-bottom:2px}
+.space .top{display:flex;gap:6px;align-items:center}
+.space .sub{padding-left:14px;color:var(--dim)}
+.space.active{background:#2a2e38;color:var(--ink)}
+.dotchar{color:var(--dim)}
+.dotchar.on{color:var(--accent)}
+.space.active .dotchar{color:var(--accent)}
+.agents{margin-top:18px}
+.agent{padding:4px 6px;border-radius:3px;cursor:pointer}
+.agent:hover{background:#242830}
+.agent .top{display:flex;gap:6px;align-items:center}
+.agent .sub{padding-left:14px;font-size:11.5px}
 
-/* dark terminal cards */
-.term{background:var(--term-bg);color:var(--term-ink);border-radius:8px;padding:9px 12px;margin-top:10px}
-.term .hd{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px}
-.term .hd .name{font-weight:700}
-.term .badge{font-size:10px;border:1px solid #3a4258;border-radius:999px;padding:2px 7px;color:var(--term-muted)}
-.term .hd .state{margin-left:auto;color:var(--term-muted);font-size:11.5px}
-.term pre{margin:0;font-family:var(--mono);font-size:11.5px;color:var(--term-muted);white-space:pre-wrap;line-height:1.55;min-height:2.3em;cursor:pointer}
-.term pre .cur{color:var(--term-ink)}
-.term.typing pre .cur::after{content:"\2588";margin-left:1px;animation:blink 1s step-end infinite}
+.main{overflow:hidden;padding:12px;display:flex;flex-direction:column;min-height:0}
+.tabpage[hidden]{display:none}
+.tabpage{height:100%;display:flex;flex-direction:column;min-height:0}
+.onecol{flex:1;min-height:0}
+.twocol{flex:1;display:grid;grid-template-columns:1fr 1.5fr;gap:12px;min-height:0}
+.leftstack{display:grid;grid-template-rows:1fr 1fr;gap:12px;min-height:0}
+
+/* pane */
+.pane{position:relative;border:1px solid var(--border);background:var(--pane);display:flex;flex-direction:column;min-height:0;padding-top:14px}
+.pane .ptitle{position:absolute;top:-1px;left:12px;transform:translateY(-50%);background:var(--pane);padding:0 6px;color:var(--dim);font-size:11.5px}
+.pbody{flex:1;overflow-y:auto;padding:6px 12px}
+.ln{white-space:pre-wrap;word-break:break-word;padding:2px 0}
+.ln.prompt{color:var(--ink);font-weight:700}
+.ln.bullet{color:var(--ink)}
+.ln.blocked{color:var(--accent)}
+.ln.dim{color:var(--dim)}
+.ln.sub{color:var(--dim);padding-left:14px}
+
+.composer{border-top:1px solid var(--border);padding:6px 12px 8px}
+.composer .prompt{color:var(--ink);font-weight:700;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.cursor{display:inline-block;width:7px;color:var(--ink);animation:blink 1s step-end infinite}
+.cursor.hide{visibility:hidden}
 @keyframes blink{50%{opacity:0}}
+.pillopt{border:1px solid var(--accent);color:var(--accent);border-radius:3px;padding:1px 8px;margin-right:8px}
+.statusline{margin-top:6px;color:var(--dim);font-size:11.5px}
+.statusline .row{display:flex;gap:8px;flex-wrap:wrap}
+.bar{letter-spacing:-1px}
+.bar.ctx{color:#c9d16a}
+.bar.usage{color:#d18ad1}
+.bar.weekly{color:#7aa7d1}
+.statusline .green{color:var(--green)}
+.statusline .foot{display:flex;justify-content:space-between;margin-top:2px}
 
-/* tracks */
-.tracks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:12px}
-@media (max-width:980px){.tracks{grid-template-columns:1fr}}
-.track h3{font-size:12.5px;color:var(--muted);font-weight:700;margin:0}
-.lanewrap{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.lanewrap .term{margin-top:8px}
-.prrow{margin-top:10px;display:flex;align-items:center;gap:8px;position:relative;min-height:24px}
-.prchip{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 9px;border:1px solid var(--line-strong);color:var(--muted)}
-.prchip[data-state="score"]{color:var(--accent);border-color:var(--accent)}
-.prchip[data-state="merged"]{color:#1c7a3d;border-color:#1c7a3d}
-
-/* slot badge + message pills */
-.slotbadge{position:absolute;top:0;left:0;width:22px;height:22px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);
-  transform:translate(-9999px,-9999px);pointer-events:none;z-index:5}
-.pill{position:absolute;background:var(--accent);color:#fff;font-size:10.5px;border-radius:999px;padding:4px 10px;white-space:nowrap;pointer-events:none;z-index:6;transform:translate(-50%,-50%)}
-
-/* side panel */
-.panel{position:fixed;inset:0;background:rgba(29,34,48,.35);display:flex;justify-content:flex-end;z-index:20}
-.panel[hidden]{display:none}
-.panel .box{width:min(420px,92vw);background:#fff;height:100%;padding:20px;overflow:auto;border-left:1px solid var(--line-strong)}
-.panel pre{white-space:pre-wrap;font-family:var(--mono);font-size:13px;margin-top:10px}
-.panel button{border:1px solid var(--line-strong);border-radius:6px;padding:6px 10px}
+@media (max-width:900px){
+  .body{grid-template-columns:0 1fr}
+  .sidebar{display:none}
+  .twocol{grid-template-columns:1fr}
+  .leftstack{grid-template-rows:1fr 1fr 1fr}
+}
 </style>
 </head>
 <body>
-<div class="app">
-  <header class="hdr">
-    <h1>Full power</h1>
+<div class="win">
+  <div class="titlebar">
+    <span class="dots"><span></span><span></span><span></span></span>
+    <span class="wname">MacBook-Pro: OCH</span>
     <div class="ctrls">
-      <button id="stepBack" aria-label="Step back">&larr;</button>
-      <button id="playPause" aria-label="Play or pause">Play</button>
-      <button id="stepFwd" aria-label="Step forward">&rarr;</button>
+      <button class="follow" id="followBtn" data-on="true">follow</button>
+      <button id="stepBack" aria-label="Step back">&lsaquo;</button>
+      <button id="playPause" aria-label="Play or pause">&#9655; play</button>
+      <button id="stepFwd" aria-label="Step forward">&rsaquo;</button>
       <input type="range" id="scrub" min="0" max="1" step="0.001" value="0" aria-label="Scrub">
-      <span class="stationlbl" id="stationLabel">1 &middot; Need</span>
-    </div>
-  </header>
-
-  <div class="steps" id="steps"></div>
-
-  <div class="stagewrap">
-    <div class="stage" id="stage">
-      <div class="youbar" id="youbar"><b>You</b> &rsaquo; &ldquo;Ship the invoicing fixes this week.&rdquo;</div>
-
-      <div class="term" id="masterNode" data-node="master">
-        <div class="hd"><span class="name">Master</span><span class="badge">Opus</span><span class="state" data-role="state">waiting</span></div>
-        <pre data-role="log"></pre>
-      </div>
-
-      <div class="tracks" id="tracks"></div>
-    </div>
-    <div class="rail" id="rail">
-      <h2>Messages</h2>
-      <div class="hint" id="railHint">Nothing yet. Play to begin.</div>
+      <span class="station" id="stationLabel">1 &middot; Need</span>
     </div>
   </div>
-</div>
 
-<div class="panel" id="panel" hidden>
-  <div class="box">
-    <button id="panelClose">Close (Esc)</button>
-    <h2 id="panelTitle" style="margin-top:12px"></h2>
-    <pre id="panelBody"></pre>
+  <div class="tabbar" id="tabbar"></div>
+  <div class="stations" id="stations"></div>
+
+  <div class="body">
+    <div class="sidebar">
+      <h4>spaces</h4>
+      <div class="space"><div class="top"><span class="dotchar">&#9675;</span> selal-v2</div><div class="sub">feat/1507-guarantor-b&hellip;</div></div>
+      <div class="space active"><div class="top"><span class="dotchar on">&#9679;</span> OCH</div><div class="sub">main</div></div>
+      <div class="agents">
+        <h4>agents &middot; grouped</h4>
+        <div id="agentList"></div>
+      </div>
+    </div>
+    <div class="main" id="main"></div>
   </div>
 </div>
 
@@ -143,290 +147,292 @@ var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 var STATION_NAMES = ["Need","Decide","Brief","Build","Collide","Gate","Ship","Note"];
 var TRACKS = [
-  {key:"pdf", name:"Invoice PDF", lanes:["lane-pdf-1","lane-pdf-2"]},
-  {key:"tax", name:"Tax rounding", lanes:["lane-tax-1","lane-tax-2"]},
-  {key:"csv", name:"CSV export", lanes:["lane-csv-1","lane-csv-2"]}
+  {key:"pdf", name:"Invoice PDF", branch:"feat/invoice-pdf"},
+  {key:"tax", name:"Tax rounding", branch:"feat/tax-rounding"},
+  {key:"csv", name:"CSV export", branch:"feat/csv-export"}
+];
+var AGENTS = [{key:"master", name:"Master", model:"Opus 5"}].concat(
+  TRACKS.map(function(t){ return {key:t.key, name:t.name, model:"Sonnet 5"}; })
+);
+
+/* ---------- transcript deltas: line objects appended per station, per pane ---------- */
+function L(type, text){ return {type:type, text:text}; }
+function bulletsFor(track, sha, score, note){
+  var lines = [L("bullet","Cold review at "+sha+": "+score+"/10"+(note?(" — "+note):""))];
+  return lines;
+}
+
+var MASTER = [
+  [], /* station 0: nothing in body yet, composer holds the typed line */
+  [ L("prompt","Ship the invoicing fixes this week."),
+    L("bullet","Reading PRD §52 and the last handoff…"),
+    L("dim","Ran 2 shell commands"),
+    L("bullet","Three tracks: Invoice PDF, Tax rounding, CSV export. Opening tabs.") ],
+  [], [],
+  [ L("prompt","[from Tax rounding] rounding mode reserved for Ahmed: half-up or banker's?") ],
+  [], [],
+  [ L("bullet","Three PRs merged. One decision recorded. Nothing blocked.") ]
 ];
 
-var LANE_LINES = {
-  pdf: [[], [], ["lane-pdf-1: claim c_a1 scope invoice/pdf"], ["lane-pdf-1: writing render.go", "lane-pdf-2: writing pdf_test.go"], ["lane-pdf-1: touching money/format.ts, merging first"], ["lane-pdf-1: gate 10/10, squash-merge"], [], ["lane-pdf-1: released claim"]],
-  tax: [[], [], ["lane-tax-1: claim c_a2 scope tax/rounding"], ["lane-tax-1: hit reserved decision, paused"], ["lane-tax-1: resumed with your call"], ["lane-tax-1: gate 10/10, squash-merge"], [], ["lane-tax-1: released claim"]],
-  csv: [[], [], ["lane-csv-1: claim c_a3 scope csv/export"], ["lane-csv-1: writing exporter.go", "lane-csv-2: writing exporter_test.go"], ["lane-csv-1: waiting on money/format.ts", "lane-csv-1: rebased onto main"], ["lane-csv-1: gate 9/10, item 6 reworked", "lane-csv-1: gate 10/10, squash-merge"], [], ["lane-csv-1: released claim"]]
+var COORD = {
+  pdf: [ [], [ L("prompt","/ponytail full — you coordinate track: Invoice PDF. Read the handoff…") ],
+    [ L("bullet","Brief written: scope invoice/pdf, pattern index.html, test pin selftest.") ],
+    [], [],
+    bulletsFor("pdf","a1b2c3d",10),
+    [ L("bullet","Taking the integration slot"), L("dim","SLOT-RELEASED"), L("bullet","Squash-merged #41") ],
+    [ L("bullet","Wrote docs/notes/2026-09-07-invoice-pdf.md") ] ],
+  tax: [ [], [ L("prompt","/ponytail full — you coordinate track: Tax rounding. Read the handoff…") ],
+    [ L("bullet","Brief written: scope tax/rounding, reserved decision: rounding mode.") ],
+    [ L("blocked","[from LANE-A] LANE-BLOCKED — rounding mode: half-up or banker's? Coordinator must pick."), L("dim","Escalated to Master.") ],
+    [],
+    bulletsFor("tax","d4e5f6a",10),
+    [ L("bullet","Taking the integration slot"), L("dim","SLOT-RELEASED"), L("bullet","Squash-merged #42") ],
+    [ L("bullet","Wrote docs/notes/2026-09-07-tax-rounding.md") ] ],
+  csv: [ [], [ L("prompt","/ponytail full — you coordinate track: CSV export. Read the handoff…") ],
+    [ L("bullet","Brief written: scope csv/export, pattern money/format.ts.") ],
+    [],
+    [ L("bullet","money/format.ts is claimed by Invoice PDF. Messaging their coordinator."), L("prompt","[from Invoice PDF] merged. Go ahead and rebase."), L("bullet","Rebased on main. Suite green.") ],
+    bulletsFor("csv","9f8e7d6",9,"item 6: mutation did not bite").concat([ L("prompt","rework: add mutation test for money.Round"), L("bullet","LANE-DONE — feat/csv-export a1b2c3d rework 1"), L("bullet","Cold review again: 10/10") ]),
+    [ L("bullet","Taking the integration slot"), L("dim","SLOT-RELEASED"), L("bullet","Squash-merged #43") ],
+    [ L("bullet","Wrote docs/notes/2026-09-07-csv-export.md") ] ]
 };
-var COORD_STATE = {
-  pdf: ["idle","idle","briefing","building","building","gating","merged","noted"],
-  tax: ["idle","idle","briefing","building","building","gating","merged","noted"],
-  csv: ["idle","idle","briefing","building","building","gating","merged","noted"]
-};
-var PR_STATE = {
-  pdf: ["none","none","none","none","none","score","merged","merged"],
-  tax: ["none","none","none","none","none","score","merged","merged"],
-  csv: ["none","none","none","none","none","score","merged","merged"]
-};
-var PR_LABEL = {none:"no PR", score:"9/10", merged:"merged"};
-var SLOT_HOLDER = ["", "", "", "", "pdf", "pdf", "csv", "csv"];
-var PR_LABEL_OVERRIDE = {"csv-5":"10/10","pdf-5":"9/10"};
 
-var RAIL = [
-  [],
-  [{from:"Master", to:"You", text:"Splitting into three tracks: PDF, tax rounding, CSV export."}],
-  [{from:"coord-pdf", to:"Master", text:"Brief written: scope, files, pattern to copy."}],
-  [{from:"coord-tax", to:"Master", text:"Lane paused on a reserved decision."}],
-  [{from:"coord-pdf", to:"coord-csv", text:"Both touch money/format.ts. I merge first, you rebase."}, {from:"coord-csv", to:"coord-pdf", text:"Waiting on your merge."}],
-  [{from:"coord-csv", to:"Master", text:"Gate item 6 failed (mutation didn't bite). Sent back."}, {from:"coord-csv", to:"Master", text:"Reworked. 10/10."}],
-  [{from:"coord-pdf", to:"Master", text:"Merged."}, {from:"coord-tax", to:"Master", text:"Merged."}, {from:"coord-csv", to:"Master", text:"Merged."}],
-  [{from:"Master", to:"You", text:"Three PRs merged. One decision recorded. Nothing blocked."}]
-];
-
-var YOU_LINE = [
-  "You &rsaquo; &ldquo;Ship the invoicing fixes this week.&rdquo;",
-  "You &rsaquo; &ldquo;Ship the invoicing fixes this week.&rdquo;",
-  "You &rsaquo; sent. Master is splitting the work.",
-  "You &rsaquo; sent. Master is splitting the work.",
-  "You &rsaquo; sent. Master is splitting the work.",
-  "You &rsaquo; sent. Master is splitting the work.",
-  "You &rsaquo; sent. Master is splitting the work.",
-  "You &rsaquo; Master: three PRs merged, nothing blocked."
-];
-var MASTER_TXT = [
-  "waiting for you",
-  "read PRD + last handoff, splitting the work",
-  "coordinators writing briefs",
-  "lanes building; tax-rounding has hit a reserved decision",
-  "PDF and CSV both need money/format.ts",
-  "gating three PRs against the ten-item review",
-  "three squash-merges, one slot, no collisions",
-  "done for the day"
-];
-var MASTER_STATE = ["waiting","splitting","briefing","building","coordinating","gating","shipping","done"];
-
-var TRANSCRIPTS = {
-  master: ["Reads PRD and last handoff.", "Splits: Invoice PDF, Tax rounding, CSV export.", "Opens three tabs, one coordinator each.", "Waits for evidence, not typing."],
-  "coord-pdf": ["Brief: scope invoice/pdf, pattern to copy, no reserved decisions.", "Watches lane-pdf-1 build.", "Merges first into money/format.ts.", "Gate 9/10, merged."],
-  "coord-tax": ["Brief: scope tax/rounding.", "Reserved decision: rounding mode. Lane paused, asked you.", "Resumed after your call.", "Gate 10/10, merged."],
-  "coord-csv": ["Brief: scope csv/export.", "Waits for PDF's merge to money/format.ts, then rebases.", "Gate item 6 failed: mutation didn't bite. Sent back as a file.", "Reworked, gate 10/10, merged."],
-  "lane-pdf-1": ["claim c_a1 scope invoice/pdf", "worktree wt-pdf-1 ready", "render.go: PDF layout for line items", "commit: add invoice PDF renderer", "PR opened against main"],
-  "lane-pdf-2": ["pdf_test.go: golden file for layout", "commit: add renderer tests"],
-  "lane-tax-1": ["claim c_a2 scope tax/rounding", "hit reserved decision: half up or banker's?", "resumed: half up (your call)", "commit: round half up in tax calc", "PR opened, gate 10/10"],
-  "lane-tax-2": ["tax_test.go: rounding edge cases"],
-  "lane-csv-1": ["claim c_a3 scope csv/export", "exporter.go: CSV writer for line items", "waiting: PDF holds money/format.ts", "rebased onto main after PDF merge", "gate rework: mutation test on money.Round"],
-  "lane-csv-2": ["exporter_test.go: quoting and delimiters"]
+var LANE = {
+  "pdf-a": [ [], [], [ L("prompt","/ponytail full — you are LANE-A. Read docs/lanes/LANE-BRIEF-invoice-pdf.md…") ],
+    [ L("bullet","Reading 3 files"), L("dim","Ran 1 shell command"), L("bullet","Added renderer for line items") ],
+    [], [ L("dim","gate passed, 10/10") ], [], [] ],
+  "pdf-b": [ [], [], [ L("prompt","/ponytail full — you are LANE-B. Read docs/lanes/LANE-BRIEF-invoice-pdf.md…") ],
+    [ L("bullet","Added golden-file test for layout") ],
+    [], [], [], [] ],
+  "tax-a": [ [], [], [ L("prompt","/ponytail full — you are LANE-A. Read docs/lanes/LANE-BRIEF-tax-rounding.md…") ],
+    [ L("blocked","LANE-BLOCKED — rounding mode: half-up or banker's? Coordinator must pick.") ],
+    [], [ L("dim","gate passed, 10/10") ], [], [] ],
+  "tax-b": [ [], [], [ L("prompt","/ponytail full — you are LANE-B. Read docs/lanes/LANE-BRIEF-tax-rounding.md…") ],
+    [ L("bullet","Added rounding edge-case tests, waiting on mode") ],
+    [], [], [], [] ],
+  "csv-a": [ [], [], [ L("prompt","/ponytail full — you are LANE-A. Read docs/lanes/LANE-BRIEF-csv-export.md…") ],
+    [ L("bullet","Reading 3 files"), L("dim","Ran 1 shell command"), L("bullet","Writing exporter for line items") ],
+    [ L("dim","✳ waiting"), L("bullet","Rebased onto main after PDF merge") ],
+    [ L("prompt","rework: add mutation test for money.Round"), L("bullet","LANE-DONE — feat/csv-export a1b2c3d rework 1") ],
+    [], [] ],
+  "csv-b": [ [], [], [ L("prompt","/ponytail full — you are LANE-B. Read docs/lanes/LANE-BRIEF-csv-export.md…") ],
+    [ L("bullet","Added quoting and delimiter tests") ],
+    [], [], [], [] ]
 };
+
+var FOCUS_TAB = [0, 0, 1, 0, 1, 3, 0, 0]; /* which tab the follow toggle jumps to, per station */
+var AGENT_ACTIVE = { master:[0,1,7], pdf:[2,3,4,5,6], tax:[2,3,4,5,6], csv:[2,3,4,5,6] };
 
 /* ---------- state ---------- */
 var decisionChoice = null;
 var idx = 0;
 var playing = false;
-var lastIdx = -1;
+var activeTab = 0;
+var follow = true;
+var seenTab = [0]; /* tabs the viewer has already looked at this station */
 
-var stepsEl = document.getElementById("steps");
-var stageEl = document.getElementById("stage");
-var tracksEl = document.getElementById("tracks");
-var railEl = document.getElementById("rail");
+var tabbarEl = document.getElementById("tabbar");
+var stationsEl = document.getElementById("stations");
+var mainEl = document.getElementById("main");
+var agentListEl = document.getElementById("agentList");
 var stationLabelEl = document.getElementById("stationLabel");
 var scrubEl = document.getElementById("scrub");
 var playBtn = document.getElementById("playPause");
-var youbarEl = document.getElementById("youbar");
-var masterNode = document.getElementById("masterNode");
+var followBtn = document.getElementById("followBtn");
 
+/* ---------- build static DOM ---------- */
 STATION_NAMES.forEach(function(name, i){
-  var d = document.createElement("div");
-  d.className = "step"; d.dataset.i = i;
-  d.innerHTML = "<b>"+(i+1)+"</b> "+name;
-  stepsEl.appendChild(d);
+  var s = document.createElement("span");
+  s.className = "st"; s.dataset.i = i;
+  s.innerHTML = "<b>"+(i+1)+" "+name+"</b>";
+  stationsEl.appendChild(s);
 });
 
-TRACKS.forEach(function(t, ti){
-  var col = document.createElement("div");
-  col.className = "track"; col.dataset.i = ti;
-  col.innerHTML =
-    "<h3>"+t.name+"</h3>" +
-    '<div class="term" data-node="coord-'+t.key+'"><div class="hd"><span class="name">Coordinator</span><span class="badge">Sonnet</span><span class="state" data-role="cstate">idle</span></div><pre data-role="clog"></pre></div>' +
-    '<div class="lanewrap">' + t.lanes.map(function(l){
-      return '<div class="term" data-node="'+l+'"><div class="hd"><span class="name">'+l+'</span></div><pre data-role="lane"></pre></div>';
-    }).join("") + '</div>' +
-    '<div class="prrow" data-role="prrow"><span class="prchip" data-role="pr" data-state="none">no PR</span></div>';
-  tracksEl.appendChild(col);
-});
-
-var slotBadge = document.createElement("div");
-slotBadge.className = "slotbadge"; slotBadge.textContent = "slot";
-stageEl.appendChild(slotBadge);
-
-/* click-through transcripts */
-document.body.addEventListener("click", function(e){
-  var node = e.target.closest("[data-node]");
-  if (!node) return;
-  var key = node.dataset.node;
-  var lines = TRANSCRIPTS[key];
-  if (!lines) return;
-  openPanel(key, lines);
-});
-function openPanel(title, lines){
-  document.getElementById("panelTitle").textContent = title;
-  document.getElementById("panelBody").textContent = lines.join("\n");
-  document.getElementById("panel").hidden = false;
+function tabCount(){ return idx >= 1 ? 4 : 1; }
+function rebuildTabbar(){
+  tabbarEl.innerHTML = "";
+  var n = tabCount();
+  for (var i=0;i<n;i++){
+    (function(i){
+      var b = document.createElement("button");
+      b.className = "tabbtn"; b.dataset.i = i;
+      b.dataset.active = (i===activeTab) ? "true":"false";
+      b.innerHTML = (i+1)+" <span class=\"dot\" "+(seenTab.indexOf(i)>=0||i===activeTab?"hidden":"")+"></span>";
+      b.addEventListener("click", function(){ follow=false; followBtn.dataset.on="false"; setActiveTab(i); });
+      tabbarEl.appendChild(b);
+    })(i);
+  }
+  var plus = document.createElement("span");
+  plus.className = "tabplus"; plus.textContent = "+";
+  tabbarEl.appendChild(plus);
 }
-document.getElementById("panelClose").addEventListener("click", closePanel);
-function closePanel(){ document.getElementById("panel").hidden = true; }
-document.addEventListener("keydown", function(e){
-  if (e.key === "Escape") closePanel();
-  if (e.key === " "){ e.preventDefault(); togglePlay(); }
-  if (e.key === "ArrowRight"){ e.preventDefault(); step(1); }
-  if (e.key === "ArrowLeft"){ e.preventDefault(); step(-1); }
-});
 
-/* ---------- typing effect ---------- */
-function typeLine(el, text){
-  if (reduced || typeof gsap === "undefined"){ el.textContent = text; return; }
+function paneHTML(id, title){
+  return '<div class="pane" data-pane="'+id+'"><div class="ptitle">─ '+title+' ─</div>' +
+    '<div class="pbody" data-role="body"></div>' +
+    '<div class="composer" data-role="composer"><div class="prompt"><span>❯</span><span data-role="ctext"></span><span class="cursor" data-role="cursor">▍</span></div>' +
+    '<div class="statusline" data-role="status"></div></div></div>';
+}
+
+function buildMain(){
+  mainEl.innerHTML = "";
+  var page0 = document.createElement("div");
+  page0.className = "tabpage"; page0.dataset.tab = "0"; page0.hidden = activeTab !== 0;
+  page0.innerHTML = '<div class="onecol">'+paneHTML("master","master")+'</div>';
+  mainEl.appendChild(page0);
+
+  TRACKS.forEach(function(t, ti){
+    var tabI = ti+1;
+    var page = document.createElement("div");
+    page.className = "tabpage"; page.dataset.tab = String(tabI); page.hidden = activeTab !== tabI;
+    page.innerHTML = '<div class="twocol">' +
+      '<div class="leftstack">' + paneHTML(t.key+"-a","LANE-A "+t.key) + paneHTML(t.key+"-b","LANE-B "+t.key) + '</div>' +
+      paneHTML(t.key+"-coord","coordinator") +
+      '</div>';
+    mainEl.appendChild(page);
+  });
+}
+
+function buildAgents(){
+  agentListEl.innerHTML = "";
+  AGENTS.forEach(function(a){
+    var row = document.createElement("div");
+    row.className = "agent"; row.dataset.key = a.key;
+    row.innerHTML = '<div class="top"><span class="dotchar" data-role="adot">○</span> OCH &middot; '+a.name+'</div><div class="sub">claude</div>';
+    row.addEventListener("click", function(){
+      follow = false; followBtn.dataset.on = "false";
+      setActiveTab(a.key === "master" ? 0 : TRACKS.map(function(t){return t.key;}).indexOf(a.key)+1);
+    });
+    agentListEl.appendChild(row);
+  });
+}
+buildAgents();
+
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+function lineHTML(l){
+  var prefix = l.type==="prompt" ? "❯ " : (l.type==="bullet"||l.type==="blocked") ? "⏺ " : (l.type==="sub") ? "└ " : "";
+  return '<div class="ln '+l.type+'">'+prefix+esc(l.text)+'</div>';
+}
+function cumulative(table, key, upTo){
+  var out = [];
+  for (var s=0; s<=upTo; s++){ out = out.concat(table[key][s] || []); }
+  return out;
+}
+function statusHTML(model, branch, claims){
+  return '<div class="row">['+model+'] &nbsp;OCH git:('+branch+'*)</div>' +
+    '<div class="row"><span class="bar ctx">Context ██░░░░</span> 13% &nbsp;|&nbsp; <span class="bar usage">Usage ███░░░</span> 75% (resets in 1h 29m) &nbsp;|&nbsp; <span class="bar weekly">Weekly ██░░░░</span> 38%</div>' +
+    '<div class="row">OCH &nbsp;0 unread &middot; '+claims+' claims &middot; session-full-power</div>' +
+    '<div class="foot"><span class="green">⯵⯵ auto mode on</span> (shift+tab to cycle) &middot; ← for agents</div>';
+}
+
+function setActiveTab(i){
+  activeTab = i;
+  if (seenTab.indexOf(i) < 0) seenTab.push(i);
+  document.querySelectorAll(".tabpage").forEach(function(p){ p.hidden = (+p.dataset.tab !== i); });
+  document.querySelectorAll(".tabbtn").forEach(function(b){
+    var bi = +b.dataset.i;
+    b.dataset.active = (bi===i) ? "true":"false";
+    var dot = b.querySelector(".dot");
+    if (dot) dot.hidden = (bi===i) || seenTab.indexOf(bi)>=0;
+  });
+}
+
+/* ---------- render ---------- */
+function fillPane(id, lines, composerLines, model, branch, claims, cursorOn){
+  var pane = mainEl.querySelector('.pane[data-pane="'+id+'"]');
+  if (!pane) return;
+  var body = pane.querySelector('[data-role="body"]');
+  body.innerHTML = lines.map(lineHTML).join("");
+  body.scrollTop = body.scrollHeight;
+  var ctext = pane.querySelector('[data-role="ctext"]');
+  var cursor = pane.querySelector('[data-role="cursor"]');
+  var comp = pane.querySelector('[data-role="composer"] .prompt');
+  if (composerLines){
+    comp.innerHTML = composerLines;
+  } else {
+    comp.innerHTML = '<span>❯</span><span data-role="ctext"></span><span class="cursor" data-role="cursor">▍</span>';
+    pane.querySelector('[data-role="ctext"]').textContent = "";
+  }
+  var cur = pane.querySelector('[data-role="cursor"]');
+  if (cur) cur.classList.toggle("hide", cursorOn===false);
+  pane.querySelector('[data-role="status"]').innerHTML = statusHTML(model, branch, claims);
+}
+
+function render(opts){
+  opts = opts || {};
+  rebuildTabbar();
+  buildMain();
+
+  stationsEl.querySelectorAll(".st").forEach(function(el){ el.dataset.now = (+el.dataset.i === idx) ? "true":"false"; });
+  stationLabelEl.textContent = (idx+1)+" · "+STATION_NAMES[idx];
+  scrubEl.value = idx/7;
+  playBtn.innerHTML = playing ? "&#10074;&#10074; pause" : "&#9655; play";
+
+  var claims = idx >= 6 ? 0 : 1;
+
+  if (follow){
+    var target = FOCUS_TAB[idx];
+    if (target !== activeTab) setActiveTab(target);
+  }
+
+  /* master pane */
+  var masterLines = cumulative({m:MASTER}, "m", idx);
+  var masterComposer = null;
+  if (idx === 0){
+    masterComposer = '<span>❯</span><span data-role="ctext"></span><span class="cursor" data-role="cursor">▍</span>';
+  } else if (idx === 3 && decisionChoice === null){
+    masterComposer = '<span>❯</span><button class="pillopt" data-choice="up">half-up</button><button class="pillopt" data-choice="bankers">banker\'s</button>';
+  }
+  fillPane("master", masterLines, masterComposer, "Opus 5", "main", claims, idx!==0);
+  if (idx === 0 && !reduced) typeInto(mainEl.querySelector('.pane[data-pane="master"] [data-role="ctext"]'), "Ship the invoicing fixes this week.");
+  else if (idx === 0) mainEl.querySelector('.pane[data-pane="master"] [data-role="ctext"]').textContent = "Ship the invoicing fixes this week.";
+
+  if (idx === 3 && decisionChoice === null){
+    mainEl.querySelectorAll('.pillopt').forEach(function(b){
+      b.addEventListener("click", function(){
+        decisionChoice = b.dataset.choice;
+        var label = decisionChoice === "up" ? "half-up" : "banker's";
+        MASTER[3] = MASTER[3].concat([L("prompt", label)]);
+        COORD.tax[3] = COORD.tax[3].concat([L("prompt","[from Master] use "+label+" rounding.")]);
+        LANE["tax-a"][3] = LANE["tax-a"][3].concat([L("bullet","Resumed: "+label+" rounding.")]);
+        render({forward:true});
+      });
+    });
+  }
+
+  /* coordinator + lane panes */
+  TRACKS.forEach(function(t){
+    var coordLines = cumulative(COORD, t.key, idx);
+    fillPane(t.key+"-coord", coordLines, null, "Sonnet 5", t.branch, claims, true);
+    ["a","b"].forEach(function(ab){
+      var laneLines = cumulative(LANE, t.key+"-"+ab, idx);
+      fillPane(t.key+"-"+ab, laneLines, null, "Sonnet 5", t.branch, claims, true);
+    });
+  });
+
+  /* sidebar agent dots */
+  AGENTS.forEach(function(a){
+    var row = agentListEl.querySelector('.agent[data-key="'+a.key+'"]');
+    var on = AGENT_ACTIVE[a.key].indexOf(idx) >= 0;
+    row.querySelector('[data-role="adot"]').classList.toggle("on", on);
+    row.querySelector('[data-role="adot"]').textContent = on ? "●" : "○";
+  });
+
+  maybePause();
+}
+
+function typeInto(el, text){
+  if (!el) return;
+  if (typeof gsap === "undefined"){ el.textContent = text; return; }
   var obj = {n:0};
   gsap.to(obj, {n:text.length, duration:Math.max(text.length/40,.05), ease:"none", onUpdate:function(){
     el.textContent = text.slice(0, Math.round(obj.n));
   }});
 }
 
-function lastLines(list, n){ return list.slice(Math.max(0,list.length-n)); }
-
-/* ---------- message travel ---------- */
-function travel(msg){
-  if (reduced) return;
-  var from = document.querySelector('[data-node="'+keyOf(msg.from)+'"]');
-  var to = document.querySelector('[data-node="'+keyOf(msg.to)+'"]');
-  if (!from || !to || typeof gsap === "undefined") return;
-  var sr = stageEl.getBoundingClientRect();
-  var fr = from.getBoundingClientRect(), tr = to.getBoundingClientRect();
-  var x1 = fr.left+fr.width/2-sr.left+stageEl.scrollLeft, y1 = fr.top+fr.height/2-sr.top+stageEl.scrollTop;
-  var x2 = tr.left+tr.width/2-sr.left+stageEl.scrollLeft, y2 = tr.top+tr.height/2-sr.top+stageEl.scrollTop;
-  var pill = document.createElement("div");
-  pill.className = "pill"; pill.textContent = msg.text.slice(0,28);
-  pill.style.left = x1+"px"; pill.style.top = y1+"px";
-  stageEl.appendChild(pill);
-  gsap.to(pill, {left:x2, top:y2, duration:.5, ease:"power1.inOut", onComplete:function(){ pill.remove(); }});
-}
-function keyOf(name){
-  if (name === "You" || name === "Master") return name.toLowerCase();
-  return name;
-}
-masterNode.dataset.node = "master";
-
-/* ---------- render ---------- */
-function moveSlot(track){
-  if (!track){ slotBadge.style.transform = "translate(-9999px,-9999px)"; return; }
-  var row = document.querySelector('.track[data-i="'+TRACKS.map(function(t){return t.key;}).indexOf(track)+'"] [data-role="prrow"]');
-  if (!row) return;
-  var sr = stageEl.getBoundingClientRect(), rr = row.getBoundingClientRect();
-  var x = rr.right - sr.left + stageEl.scrollLeft - 26, y = rr.top - sr.top + stageEl.scrollTop + 1;
-  if (reduced || typeof gsap === "undefined"){ slotBadge.style.transform = "translate("+x+"px,"+y+"px)"; return; }
-  gsap.to(slotBadge, {x:x, y:y, duration:.4, ease:"power1.inOut"});
-}
-
-function render(opts){
-  opts = opts || {};
-  var animate = opts.forward && !reduced;
-
-  stepsEl.querySelectorAll(".step").forEach(function(el){
-    var i = +el.dataset.i;
-    el.dataset.lit = i < idx ? "past" : (i === idx ? "now" : "future");
-  });
-  stationLabelEl.textContent = (idx+1)+" · "+STATION_NAMES[idx];
-  scrubEl.value = idx/7;
-  playBtn.textContent = playing ? "Pause" : "Play";
-
-  youbarEl.innerHTML = YOU_LINE[idx];
-
-  var mState = masterNode.querySelector('[data-role="state"]');
-  if (mState.textContent !== MASTER_STATE[idx] && animate && typeof gsap !== "undefined"){
-    gsap.fromTo(mState, {opacity:0}, {opacity:1, duration:.15});
-  }
-  mState.textContent = MASTER_STATE[idx];
-  masterNode.classList.toggle("typing", idx > 0 && idx < 7);
-  var mlog = masterNode.querySelector('[data-role="log"]');
-  mlog.textContent = MASTER_TXT.slice(0, idx+1).slice(-3).join("\n");
-
-  TRACKS.forEach(function(t, ti){
-    var col = tracksEl.querySelector('.track[data-i="'+ti+'"]');
-    var cstate = col.querySelector('[data-role="cstate"]');
-    var newC = idx===0 ? "waiting" : COORD_STATE[t.key][idx];
-    if (cstate.textContent !== newC && animate && typeof gsap !== "undefined") gsap.fromTo(cstate, {opacity:0}, {opacity:1, duration:.15});
-    cstate.textContent = newC;
-    var clog = col.querySelector('[data-role="clog"]');
-    var briefLines = [];
-    if (idx>=2) briefLines.push("brief: scope "+t.key+"/*, pattern to copy");
-    if (idx>=3) briefLines.push("watching lanes build");
-    if (idx>=5) briefLines.push("gate run against the ten-item review");
-    if (idx>=6) briefLines.push("squash-merged, note written");
-    clog.textContent = lastLines(briefLines,3).join("\n");
-
-    t.lanes.forEach(function(l, li){
-      var acc = [];
-      for (var s=0; s<=idx; s++){
-        LANE_LINES[t.key][s].forEach(function(line){
-          if (line.indexOf(l+":") === 0) acc.push(line.slice(l.length+2));
-        });
-      }
-      var laneEl = col.querySelectorAll('[data-role="lane"]')[li];
-      var termEl = laneEl.closest(".term");
-      var shown = lastLines(acc,4);
-      var isNew = shown.length && shown[shown.length-1] !== laneEl.dataset.last;
-      laneEl.dataset.last = shown.length ? shown[shown.length-1] : "";
-      if (isNew && animate){
-        termEl.classList.add("typing");
-        laneEl.textContent = shown.slice(0,-1).join("\n") + (shown.length>1?"\n":"");
-        var span = document.createElement("span");
-        span.className = "cur";
-        laneEl.appendChild(span);
-        typeLine(span, shown[shown.length-1]);
-        setTimeout(function(){ termEl.classList.remove("typing"); }, shown[shown.length-1].length*25+300);
-      } else {
-        laneEl.textContent = shown.join("\n");
-      }
-    });
-
-    var pr = col.querySelector('[data-role="pr"]');
-    var prState = PR_STATE[t.key][idx];
-    pr.dataset.state = prState;
-    var override = PR_LABEL_OVERRIDE[t.key+"-"+idx];
-    pr.textContent = override ? override : PR_LABEL[prState];
-  });
-
-  moveSlot(SLOT_HOLDER[idx] || null);
-
-  var hint = document.getElementById("railHint");
-  railEl.querySelectorAll(".msg").forEach(function(m){ m.remove(); });
-  var all = [];
-  for (var s=0; s<=idx; s++){ all = all.concat(RAIL[s]); }
-  hint.style.display = all.length ? "none" : "block";
-  all.forEach(function(m, i){
-    var el = document.createElement("div");
-    el.className = "msg";
-    el.innerHTML = '<span class="from">'+m.from+' &rarr; '+m.to+'</span><div>'+m.text+'</div>';
-    railEl.appendChild(el);
-  });
-  if (animate){ (RAIL[idx]||[]).forEach(travel); }
-
-  maybePause();
-  lastIdx = idx;
-}
-
 function maybePause(){
-  var box = document.getElementById("decisionBox");
-  if (box) box.remove();
-  stageEl.classList.toggle("dim", idx === 3 && decisionChoice === null);
   if (idx === 3 && decisionChoice === null){
-    playing = false; playBtn.textContent = "Play";
-    var d = document.createElement("div");
-    d.id = "decisionBox"; d.className = "decision";
-    d.innerHTML = '<span>Round half up or banker\'s rounding?</span><br>' +
-      '<button class="pillbtn" data-choice="up">Half up</button>' +
-      '<button class="pillbtn" data-choice="bankers">Banker\'s</button>';
-    youbarEl.insertAdjacentElement("afterend", d);
-    d.querySelectorAll("button").forEach(function(b){
-      b.addEventListener("click", function(){
-        decisionChoice = b.dataset.choice;
-        RAIL[3] = RAIL[3].concat([{from:"You", to:"coord-tax", text:"Use "+(decisionChoice==="up"?"half up":"banker's")+" rounding."}]);
-        render({forward:true});
-      });
-    });
+    playing = false; playBtn.innerHTML = "&#9655; play";
   }
 }
 
@@ -436,22 +442,23 @@ function step(dir){
   if (next < 0 || next > 7) return;
   if (dir > 0 && idx === 3 && decisionChoice === null) return;
   idx = next;
+  seenTab = follow ? [FOCUS_TAB[idx]] : seenTab;
   render({forward: dir>0});
 }
 function togglePlay(){
   playing = !playing;
-  playBtn.textContent = playing ? "Pause" : "Play";
+  playBtn.innerHTML = playing ? "&#10074;&#10074; pause" : "&#9655; play";
   if (playing) tick();
 }
 function tick(){
   if (!playing) return;
-  if (idx === 3 && decisionChoice === null){ playing = false; playBtn.textContent = "Play"; return; }
-  if (idx >= 7){ playing = false; playBtn.textContent = "Play"; return; }
+  if (idx === 3 && decisionChoice === null){ playing = false; playBtn.innerHTML = "&#9655; play"; return; }
+  if (idx >= 7){ playing = false; playBtn.innerHTML = "&#9655; play"; return; }
   setTimeout(function(){
     if (!playing) return;
     step(1);
     tick();
-  }, reduced ? 10 : 1600);
+  }, reduced ? 10 : 1700);
 }
 
 playBtn.addEventListener("click", togglePlay);
@@ -463,7 +470,16 @@ scrubEl.addEventListener("input", function(){
   idx = target;
   render({forward:false});
 });
-window.addEventListener("resize", function(){ moveSlot(SLOT_HOLDER[idx] || null); });
+followBtn.addEventListener("click", function(){
+  follow = !follow;
+  followBtn.dataset.on = follow ? "true":"false";
+  if (follow) render({forward:false});
+});
+document.addEventListener("keydown", function(e){
+  if (e.key === " "){ e.preventDefault(); togglePlay(); }
+  if (e.key === "ArrowRight"){ e.preventDefault(); step(1); }
+  if (e.key === "ArrowLeft"){ e.preventDefault(); step(-1); }
+});
 
 render({forward:false});
 
@@ -473,16 +489,15 @@ if (location.hash === "#selftest"){
   function assert(cond, msg){ if (!cond) fails.push(msg); }
   decisionChoice = "up";
   idx = 7; render({forward:false});
-  assert(stepsEl.querySelectorAll('[data-lit="now"]').length === 1, "exactly one lit-now station");
-  assert(+stepsEl.querySelector('[data-lit="now"]').dataset.i === 7, "station strip lit index at end");
-  TRACKS.forEach(function(t, ti){
-    var col = tracksEl.querySelector('.track[data-i="'+ti+'"]');
-    assert(col.querySelector('[data-role="pr"]').dataset.state === "merged", "PR merged for "+t.key);
+  assert(stationsEl.querySelectorAll('[data-now="true"]').length === 1, "exactly one lit-now station");
+  assert(+stationsEl.querySelector('[data-now="true"]').dataset.i === 7, "station strip lit index at end");
+  TRACKS.forEach(function(t){
+    var lines = cumulative(COORD, t.key, 7).map(function(l){return l.text;}).join(" ");
+    assert(lines.indexOf("Squash-merged") >= 0, "coordinator "+t.key+" reports a squash-merge by Note");
   });
-  for (var s = 6; s <= 7; s++){
-    idx = s; render({forward:false});
-    assert(!!SLOT_HOLDER[s], "exactly one slot token visible at station "+(s+1));
-  }
+  assert(mainEl.querySelector('.pane[data-pane="master"] [data-role="status"]').textContent.indexOf("0 claims") >= 0, "claims drop to 0 by Ship/Note");
+  idx = 5; render({forward:false});
+  assert(mainEl.querySelector('.pane[data-pane="master"] [data-role="status"]').textContent.indexOf("1 claims") >= 0, "claims still 1 before Ship");
   console.assert(fails.length === 0, "full-power selftest failures:", fails);
   if (fails.length === 0) console.log("full-power selftest: OK"); else console.log(fails);
   idx = 0; decisionChoice = null; render({forward:false});
