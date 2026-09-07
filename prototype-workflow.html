@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workflow page prototype</title>
+<!-- PROTOTYPE, throwaway. Three variants of the workflow page, switchable via ?variant=A|B|C or the bar at the bottom.
+     Question: which structure makes "idea to shipped, and remembered" readable in one pass? -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#eef0f3;--surface:#f7f8fa;--ink:#16191f;--muted:#5c6470;--line:#cfd4dc;--line-strong:#a9b1bd;--accent:#0e7c86;--accent-ink:#fff;
+  --sans:"Archivo",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1318;--surface:#161b22;--ink:#e6eaf0;--muted:#8b95a3;--line:#2a323d;--line-strong:#3d4755;--accent:#3fb6bf;--accent-ink:#0f1318}}
+:root[data-theme="dark"]{--bg:#0f1318;--surface:#161b22;--ink:#e6eaf0;--muted:#8b95a3;--line:#2a323d;--line-strong:#3d4755;--accent:#3fb6bf;--accent-ink:#0f1318}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:96px}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+h1{font-size:clamp(30px,4.5vw,46px);line-height:1.08;font-stretch:90%}
+h2{font-size:26px;line-height:1.15}h3{font-size:17px}
+p{margin:0}a{color:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding:48px 24px 40px}
+.lede{color:var(--muted);max-width:58ch;margin-top:14px;font-size:17px}
+.lede strong{color:var(--ink);font-weight:500}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.02em;padding:2px 7px;border-radius:3px;border:1px solid var(--line-strong);color:var(--muted);vertical-align:middle}
+.tag.h{border-color:var(--accent);color:var(--accent)}
+.variant{display:none}.variant.on{display:block}
+
+/* ---------- A: the line ---------- */
+.a-steps{margin-top:56px;display:grid;grid-template-columns:1fr;gap:0}
+.a-step{display:grid;grid-template-columns:72px minmax(0,3fr) minmax(0,4fr);gap:0 32px;padding:30px 0;border-top:1px solid var(--line)}
+.a-step:last-child{border-bottom:1px solid var(--line)}
+.a-n{font-family:var(--mono);font-size:13px;color:var(--accent);padding-top:6px}
+.a-what h2{font-size:24px}
+.a-what p{color:var(--muted);margin-top:8px;max-width:34ch}
+.a-who{display:grid;gap:10px;padding-top:6px}
+.a-who div{display:grid;grid-template-columns:150px 1fr;gap:12px;font-size:15px;align-items:start}
+.a-who .w{color:var(--muted);font-size:13px;padding-top:3px}
+.a-who .w.h{color:var(--ink);font-weight:600}
+.a-back{margin-top:48px;padding:28px 0 0;border-top:2px solid var(--accent);display:grid;grid-template-columns:minmax(0,3fr) minmax(0,4fr);gap:32px}
+.a-back p{color:var(--muted);margin-top:8px;max-width:34ch}
+.a-back ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:15px}
+.a-back li b{font-weight:600}.a-back li span{color:var(--muted)}
+@media (max-width:760px){.a-step{grid-template-columns:1fr;gap:12px}.a-n{padding:0}.a-who div{grid-template-columns:1fr;gap:2px}.a-back{grid-template-columns:1fr}}
+
+/* ---------- B: you vs. away from keyboard ---------- */
+.b-cols{margin-top:48px;display:grid;grid-template-columns:minmax(0,5fr) 56px minmax(0,7fr);gap:0 20px}
+.b-col h2{font-size:15px;font-weight:600;color:var(--muted);padding-bottom:12px;border-bottom:1px solid var(--line-strong)}
+.b-col h2 b{display:block;color:var(--ink);font-size:24px;letter-spacing:-.01em;margin-bottom:4px}
+.b-col.you h2 b{color:var(--accent)}
+.b-item{padding:22px 0;border-bottom:1px solid var(--line)}
+.b-item h3{font-size:18px}
+.b-item p{color:var(--muted);margin-top:6px;font-size:15px;max-width:44ch}
+.b-item .who{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
+.b-arrows{display:grid;grid-auto-rows:1fr;padding-top:64px}
+.b-arrows span{display:flex;align-items:center;justify-content:center;color:var(--line-strong);font-size:22px}
+.b-arrows span.back{color:var(--accent)}
+.b-loop{margin-top:40px;padding:24px 28px;border:1px solid var(--accent);border-radius:8px;display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
+.b-loop h3{color:var(--accent)}
+.b-loop p{color:var(--muted);font-size:15px}
+.b-loop p b{color:var(--ink);font-weight:600}
+@media (max-width:760px){.b-cols{grid-template-columns:1fr}.b-arrows{display:none}.b-col+.b-col{margin-top:32px}}
+
+/* ---------- C: the loop ---------- */
+.c-stage{margin-top:40px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;align-items:center}
+.c-ring{width:100%;max-width:520px;margin:0 auto;display:block}
+.c-ring .node{cursor:pointer}
+.c-ring .node circle{fill:var(--bg);stroke:var(--line-strong);stroke-width:1.5}
+.c-ring .node text{font-family:var(--sans);font-size:15px;font-weight:600;fill:var(--ink);text-anchor:middle;dominant-baseline:middle}
+.c-ring .node.on circle{fill:var(--accent);stroke:var(--accent)}
+.c-ring .node.on text{fill:var(--accent-ink)}
+.c-ring .node:hover circle{stroke:var(--accent)}
+.c-ring .arc{fill:none;stroke:var(--line-strong);stroke-width:1.5}
+.c-ring .arc.back{stroke:var(--accent);stroke-width:2;stroke-dasharray:4 5}
+.c-ring .hub text{font-family:var(--mono);font-size:12px;fill:var(--muted);text-anchor:middle;dominant-baseline:middle}
+.c-ring .hub circle{fill:var(--surface);stroke:var(--accent);stroke-width:1.5}
+.c-ring .hub .t{font-family:var(--sans);font-size:15px;font-weight:600;fill:var(--ink)}
+.c-detail{min-height:300px}
+.c-detail .k{font-family:var(--mono);font-size:12px;color:var(--accent)}
+.c-detail h2{margin-top:6px}
+.c-detail .what{color:var(--muted);margin-top:10px;font-size:17px;max-width:40ch}
+.c-detail dl{margin:22px 0 0;display:grid;grid-template-columns:150px 1fr;gap:10px 16px;font-size:15px}
+.c-detail dt{color:var(--muted);font-size:13px;padding-top:3px}
+.c-detail dt.h{color:var(--ink);font-weight:600}
+.c-detail dd{margin:0}
+.c-nav{margin-top:20px;display:flex;gap:8px}
+.c-nav button{font:inherit;font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--line-strong);background:transparent;color:var(--ink);cursor:pointer}
+@media (max-width:760px){.c-stage{grid-template-columns:1fr}}
+
+/* ---------- switcher (not part of the design) ---------- */
+.proto{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;background:#111;color:#fff;
+  border-radius:999px;padding:6px 8px;font:13px/1 var(--mono);box-shadow:0 8px 30px rgba(0,0,0,.35);z-index:99}
+.proto button{font:inherit;background:#2a2a2a;color:#fff;border:0;border-radius:999px;width:32px;height:32px;cursor:pointer}
+.proto span{padding:0 10px;min-width:260px;text-align:center}
+.proto em{font-style:normal;color:#9ad}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<!-- ===================== A ===================== -->
+<section class="variant" data-v="A" data-name="The line: one station per row">
+<div class="wrap">
+  <h1>From idea to shipped, and remembered</h1>
+  <p class="lede"><strong>People decide. Agents build. The hub remembers.</strong> Eight stations, read top to bottom. On the right, who is at each one.</p>
+
+  <div class="a-steps">
+    <div class="a-step"><div class="a-n">1</div>
+      <div class="a-what"><h2>A need shows up</h2><p>One line is enough. A client, an incident, or a day of friction.</p></div>
+      <div class="a-who"><div><span class="w h">You</span><span>Say it. "Nine gate cycles by hand" started a track.</span></div>
+        <div><span class="w">Coordinator</span><span>Reads the handoff, memory and the repo before acting.</span></div>
+        <div><span class="w">Hub</span><span>Serves rules, decisions, bites and the last handoff first.</span></div></div></div>
+    <div class="a-step"><div class="a-n">2</div>
+      <div class="a-what"><h2>Decide once</h2><p>Stack, hosting, scope, order. Written down, then closed.</p></div>
+      <div class="a-who"><div><span class="w h">You</span><span>Close it. It goes to the PRD and the hub and stays closed.</span></div>
+        <div><span class="w">Coordinator</span><span>Diagnoses on real data before anyone builds.</span></div>
+        <div><span class="w">Hub</span><span>Serves the decision to every later session.</span></div></div></div>
+    <div class="a-step"><div class="a-n">3</div>
+      <div class="a-what"><h2>One session owns the track</h2><p>You talk to the coordinator. It talks to the lanes.</p></div>
+      <div class="a-who"><div><span class="w h">You</span><span>Open the session on the track's handoff.</span></div>
+        <div><span class="w">Coordinator</span><span>Claims the track's scope so parallel tracks see each other.</span></div>
+        <div><span class="w">Hub</span><span>Says CONFLICT or SIMILAR if someone is already there.</span></div></div></div>
+    <div class="a-step"><div class="a-n">4</div>
+      <div class="a-what"><h2>Split into briefs</h2><p>Each lane gets a scope, a pattern to copy, and the decisions it may not make.</p></div>
+      <div class="a-who"><div><span class="w">Coordinator</span><span>Writes the brief. Reserved decisions are named.</span></div>
+        <div><span class="w">Lane</span><span>Takes a worktree and a child claim under the coordinator's.</span></div>
+        <div><span class="w h">You</span><span>Hear about it only if a decision was reserved for you.</span></div></div></div>
+    <div class="a-step"><div class="a-n">5</div>
+      <div class="a-what"><h2>Build, away from keyboard</h2><p>Typing happens in panes you can watch but don't have to.</p></div>
+      <div class="a-who"><div><span class="w">Lane</span><span>Implements step by step, visibly. No subagents.</span></div>
+        <div><span class="w">Coordinator</span><span>Waits for the sentinel, nudges stalls, writes no feature code.</span></div>
+        <div><span class="w h">You</span><span>Blocked work reaches you as a question with options.</span></div></div></div>
+    <div class="a-step"><div class="a-n">6</div>
+      <div class="a-what"><h2>Every PR passes one gate</h2><p>One reviewer, ten items, at the exact sha. Green checks are not a review.</p></div>
+      <div class="a-who"><div><span class="w">Lane</span><span>Prints the sentinel with the sha, opens the PR with a Go section.</span></div>
+        <div><span class="w">Coordinator</span><span>Cold review, one mutation per guard, ponytail pass. Rework as a file.</span></div>
+        <div><span class="w">CI</span><span>Runs the race suite; the sentinel becomes a report.</span></div>
+        <div><span class="w h">You</span><span>Read the scorecard, not the checks.</span></div></div></div>
+    <div class="a-step"><div class="a-n">7</div>
+      <div class="a-what"><h2>Ship</h2><p>Squash-merge, release the claims, restart the hub.</p></div>
+      <div class="a-who"><div><span class="w">Coordinator</span><span>Lands it in one move. Re-gates the second of two sibling PRs.</span></div>
+        <div><span class="w">Lane</span><span>Releases its own claim; the pane is reused.</span></div>
+        <div><span class="w h">You</span><span>Merge what machines may not, and read "Go to read here".</span></div></div></div>
+    <div class="a-step"><div class="a-n">8</div>
+      <div class="a-what"><h2>Leave it findable</h2><p>What was learned outlives the session that learned it.</p></div>
+      <div class="a-who"><div><span class="w">Coordinator</span><span>Dated note by PR, a handoff, bites with triggers.</span></div>
+        <div><span class="w h">You</span><span>Say what bit you. It becomes a rule, not a memory.</span></div>
+        <div><span class="w">Hub</span><span>Carries it into station 1 of the next session.</span></div></div></div>
+  </div>
+
+  <div class="a-back">
+    <div><h2>What flows back</h2><p>GitHub keeps the code. The hub keeps what the team learned, and serves it first next time.</p></div>
+    <ul>
+      <li><b>Rules</b> <span>Never force-push. Lanes never delegate. Every PR passes the gate.</span></li>
+      <li><b>Decisions</b> <span>Go over TS. VM over Cloud Run. Plugin before daemon.</span></li>
+      <li><b>Bites</b> <span>What bit us, with a trigger. Shown before the command runs.</span></li>
+      <li><b>Facts</b> <span>Measured, with an expiry.</span></li>
+      <li><b>Handoff</b> <span>Where the track is right now. Read first.</span></li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<!-- ===================== B ===================== -->
+<section class="variant" data-v="B" data-name="Two columns: you vs. away from keyboard">
+<div class="wrap">
+  <h1>From idea to shipped, and remembered</h1>
+  <p class="lede"><strong>Left: the four moments that need you. Right: everything that happens while you are away.</strong> The hub carries the right column back to the top of the left one.</p>
+
+  <div class="b-cols">
+    <div class="b-col you">
+      <h2><b>You</b>in the loop, four times</h2>
+      <div class="b-item"><h3>Say what you need</h3><p>One line. A client, an incident, or a day of friction.</p></div>
+      <div class="b-item"><h3>Decide once</h3><p>Stack, hosting, scope, order. It goes to the PRD and the hub, and stays closed.</p></div>
+      <div class="b-item"><h3>Answer the rare question</h3><p>Only decisions the brief reserved for you come back. As options, not essays.</p></div>
+      <div class="b-item"><h3>Read the score, merge the rest</h3><p>The scorecard on the PR, not the green checks. Merge what machines may not. Read "Go to read here".</p></div>
+    </div>
+    <div class="b-arrows"><span>→</span><span>→</span><span>←</span><span>←</span></div>
+    <div class="b-col">
+      <h2><b>Away from keyboard</b>coordinator, lanes, hub and CI</h2>
+      <div class="b-item"><h3>The coordinator reads first</h3><p>Handoff, memory, repo. Then it diagnoses on real data and claims the track's scope.</p>
+        <div class="who"><span class="tag">coordinator</span><span class="tag">hub</span></div></div>
+      <div class="b-item"><h3>Briefs go to lanes</h3><p>Scope with file:line, a pattern to copy, test pins, and the decisions the lane may not make. Each lane takes a worktree and a child claim.</p>
+        <div class="who"><span class="tag">coordinator</span><span class="tag">lane</span></div></div>
+      <div class="b-item"><h3>Lanes type where they can be seen</h3><p>Step by step in their panes, no subagents. The coordinator waits for the sentinel and writes no feature code.</p>
+        <div class="who"><span class="tag">lane</span><span class="tag">herdr</span></div></div>
+      <div class="b-item"><h3>One gate, every PR</h3><p>Cold review at the exact sha: ten items, a mutation per guard, a ponytail pass. CI runs the race suite. Rework goes back as a file.</p>
+        <div class="who"><span class="tag">coordinator</span><span class="tag">CI</span></div></div>
+      <div class="b-item"><h3>Land, release, restart</h3><p>Squash-merge, claims released, hub restarted. The second of two sibling PRs is re-gated.</p>
+        <div class="who"><span class="tag">coordinator</span><span class="tag">hub</span></div></div>
+    </div>
+  </div>
+
+  <div class="b-loop">
+    <h3>And back</h3>
+    <p><b>Rules, decisions, bites, facts and the handoff</b> are written to the hub as the work happens, and served first in the next session. What the right column learned, the left column never has to repeat.</p>
+  </div>
+</div>
+</section>
+
+<!-- ===================== C ===================== -->
+<section class="variant" data-v="C" data-name="The loop: ring with one station open">
+<div class="wrap">
+  <h1>From idea to shipped, and remembered</h1>
+  <p class="lede"><strong>A loop, not a line.</strong> Click a station. The hub in the middle is what makes it a loop.</p>
+  <div class="c-stage">
+    <svg class="c-ring" viewBox="0 0 520 520" id="ring" aria-label="Eight stations around the hub"></svg>
+    <div class="c-detail" id="detail"></div>
+  </div>
+</div>
+</section>
+
+<div class="proto" role="group" aria-label="Prototype variant switcher">
+  <button type="button" id="prev" aria-label="Previous variant">←</button>
+  <span id="label"></span>
+  <button type="button" id="next" aria-label="Next variant">→</button>
+</div>
+
+<script>
+// ---- switcher
+var V=['A','B','C'];
+function cur(){var v=new URLSearchParams(location.search).get('variant');return V.indexOf(v)>=0?v:'A'}
+function show(v){
+  document.querySelectorAll('.variant').forEach(function(s){s.classList.toggle('on',s.dataset.v===v)});
+  var s=document.querySelector('.variant[data-v="'+v+'"]');
+  document.getElementById('label').innerHTML='<em>'+v+'</em> — '+s.dataset.name;
+  var u=new URL(location);u.searchParams.set('variant',v);history.replaceState(null,'',u);
+  document.title='Prototype '+v+' · '+s.dataset.name;
+}
+function step(d){var i=(V.indexOf(cur())+d+V.length)%V.length;show(V[i])}
+document.getElementById('prev').onclick=function(){step(-1)};
+document.getElementById('next').onclick=function(){step(1)};
+document.addEventListener('keydown',function(e){
+  var t=e.target;if(t.matches('input,textarea,[contenteditable]'))return;
+  if(e.key==='ArrowLeft')step(-1);if(e.key==='ArrowRight')step(1);
+});
+show(cur());
+
+// ---- variant C data + ring
+var ST=[
+ ['Idea','A need shows up. One line is enough.',[['You','Say it. "Nine gate cycles by hand" started a track.',1],['Coordinator','Reads the handoff, memory and the repo before acting.'],['Hub','Serves rules, decisions, bites and the last handoff first.']]],
+ ['Decide','Stack, hosting, scope, order. Written down, then closed.',[['You','Close it. It goes to the PRD and the hub and stays closed.',1],['Coordinator','Diagnoses on real data before anyone builds.'],['Hub','Serves the decision to every later session.']]],
+ ['Track','One coordinator session owns the track.',[['You','Open the session on the handoff.',1],['Coordinator','Claims the scope so parallel tracks see each other.'],['Hub','CONFLICT or SIMILAR if someone is already there.']]],
+ ['Split','Each lane gets a brief and a child claim.',[['Coordinator','Writes the brief. Reserved decisions are named.'],['Lane','Worktree, child claim, reads the whole brief.'],['You','Hear about it only if a decision was reserved for you.',1]]],
+ ['Build','Typing happens in panes, away from keyboard.',[['Lane','Step by step, visibly. No subagents.'],['Coordinator','Waits for the sentinel, nudges stalls, writes no feature code.'],['You','Blocked work reaches you as a question with options.',1]]],
+ ['Gate','One reviewer, ten items, at the exact sha.',[['Lane','Sentinel with the sha; PR with a Go section.'],['Coordinator','Cold review, a mutation per guard, ponytail pass.'],['CI','Race suite; the sentinel becomes a report.'],['You','Read the scorecard, not the checks.',1]]],
+ ['Ship','Squash-merge, release the claims, restart the hub.',[['Coordinator','Lands it in one move; re-gates the sibling PR.'],['Lane','Releases its own claim.'],['You','Merge what machines may not; read "Go to read here".',1]]],
+ ['Learn','What was learned outlives the session.',[['Coordinator','Dated note by PR, handoff, bites with triggers.'],['You','Say what bit you. It becomes a rule, not a memory.',1],['Hub','Carries it into Idea, next session.']]]
+];
+var svg=document.getElementById('ring'),NS='http://www.w3.org/2000/svg',cx=260,cy=260,R=200,sel=0;
+function el(n,a){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);return e}
+function pos(i){var a=-Math.PI/2+i*Math.PI*2/8;return [cx+R*Math.cos(a),cy+R*Math.sin(a)]}
+var arc=el('circle',{cx:cx,cy:cy,r:R,'class':'arc'});svg.appendChild(arc);
+var p7=pos(7),p0=pos(0);
+svg.appendChild(el('path',{d:'M'+p7[0]+' '+p7[1]+' Q '+cx+' '+cy+' '+p0[0]+' '+p0[1],'class':'arc back'}));
+var hub=el('g',{'class':'hub'});hub.appendChild(el('circle',{cx:cx,cy:cy,r:62}));
+var ht=el('text',{x:cx,y:cy-10,'class':'t'});ht.textContent='the hub';hub.appendChild(ht);
+var hs=el('text',{x:cx,y:cy+12});hs.textContent='remembers';hub.appendChild(hs);svg.appendChild(hub);
+ST.forEach(function(s,i){var p=pos(i),g=el('g',{'class':'node','data-i':i,tabindex:0,role:'button'});
+  g.appendChild(el('circle',{cx:p[0],cy:p[1],r:40}));var t=el('text',{x:p[0],y:p[1]});t.textContent=s[0];g.appendChild(t);
+  g.onclick=function(){pick(i)};g.onkeydown=function(e){if(e.key==='Enter'||e.key===' ')pick(i)};svg.appendChild(g)});
+function pick(i){sel=i;svg.querySelectorAll('.node').forEach(function(n){n.classList.toggle('on',+n.dataset.i===i)});
+  var s=ST[i],h='<div class="k">station '+(i+1)+' of 8</div><h2>'+s[0]+'</h2><p class="what">'+s[1]+'</p><dl>';
+  s[2].forEach(function(w){h+='<dt class="'+(w[2]?'h':'')+'">'+w[0]+'</dt><dd>'+w[1]+'</dd>'});
+  h+='</dl><div class="c-nav"><button type="button" onclick="pick('+((i+7)%8)+')">Previous</button><button type="button" onclick="pick('+((i+1)%8)+')">Next station</button></div>';
+  document.getElementById('detail').innerHTML=h}
+pick(0);
+</script>
+</body>
+</html>
