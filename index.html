@@ -60,8 +60,11 @@ button{font:inherit;cursor:pointer}
 .line em{font-style:normal;color:var(--muted)}
 .ask{margin-top:12px;display:none;gap:8px;flex-wrap:wrap;align-items:center}
 .ask.on{display:flex}
-.ask button{border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px}
-.ask button:hover{background:var(--accent);color:var(--accent-ink)}
+.ask .wait{flex-basis:100%;font-weight:700;color:var(--accent)}
+.ask .wait b{font-weight:700;color:var(--ink)}
+.node.you.waiting{background:#eef1fb}
+.ask button{border:1px solid var(--accent);color:var(--accent-ink);background:var(--accent);border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px}
+.ask button:hover{background:#1f3a8f}
 .log{margin-top:10px;font-size:14px;color:var(--muted);display:grid;gap:4px}
 .log div::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--line-strong);margin-right:8px;vertical-align:middle}
 .log div.hot::before{background:var(--accent)}
@@ -185,7 +188,7 @@ var TRACKS=[
 var $=function(id){return document.getElementById(id)};
 var tracksEl=$('tracks'),steps=[].slice.call(document.querySelectorAll('.step'));
 var state={i:-1,answer:null};
-var timer=null,playing=false,pending=[];
+var timer=null,playing=false,pending=[],resume=false;
 var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 var quiet=reduced; /* true while rebuilding for a jump: no animation, no delays */
 var D=0.35;
@@ -215,7 +218,7 @@ function wire(fromK,toK,text){
   var p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d','M'+x1+' '+y1+' Q '+((x1+x2)/2)+' '+cy+' '+x2+' '+y2);svg.appendChild(p);
   var pill=document.createElement('div');pill.className='pill';pill.textContent=text;tree.appendChild(pill);
   if(quiet){pill.style.left=((x1+x2)/2-90)+'px';pill.style.top=(cy-2)+"px";return}
-  gsap.fromTo(pill,{left:x1-40,top:y1-14,opacity:0},{left:x2-140,top:y2-14,opacity:1,duration:1.2,ease:'power1.inOut'});
+  gsap.fromTo(pill,{left:x1-40,top:y1-14,opacity:0},{left:(x1+x2)/2-90,top:cy-2,opacity:1,duration:1.2,ease:'power1.inOut'});
 }
 function clearWire(){$('wire').innerHTML='';[].forEach.call(document.querySelectorAll('.pill'),function(p){p.remove()})}
 
@@ -246,8 +249,8 @@ var STEPS=[
   log($('mlog'),'Tax rounding needs you: half-up or banker\'s rounding?',true);
   later(function(){wire('csv','pdf','money/format.ts is yours, we wait')},400);
   if(state.answer){answered(state.answer,true)}else{
-    var ask=$('ask');ask.innerHTML='<span>The master asks:</span> <b>Rounding mode?</b> <button data-a="Half-up">Half-up</button><button data-a="Banker\'s">Banker\'s</button>';ask.classList.add('on');
-    hold();
+    var ask=$('ask');ask.innerHTML='<div class="wait">Waiting for you. The master asks: <b>rounding mode?</b></div><button data-a="Half-up">Half-up</button><button data-a="Banker\'s">Banker\'s</button>';ask.classList.add('on');
+    resume=playing;hold();paint();
   }
  },
  function gate(){
@@ -275,12 +278,12 @@ var STEPS=[
 function answered(a,silent){state.answer=a;var ask=$('ask');ask.classList.remove('on');ask.innerHTML='';
   $('youline').innerHTML='<em>You answered:</em> '+a+'. Work resumes.';
   setLane('tax','lane-tax-1','unblocked: '+a.toLowerCase()+' rounding',true);log(clog('tax'),'Answer from the master: '+a+'. Lane resumed.');
-  if(!silent&&playing)schedule()}
+  if(!silent&&resume){resume=false;playing=true;paint();schedule()}}
 $('ask').addEventListener('click',function(e){if(e.target.dataset.a)answered(e.target.dataset.a)});
 
 function paint(){steps.forEach(function(s,i){s.classList.toggle('done',i<state.i);s.classList.toggle('now',i===state.i)});
   $('back').disabled=state.i<0;$('fwd').disabled=state.i>=STEPS.length-1;
-  $('play').textContent=playing?'Pause':(state.i>=STEPS.length-1?'Play again':(state.i<0?'Play the day':'Play'))}
+  $('you').classList.toggle('waiting',asking());$('play').textContent=asking()?'Waiting for you':playing?'Pause':(state.i>=STEPS.length-1?'Play again':(state.i<0?'Play the day':'Play'))}
 function blank(){clearLater();clearWire();$('say').classList.remove('hidden');$('youline').textContent='';$('ask').classList.remove('on');$('ask').innerHTML='';
   $('link1').classList.add('hidden');$('master').classList.add('hidden');$('mlog').innerHTML='';$('fan').classList.add('hidden');tracksEl.innerHTML=''}
 function goto(n){var keep=state.answer;blank();state={i:-1,answer:keep};
@@ -292,7 +295,7 @@ function schedule(){clearTimeout(timer);if(!playing)return;timer=setTimeout(func
 function hold(){playing=false;clearTimeout(timer);paint()}
 function play(){if(state.i>=STEPS.length-1)goto(-1);playing=true;next();if(!asking())schedule();paint()}
 
-$('play').onclick=function(){playing?hold():play()};
+$('play').onclick=function(){if(asking())return;playing?hold():play()};
 $('fwd').onclick=function(){hold();next()};
 $('back').onclick=function(){hold();goto(state.i-1)};
 $('reset').onclick=function(){hold();state.answer=null;goto(-1)};
