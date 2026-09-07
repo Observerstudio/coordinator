@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Full power</title>
+<meta name="description" content="A mock replay of one day of coordinated agent work: a master, three coordinators, six lanes, one shared decision.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+:root{
+  --bg:#f6f5f1; --card:#fffefb; --ink:#1d2230; --muted:#6a7080; --line:#d9d8d2; --line-strong:#b9b8b0;
+  --accent:#2d4fb5; --accent-ink:#ffffff;
+  --sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:88px}
+h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.02em}
+h1{font-size:clamp(22px,3.4vw,30px);font-weight:800}
+p{margin:0}
+button{font:inherit;cursor:pointer}
+code{font-family:var(--mono);font-size:.85em}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1200px;margin:0 auto;padding:32px 20px 24px}
+
+/* stations strip */
+.steps{margin-top:20px;display:grid;grid-template-columns:repeat(8,1fr);gap:10px}
+.step{border-top:3px solid var(--line-strong);padding-top:8px;font-size:12.5px;color:var(--muted)}
+.step b{display:block;font-weight:700;color:var(--ink);margin-bottom:2px;font-size:13px}
+.step[data-lit="past"]{border-top-color:var(--ink)}
+.step[data-lit="now"]{border-top-color:var(--accent)}
+.step[data-lit="now"] b{color:var(--accent)}
+@media (max-width:820px){.steps{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:480px){.steps{grid-template-columns:repeat(2,1fr)}}
+
+/* you bar */
+.youbar{margin-top:22px;background:var(--card);border:2px solid var(--accent);border-radius:10px;padding:12px 18px;display:flex;gap:14px;align-items:baseline}
+.youbar b{color:var(--accent)}
+.youbar span{color:var(--muted);font-size:14.5px}
+.youbar input{flex:1;min-width:120px;border:1px solid var(--line-strong);border-radius:6px;padding:8px 10px;font:inherit;background:#fff;color:var(--ink)}
+.youbar button{border:1px solid var(--line-strong);background:var(--ink);color:#fff;border-radius:6px;padding:8px 14px;font-weight:700}
+.youbar button:disabled{opacity:.4;cursor:default}
+
+/* master */
+.master{margin-top:16px;background:var(--card);border:1px solid var(--line-strong);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:12px}
+.badge{font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;border:1px solid var(--line-strong);color:var(--muted)}
+.badge.opus{border-color:var(--accent);color:var(--accent)}
+.master .txt{color:var(--muted);font-size:14.5px}
+
+/* tabs */
+.tabs{margin-top:20px;display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start}
+.tabbar{display:flex;gap:8px}
+.tabbtn{border:1px solid var(--line-strong);background:var(--card);border-radius:8px 8px 0 0;padding:8px 14px;font-weight:700;font-size:14px;color:var(--muted)}
+.tabbtn[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--card);position:relative;top:1px}
+.tabpanels{border:1px solid var(--line-strong);border-radius:0 8px 8px 8px;background:var(--card);padding:16px}
+.tabpanel[hidden]{display:none}
+.coordnode{border:1px solid var(--line-strong);border-radius:8px;padding:10px 12px;background:var(--bg);display:flex;align-items:center;gap:10px}
+.coordnode .txt{color:var(--muted);font-size:13.5px}
+.lanes2{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lane{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff;cursor:pointer}
+.lane b{display:block;font-size:12.5px;margin-bottom:6px}
+.lane pre{margin:0;font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:pre-wrap;line-height:1.5;min-height:1.5em}
+.rowline{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.prchip{font-size:12.5px;font-weight:700;border-radius:999px;padding:4px 10px;border:1px solid var(--line-strong);color:var(--muted)}
+.prchip[data-state="open"]{color:var(--ink)}
+.prchip[data-state="score"]{color:var(--accent);border-color:var(--accent)}
+.prchip[data-state="merged"]{color:#1c7a3d;border-color:#1c7a3d}
+.slot{font-size:11px;font-weight:700;color:#8a5a00;border:1px solid #d8b25c;background:#fff8e6;border-radius:999px;padding:3px 9px}
+.slot[hidden]{display:none}
+
+/* right rail */
+.rail{border:1px solid var(--line-strong);border-radius:10px;background:var(--card);padding:14px;max-height:520px;overflow:auto}
+.rail h2{font-size:14px;margin-bottom:10px}
+.rail .hint{color:var(--muted);font-size:13px}
+.msg{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-top:8px;font-size:13px;background:#fff}
+.msg .from{font-weight:700;font-size:11.5px;color:var(--accent)}
+@media (max-width:980px){.tabs{grid-template-columns:1fr}}
+
+/* side panel */
+.panel{position:fixed;inset:0;background:rgba(29,34,48,.35);display:flex;justify-content:flex-end;z-index:20}
+.panel[hidden]{display:none}
+.panel .box{width:min(420px,92vw);background:var(--card);height:100%;padding:20px;overflow:auto;border-left:1px solid var(--line-strong)}
+.panel pre{white-space:pre-wrap;font-family:var(--mono);font-size:13px;color:var(--ink);margin-top:10px}
+.panel button{border:1px solid var(--line-strong);background:transparent;border-radius:6px;padding:6px 10px}
+
+/* controls */
+.controls{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line-strong);padding:10px 16px;display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap}
+.controls button{border:1px solid var(--line-strong);background:#fff;border-radius:6px;padding:7px 12px;font-weight:700}
+.controls input[type=range]{width:min(320px,40vw)}
+.controls .station{font-size:13px;color:var(--muted);min-width:110px}
+@media (max-width:820px){body{overflow-x:hidden}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Full power</h1>
+<p style="color:var(--muted);margin-top:6px">One master, three coordinators, six lanes. Mock data, one shared decision, one merge slot.</p>
+
+<div class="steps" id="steps"></div>
+
+<div class="youbar">
+  <b>You</b>
+  <input id="needInput" value="Ship the invoicing fixes this week." />
+  <button id="sendBtn">Enter</button>
+  <span id="youNote"></span>
+</div>
+
+<div class="master">
+  <span class="badge opus">Opus</span>
+  <span class="txt" id="masterTxt">waiting for you</span>
+</div>
+
+<div class="tabs">
+  <div>
+    <div class="tabbar" id="tabbar"></div>
+    <div class="tabpanels" id="tabpanels"></div>
+  </div>
+  <div class="rail" id="rail">
+    <h2>Messages</h2>
+    <div class="hint" id="railHint">Nothing yet. Play to begin.</div>
+  </div>
+</div>
+</div>
+
+<div class="panel" id="panel" hidden>
+  <div class="box">
+    <button id="panelClose">Close (Esc)</button>
+    <h2 id="panelTitle" style="margin-top:12px"></h2>
+    <pre id="panelBody"></pre>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="stepBack" aria-label="Step back">&larr;</button>
+  <button id="playPause" aria-label="Play or pause">Play</button>
+  <button id="stepFwd" aria-label="Step forward">&rarr;</button>
+  <input type="range" id="scrub" min="0" max="1" step="0.001" value="0" aria-label="Scrub">
+  <span class="station" id="stationLabel">1. Need</span>
+</div>
+
+<script>
+(function(){
+"use strict";
+var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+var STATION_NAMES = ["Need","Decide","Brief","Build","Collide","Gate","Ship","Note"];
+var TRACKS = [
+  {key:"pdf", name:"Invoice PDF", lanes:["lane-pdf-1","lane-pdf-2"]},
+  {key:"tax", name:"Tax rounding", lanes:["lane-tax-1","lane-tax-2"]},
+  {key:"csv", name:"CSV export", lanes:["lane-csv-1","lane-csv-2"]}
+];
+
+/* Cumulative deltas per station: what gets appended at each station, per track. */
+var LANE_LINES = {
+  pdf: [[], [], ["lane-pdf-1: claim c_a1 scope invoice/pdf"], ["lane-pdf-1: worktree ready, writing render.go", "lane-pdf-2: writing pdf_test.go"], ["lane-pdf-1: touching money/format.ts, merging first"], ["lane-pdf-1: gate 10/10, squash-merge"], [], ["lane-pdf-1: released claim"]],
+  tax: [[], [], ["lane-tax-1: claim c_a2 scope tax/rounding"], ["lane-tax-1: hit reserved decision, paused"], ["lane-tax-1: resumed with your call"], ["lane-tax-1: gate 10/10, squash-merge"], [], ["lane-tax-1: released claim"]],
+  csv: [[], [], ["lane-csv-1: claim c_a3 scope csv/export"], ["lane-csv-1: writing exporter.go", "lane-csv-2: writing exporter_test.go"], ["lane-csv-1: waiting on money/format.ts", "lane-csv-1: rebased onto main"], ["lane-csv-1: gate 9/10, item 6 reworked", "lane-csv-1: gate 10/10, squash-merge"], [], ["lane-csv-1: released claim"]]
+};
+var COORD_STATE = {
+  pdf: ["idle","idle","briefing","building","building","gating","merged","noted"],
+  tax: ["idle","idle","briefing","building","building","gating","merged","noted"],
+  csv: ["idle","idle","briefing","building","building","gating","merged","noted"]
+};
+var PR_STATE = {
+  pdf: ["none","none","none","none","none","score","merged","merged"],
+  tax: ["none","none","none","none","none","score","merged","merged"],
+  csv: ["none","none","none","none","none","score","merged","merged"]
+};
+var PR_LABEL = {none:"no PR", score:"9/10", merged:"merged"};
+var SLOT_HOLDER = ["", "", "", "", "pdf", "pdf", "csv", "csv"]; /* which track holds the slot, by station index; empty = none visible */
+/* station 6 (Gate, index5): csv reaches 10/10 after rework */
+var PR_LABEL_OVERRIDE = {"csv-5":"10/10","pdf-5":"9/10"};
+
+var RAIL = [
+  [],
+  [{from:"Master", to:"You", text:"Splitting into three tracks: PDF, tax rounding, CSV export."}],
+  [{from:"coord-pdf", to:"Master", text:"Brief written: scope, files, pattern to copy."}],
+  [{from:"coord-tax", to:"Master", text:"Lane paused on a reserved decision."}],
+  [{from:"coord-pdf", to:"coord-csv", text:"Both touch money/format.ts. I merge first, you rebase."}, {from:"coord-csv", to:"coord-pdf", text:"Waiting on your merge."}],
+  [{from:"coord-csv", to:"Master", text:"Gate item 6 failed (mutation didn't bite). Sent back."}, {from:"coord-csv", to:"Master", text:"Reworked. 10/10."}],
+  [{from:"coord-pdf", to:"Master", text:"Merged."}, {from:"coord-tax", to:"Master", text:"Merged."}, {from:"coord-csv", to:"Master", text:"Merged."}],
+  [{from:"Master", to:"You", text:"Three PRs merged. One decision recorded. Nothing blocked."}]
+];
+
+var YOU_NOTE = ["", "", "", "", "", "", "", "Master reported back."];
+var MASTER_TXT = [
+  "waiting for you",
+  "read PRD + last handoff, splitting the work",
+  "coordinators writing briefs",
+  "lanes building; tax-rounding has hit a reserved decision",
+  "PDF and CSV both need money/format.ts",
+  "gating three PRs against the ten-item review",
+  "three squash-merges, one slot, no collisions",
+  "done for the day"
+];
+
+var TRANSCRIPTS = {
+  master: ["Reads PRD and last handoff.", "Splits: Invoice PDF, Tax rounding, CSV export.", "Opens three tabs, one coordinator each.", "Waits for evidence, not typing."],
+  "coord-pdf": ["Brief: scope invoice/pdf, pattern to copy, no reserved decisions.", "Watches lane-pdf-1 build.", "Merges first into money/format.ts.", "Gate: 9/10 -> 10/10 not needed, merged at first pass."],
+  "coord-tax": ["Brief: scope tax/rounding.", "Reserved decision: rounding mode. Lane paused, asked you.", "Resumed after your call.", "Gate 10/10, merged."],
+  "coord-csv": ["Brief: scope csv/export.", "Waits for PDF's merge to money/format.ts, then rebases.", "Gate item 6 failed: mutation didn't bite. Sent back as a file.", "Reworked, gate 10/10, merged."],
+  "lane-pdf-1": ["claim c_a1 scope invoice/pdf", "worktree wt-pdf-1 ready", "render.go: PDF layout for line items", "commit: add invoice PDF renderer", "PR opened against main"],
+  "lane-pdf-2": ["pdf_test.go: golden file for layout", "commit: add renderer tests"],
+  "lane-tax-1": ["claim c_a2 scope tax/rounding", "hit reserved decision: half up or banker's?", "resumed: half up (your call)", "commit: round half up in tax calc", "PR opened, gate 10/10"],
+  "lane-tax-2": ["tax_test.go: rounding edge cases"],
+  "lane-csv-1": ["claim c_a3 scope csv/export", "exporter.go: CSV writer for line items", "waiting: PDF holds money/format.ts", "rebased onto main after PDF merge", "gate rework: mutation test on money.Round"],
+  "lane-csv-2": ["exporter_test.go: quoting and delimiters"]
+};
+
+/* ---------- state ---------- */
+var decisionChoice = null; /* null until picked */
+var idx = 0; /* current station index 0..7 */
+var activeTab = 0;
+var playing = false;
+var pendingPause = false;
+
+var stepsEl = document.getElementById("steps");
+var tabbarEl = document.getElementById("tabbar");
+var tabpanelsEl = document.getElementById("tabpanels");
+var railEl = document.getElementById("rail");
+var stationLabelEl = document.getElementById("stationLabel");
+var scrubEl = document.getElementById("scrub");
+var playBtn = document.getElementById("playPause");
+var masterTxtEl = document.getElementById("masterTxt");
+var youNoteEl = document.getElementById("youNote");
+var sendBtn = document.getElementById("sendBtn");
+var needInput = document.getElementById("needInput");
+
+STATION_NAMES.forEach(function(name, i){
+  var d = document.createElement("div");
+  d.className = "step"; d.dataset.i = i;
+  d.innerHTML = "<b>"+(i+1)+". "+name+"</b>";
+  stepsEl.appendChild(d);
+});
+
+TRACKS.forEach(function(t, i){
+  var b = document.createElement("button");
+  b.className = "tabbtn"; b.textContent = t.name; b.dataset.i = i;
+  b.setAttribute("role","tab"); b.setAttribute("aria-selected", i===0 ? "true":"false");
+  b.addEventListener("click", function(){ activeTab = i; render(); });
+  tabbarEl.appendChild(b);
+
+  var panel = document.createElement("div");
+  panel.className = "tabpanel"; panel.dataset.i = i;
+  panel.hidden = i !== 0;
+  panel.innerHTML =
+    '<div class="coordnode" data-node="coord-'+t.key+'"><span class="badge">Sonnet</span><span class="txt" data-role="coordtxt">idle</span></div>' +
+    '<div class="lanes2">' +
+      t.lanes.map(function(l){ return '<div class="lane" data-node="'+l+'"><b>'+l+'</b><pre data-role="lane"></pre></div>'; }).join("") +
+    '</div>' +
+    '<div class="rowline"><span class="prchip" data-role="pr" data-state="none">no PR</span><span class="slot" data-role="slot" hidden>holds the slot</span></div>';
+  tabpanelsEl.appendChild(panel);
+});
+
+/* click-through for transcripts */
+document.body.addEventListener("click", function(e){
+  var node = e.target.closest("[data-node]");
+  if (!node) return;
+  var key = node.dataset.node;
+  var lines = TRANSCRIPTS[key];
+  if (!lines) return;
+  openPanel(key, lines);
+});
+function openPanel(title, lines){
+  document.getElementById("panelTitle").textContent = title;
+  document.getElementById("panelBody").textContent = lines.join("\n");
+  document.getElementById("panel").hidden = false;
+}
+document.getElementById("panelClose").addEventListener("click", closePanel);
+function closePanel(){ document.getElementById("panel").hidden = true; }
+document.addEventListener("keydown", function(e){
+  if (e.key === "Escape") closePanel();
+  if (e.target === needInput) return;
+  if (e.key === " "){ e.preventDefault(); togglePlay(); }
+  if (e.key === "ArrowRight"){ e.preventDefault(); step(1); }
+  if (e.key === "ArrowLeft"){ e.preventDefault(); step(-1); }
+});
+
+/* ---------- render ---------- */
+function render(){
+  stepsEl.querySelectorAll(".step").forEach(function(el){
+    var i = +el.dataset.i;
+    el.dataset.lit = i < idx ? "past" : (i === idx ? "now" : "future");
+  });
+  stationLabelEl.textContent = (idx+1)+". "+STATION_NAMES[idx];
+  masterTxtEl.textContent = MASTER_TXT[idx];
+  youNoteEl.textContent = YOU_NOTE[idx];
+  needInput.disabled = idx > 0;
+  sendBtn.disabled = idx > 0;
+
+  tabbarEl.querySelectorAll(".tabbtn").forEach(function(b){ b.setAttribute("aria-selected", (+b.dataset.i===activeTab) ? "true":"false"); });
+  tabpanelsEl.querySelectorAll(".tabpanel").forEach(function(p){ p.hidden = (+p.dataset.i !== activeTab); });
+
+  TRACKS.forEach(function(t){
+    var panel = tabpanelsEl.querySelector('.tabpanel[data-i="'+TRACKS.indexOf(t)+'"]');
+    var coordState = COORD_STATE[t.key][idx];
+    panel.querySelector('[data-role="coordtxt"]').textContent = idx===0 ? "waiting for the master" : coordState;
+    t.lanes.forEach(function(l, li){
+      var acc = [];
+      for (var s=0; s<=idx; s++){
+        LANE_LINES[t.key][s].forEach(function(line){
+          if (line.indexOf(l+":") === 0) acc.push(line.slice(l.length+2));
+        });
+      }
+      panel.querySelectorAll('[data-role="lane"]')[li].textContent = acc.slice(-5).join("\n");
+    });
+    var pr = panel.querySelector('[data-role="pr"]');
+    var prState = PR_STATE[t.key][idx];
+    pr.dataset.state = prState;
+    var override = PR_LABEL_OVERRIDE[t.key+"-"+idx];
+    pr.textContent = override ? override : PR_LABEL[prState];
+    var slot = panel.querySelector('[data-role="slot"]');
+    slot.hidden = SLOT_HOLDER[idx] !== t.key;
+  });
+
+  var hint = document.getElementById("railHint");
+  var msgs = railEl.querySelectorAll(".msg");
+  msgs.forEach(function(m){ m.remove(); });
+  var all = [];
+  for (var s=0; s<=idx; s++){ all = all.concat(RAIL[s]); }
+  hint.style.display = all.length ? "none" : "block";
+  all.forEach(function(m, i){
+    var el = document.createElement("div");
+    el.className = "msg";
+    el.innerHTML = '<span class="from">'+m.from+' &rarr; '+m.to+'</span><div>'+m.text+'</div>';
+    railEl.appendChild(el);
+    if (i === all.length - 1 && !reduced) {
+      gsap.fromTo(el, {x: 24, opacity: 0}, {x: 0, opacity: 1, duration: 0.35});
+    }
+  });
+
+  scrubEl.value = idx/7;
+  playBtn.textContent = playing ? "Pause" : "Play";
+
+  maybePause();
+}
+
+function maybePause(){
+  var box = document.getElementById("youbarDecision");
+  if (box) box.remove();
+  if (idx === 3 && decisionChoice === null){
+    playing = false; playBtn.textContent = "Play";
+    var d = document.createElement("div");
+    d.id = "youbarDecision";
+    d.style.marginTop = "10px";
+    d.innerHTML = '<span style="color:var(--muted);font-size:14px">Round half up or banker\'s rounding?</span> ' +
+      '<button data-choice="up" style="margin-left:8px">Half up</button> ' +
+      '<button data-choice="bankers">Banker\'s</button>';
+    document.querySelector(".youbar").insertAdjacentElement("afterend", d);
+    d.querySelectorAll("button").forEach(function(b){
+      b.addEventListener("click", function(){
+        decisionChoice = b.dataset.choice;
+        RAIL[3] = RAIL[3].concat([{from:"You", to:"coord-tax", text:"Use "+(decisionChoice==="up"?"half up":"banker's")+" rounding."}]);
+        render();
+      });
+    });
+  }
+}
+
+/* ---------- transport ---------- */
+function step(dir){
+  var next = idx + dir;
+  if (next < 0 || next > 7) return;
+  if (dir > 0 && idx === 3 && decisionChoice === null) return; /* held at decision */
+  idx = next;
+  render();
+}
+function togglePlay(){
+  playing = !playing;
+  playBtn.textContent = playing ? "Pause" : "Play";
+  if (playing) tick();
+}
+function tick(){
+  if (!playing) return;
+  if (idx === 3 && decisionChoice === null){ playing = false; playBtn.textContent = "Play"; return; }
+  if (idx >= 7){ playing = false; playBtn.textContent = "Play"; return; }
+  setTimeout(function(){
+    if (!playing) return;
+    step(1);
+    tick();
+  }, reduced ? 10 : 1400);
+}
+
+playBtn.addEventListener("click", togglePlay);
+document.getElementById("stepFwd").addEventListener("click", function(){ step(1); });
+document.getElementById("stepBack").addEventListener("click", function(){ step(-1); });
+scrubEl.addEventListener("input", function(){
+  var target = Math.round(+scrubEl.value * 7);
+  if (target > idx && idx <= 3 && idx+1 > 3 && decisionChoice === null && target > 3) target = 3;
+  idx = target;
+  render();
+});
+sendBtn.addEventListener("click", function(){ if (idx===0) step(1); });
+
+render();
+
+/* ---------- self-test ---------- */
+if (location.hash === "#selftest"){
+  var fails = [];
+  function assert(cond, msg){ if (!cond) fails.push(msg); }
+  decisionChoice = "up";
+  idx = 7; render();
+  assert(stepsEl.querySelectorAll('[data-lit="now"]').length === 1, "exactly one lit-now station");
+  assert(+stepsEl.querySelector('[data-lit="now"]').dataset.i === 7, "station strip lit index at end");
+  TRACKS.forEach(function(t){
+    var panel = tabpanelsEl.querySelector('.tabpanel[data-i="'+TRACKS.indexOf(t)+'"]');
+    assert(panel.querySelector('[data-role="pr"]').dataset.state === "merged", "PR merged for "+t.key);
+  });
+  for (var s = 6; s <= 7; s++){
+    idx = s; render();
+    var visible = 0;
+    tabpanelsEl.querySelectorAll('[data-role="slot"]').forEach(function(el){ if (!el.hidden) visible++; });
+    assert(visible <= 1, "at most one slot token visible at station "+(s+1));
+  }
+  console.assert(fails.length === 0, "full-power selftest failures:", fails);
+  if (fails.length === 0) console.log("full-power selftest: OK"); else console.log(fails);
+  idx = 0; decisionChoice = null; render();
+}
+})();
+</script>
+</body>
+</html>
