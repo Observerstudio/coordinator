@@ -111,14 +111,15 @@ installed, the conventions below are protocol, not memory:
   lane's scope; put the returned claim id in the brief, and the lane claims its own scope with
   `--parent <that id>` so the hub links executor to coordinator instead of reporting a CONFLICT
   between them (every other overlap still conflicts). CONFLICT and SIMILAR tell you who is
-  already there before you brief anyone. After the merge, `och resolve done` the lane's claim; the
-  parent, having no report of its own, is closed with `och release … --no-handoff-reason`.
+  already there before you brief anyone. Closing both claims after the merge is described under
+  "Done means" below.
 - **Blocked means `och ask`.** A lane that hits a reserved decision runs `och ask <claim> "<q>"
   --option A --option B`; its claim waits. You see it first in `och context` and answer with
   `och resolve answer <id> --option N`. LANE-BLOCKED stays as the pane sentinel.
 - **Done means `och report` with evidence.** The plugin turns a `LANE-DONE — <branch> <sha>`
-  sentinel into the report. The gate ends with `och resolve done <claim> --reason "<gate>"`
-  after the merge, then release with the PR as reason.
+  sentinel into a report on the **lane's** claim. After the merge the gate ends with
+  `och resolve done <lane claim> --reason "<gate>"`; the coordinator's parent claim was never
+  reported, so it closes with `och release <parent> --reason "<PR>" --no-handoff-reason "<why>"`.
 - **The slot is a lease.** `och lease integration-slot`; LEASE_HELD names the holder and the
   expiry. Release it instead of printing SLOT-RELEASED.
 - **Lessons are bites with triggers.** Something bit you? `och publish bite "<imperative>"
