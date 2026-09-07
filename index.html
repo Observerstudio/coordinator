@@ -210,11 +210,11 @@ function wire(fromK,toK,text){
   var a=tracksEl.querySelector('[data-k="'+fromK+'"] .node'),b=tracksEl.querySelector('[data-k="'+toK+'"] .node'),tree=$('tree');
   if(!a||!b||innerWidth<821)return;
   var r=tree.getBoundingClientRect(),ra=a.getBoundingClientRect(),rb=b.getBoundingClientRect();
-  var x1=ra.left+ra.width/2-r.left,y1=ra.top-r.top-6,x2=rb.left+rb.width/2-r.left,y2=rb.top-r.top-6,cy=Math.min(y1,y2)-40;
+  var x1=ra.left+ra.width/2-r.left,y1=ra.top-r.top-6,x2=rb.left+rb.width/2-r.left,y2=rb.top-r.top-6,cy=Math.min(y1,y2)-62;
   var svg=$('wire');svg.setAttribute('width',r.width);svg.setAttribute('height',r.height);
   var p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d','M'+x1+' '+y1+' Q '+((x1+x2)/2)+' '+cy+' '+x2+' '+y2);svg.appendChild(p);
   var pill=document.createElement('div');pill.className='pill';pill.textContent=text;tree.appendChild(pill);
-  if(quiet){pill.style.left=((x1+x2)/2-90)+'px';pill.style.top=(cy+6)+'px';return}
+  if(quiet){pill.style.left=((x1+x2)/2-90)+'px';pill.style.top=(cy-2)+"px";return}
   gsap.fromTo(pill,{left:x1-40,top:y1-14,opacity:0},{left:x2-140,top:y2-14,opacity:1,duration:1.2,ease:'power1.inOut'});
 }
 function clearWire(){$('wire').innerHTML='';[].forEach.call(document.querySelectorAll('.pill'),function(p){p.remove()})}
