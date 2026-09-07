@@ -96,6 +96,27 @@ button{font:inherit;cursor:pointer}
 .pill{position:absolute;font-size:12.5px;font-weight:700;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:4px 10px;pointer-events:none;white-space:nowrap}
 @media (max-width:820px){.tracks{grid-template-columns:1fr;grid-template-rows:none}.track{grid-template-rows:none;grid-row:auto}.fan{display:none}.wire,.pill{display:none}}
 
+
+/* prose sections */
+.sec{margin-top:64px;padding-top:30px;border-top:1px solid var(--line-strong);display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:20px 48px}
+.sec p{color:var(--muted);font-size:15.5px;max-width:64ch}
+.sec p b,.sec dd b{color:var(--ink);font-weight:700}
+.sec p+p{margin-top:12px}
+.layers{display:grid;gap:0}
+.layers div{padding:12px 0;border-bottom:1px solid var(--line);font-size:15px;display:grid;grid-template-columns:130px 1fr;gap:16px}
+.layers div b{font-weight:700}
+.layers div span{color:var(--muted)}
+.sec dl{margin:0;display:grid;grid-template-columns:130px 1fr;gap:10px 16px;font-size:15px}
+.sec dt{font-weight:700}.sec dd{margin:0;color:var(--muted)}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.num{background:var(--card);border:1px solid var(--line-strong);border-radius:10px;padding:16px 18px}
+.num b{display:block;font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.num.hot{border-color:var(--accent)}.num.hot b{color:var(--accent)}
+.num span{display:block;font-size:13px;color:var(--muted);margin-top:8px}
+.after{margin-top:14px;font-size:15px}
+.after b{font-weight:700}
+@media (max-width:820px){.sec{grid-template-columns:1fr}.layers div,.sec dl{grid-template-columns:1fr;gap:2px}.nums{grid-template-columns:1fr}}
+
 /* below */
 .stays{margin-top:60px;background:var(--card);border:1px solid var(--line-strong);border-radius:10px;padding:22px 26px;display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:baseline}
 .stays h2{font-size:20px}
@@ -159,12 +180,57 @@ footer{margin-top:56px;font-size:13.5px;color:var(--muted);max-width:70ch}
   <div class="tracks" id="tracks"></div>
 </section>
 
-<section class="stays">
-  <h2>What stays</h2>
-  <p><b>Decisions in the PRD, findings in dated notes, a handoff per session, rules that do not bend.</b> All in the repo, all merged by PR. The next coordinator reads them before it types a word, so you never explain the same thing twice.</p>
+<section class="sec" aria-labelledby="w-h">
+  <div><h2 id="w-h">What our workflow is</h2><p>Three layers, one gate. Everything still runs on git, gh and GitHub PRs. No new tool for humans.</p></div>
+  <div class="layers">
+    <div><b>A human</b><span>Sets direction and keeps the calls that are theirs: client decisions, production data, the push to master.</span></div>
+    <div><b>A coordinator</b><span>One agent per work track does the judgment: diagnoses, writes a one-page brief per task, cold-reviews every PR against a ten-item rubric, runs the shared integration slot, merges. It never writes feature code.</span></div>
+    <div><b>Lanes</b><span>Cheap agents in their own worktrees do the typing. One brief in, one PR out, one sentinel line saying done or blocked.</span></div>
+    <div><b>Memory</b><span>Dated notes in the repo, a bites file per hard lesson, an incident registry every agent reads before touching money code.</span></div>
+  </div>
 </section>
 
-<section class="rules" aria-labelledby="rules-h">
+<section class="sec" aria-labelledby="e-h">
+  <div><h2 id="e-h">Why it is efficient</h2></div>
+  <div>
+    <p><b>Attention goes where it is scarce.</b> The expensive model reads and decides. The cheap model types. One brief per task means nothing is re-explained.</p>
+    <p><b>Parallel by default, safe by construction.</b> A worktree per lane, one integration slot, CI that cannot skip to green. The gate catches what CI cannot, and each catch becomes a rule the next agent reads.</p>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="m-h">
+  <div><h2 id="m-h">How we measure it</h2></div>
+  <dl>
+    <dt>Throughput</dt><dd>Merged PRs per week. Distinct issues touched.</dd>
+    <dt>Flow</dt><dd>PR open-to-merge time.</dd>
+    <dt>Quality</dt><dd>Staging CI green on the combined head. Reverts per PR. New post-mortems: zero since 3 August.</dd>
+    <dt>Waste</dt><dd>Dispatches on work that was already fixed.</dd>
+    <dt>Cost</dt><dd>Model tier per lane.</dd>
+  </dl>
+</section>
+
+<section class="sec" aria-labelledby="n-h">
+  <div><h2 id="n-h">What it did</h2><p>Merged PRs per week on Selal, 2026.</p></div>
+  <div>
+    <div class="nums">
+      <div class="num"><b>22</b><span>June to July. Agents assisting, no coordinator.</span></div>
+      <div class="num"><b>53</b><span>Late July to mid August. Claude Code, single session.</span></div>
+      <div class="num hot"><b>107 · 162 · 201</b><span>Since 25 August. Coordinator plus lanes, week by week.</span></div>
+    </div>
+    <p class="after"><b>65x on the year, 4x on last month.</b> Three humans now merge under the same gate. The same workflow took OCH, the coordination hub started on a Thursday, from a PRD to 21.8k lines of Go and 33 merged PRs in three days.</p>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="d-h">
+  <div><h2 id="d-h">What the demo shows</h2></div>
+  <dl>
+    <dt>Clarity</dt><dd>One brief, one sentinel, one gate comment. <b>Show:</b> a real PR with its review.</dd>
+    <dt>Simplicity</dt><dd>The workflow is markdown skills in the repo plus git and gh. <b>Show:</b> the skill file and a brief.</dd>
+    <dt>Adoption</dt><dd>Three humans merging. The skill loads itself every session. A lane needs nothing but a worktree. <b>Show:</b> a lane booting from a brief and printing its sentinel.</dd>
+  </dl>
+</section>
+
+<section class="rules sec" aria-labelledby="rules-h">
   <div><h2 id="rules-h">Six things that do not bend</h2></div>
   <ul>
     <li><b>Build the spec, nothing around it.</b><span>Do not shrink the product; enhance it.</span></li>
