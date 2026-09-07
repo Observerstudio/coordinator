@@ -6,7 +6,7 @@
 <title>Workflow page prototype</title>
 <!-- PROTOTYPE, throwaway. Three variants of the workflow page, switchable via ?variant=A|B|C or the bar at the bottom.
      Question: which structure makes "idea to shipped, and remembered" readable in one pass? -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..700&family=JetBrains+Mono:wght@400;600&family=Manrope:wght@500;700;800&display=swap">
 <style>
 :root{--bg:#eef0f3;--surface:#f7f8fa;--ink:#16191f;--muted:#5c6470;--line:#cfd4dc;--line-strong:#a9b1bd;--accent:#0e7c86;--accent-ink:#fff;
   --sans:"Archivo",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;color-scheme:light dark}
@@ -85,6 +85,61 @@ p{margin:0}a{color:inherit}
 .c-nav{margin-top:20px;display:flex;gap:8px}
 .c-nav button{font:inherit;font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--line-strong);background:transparent;color:var(--ink);cursor:pointer}
 @media (max-width:760px){.c-stage{grid-template-columns:1fr}}
+
+
+/* ---------- D + E: light, leader-first (own tokens, single theme on purpose) ---------- */
+.lead{--bg:#f6f5f1;--ink:#1d2230;--muted:#6a7080;--line:#d9d8d2;--line-strong:#b9b8b0;--accent:#2d4fb5;--accent-ink:#fff;--card:#fffefb;
+  background:var(--bg);color:var(--ink);font-family:"Manrope",var(--sans);margin:-0 0 0;padding:0 0 40px}
+.lead .wrap{max-width:1080px}
+.lead h1{font-stretch:100%;letter-spacing:-.02em;font-weight:700}
+.lead .lede{font-size:18px}
+.lead .lede strong{color:var(--ink)}
+/* D chain of command */
+.d-tree{margin-top:48px;display:grid;grid-template-columns:minmax(0,1fr);gap:0;justify-items:center}
+.d-node{background:var(--card);border:1px solid var(--line-strong);border-radius:10px;padding:18px 22px;max-width:520px;width:100%}
+.d-node.lead-node{border:2px solid var(--accent);box-shadow:0 12px 30px -18px rgba(45,79,181,.45)}
+.d-node h2{font-size:22px;letter-spacing:-.01em}
+.d-node .role{font-size:13px;color:var(--muted);margin-top:2px}
+.d-node ul{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:6px;font-size:15px}
+.d-node li b{font-weight:700}
+.d-node li span{color:var(--muted)}
+.d-link{height:44px;width:100%;max-width:520px;display:grid;grid-template-columns:1fr 1fr;font-size:12px;color:var(--muted)}
+.d-link span{display:flex;align-items:center;gap:8px;padding:0 6px}
+.d-link span:first-child{justify-content:flex-end;color:var(--accent)}
+.d-link span:first-child::after{content:"";width:1px;height:44px;background:var(--accent)}
+.d-link span:last-child::before{content:"";width:1px;height:44px;background:var(--line-strong)}
+.d-lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:760px;width:100%}
+.d-lanes .d-node{max-width:none;padding:14px 16px}
+.d-lanes h2{font-size:17px}
+.d-fan{width:100%;max-width:760px;height:44px}
+.d-fan path{fill:none;stroke:var(--line-strong);stroke-width:1}
+.d-fan path.dir{stroke:var(--accent)}
+.d-flow{margin-top:64px;padding-top:28px;border-top:1px solid var(--line-strong)}
+.d-flow h2{font-size:22px}
+.d-flow p{color:var(--muted);margin-top:8px;max-width:60ch}
+.d-steps{margin-top:24px;display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.d-step{border-top:3px solid var(--line-strong);padding-top:10px;font-size:14px}
+.d-step.you{border-top-color:var(--accent)}
+.d-step b{display:block;font-weight:700;margin-bottom:4px}
+.d-step span{color:var(--muted)}
+.d-step .who{display:block;margin-top:8px;font-size:12px;color:var(--accent);font-weight:700}
+.d-step:not(.you) .who{color:var(--muted);font-weight:500}
+@media (max-width:820px){.d-steps{grid-template-columns:1fr 1fr}.d-lanes{grid-template-columns:1fr}.d-fan{display:none}}
+/* E leader's desk */
+.e-cols{margin-top:48px;display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.e-col h2{font-size:30px;letter-spacing:-.02em;font-weight:700;color:var(--accent)}
+.e-col .you{margin-top:10px;font-size:17px;line-height:1.45}
+.e-col .then{margin-top:22px;padding-top:14px;border-top:1px solid var(--line-strong);font-size:13px;color:var(--muted);font-weight:700}
+.e-col ol{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:12px}
+.e-col li{display:grid;grid-template-columns:96px 1fr;gap:10px;font-size:14.5px}
+.e-col li .w{font-size:12.5px;color:var(--muted);padding-top:2px}
+.e-col li p{color:var(--ink)}
+.e-col li p span{color:var(--muted)}
+.e-back{margin-top:56px;background:var(--card);border:1px solid var(--line-strong);border-radius:10px;padding:22px 26px;display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:baseline}
+.e-back h2{font-size:20px}
+.e-back p{color:var(--muted);font-size:15px}
+.e-back p b{color:var(--ink);font-weight:700}
+@media (max-width:820px){.e-cols{grid-template-columns:1fr}}
 
 /* ---------- switcher (not part of the design) ---------- */
 .proto{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;background:#111;color:#fff;
@@ -209,6 +264,104 @@ p{margin:0}a{color:inherit}
 </div>
 </section>
 
+
+<!-- ===================== D ===================== -->
+<section class="variant lead" data-v="D" data-name="Chain of command: you lead, direction down, evidence up">
+<div class="wrap">
+  <h1>You lead. Agents build. Evidence comes back up.</h1>
+  <p class="lede"><strong>One person owns every track.</strong> Direction flows down through a coordinator to the lanes that type. Proof flows back up as PRs, scorecards and notes. Nothing ships without your read.</p>
+
+  <div class="d-tree">
+    <div class="d-node lead-node">
+      <h2>You</h2><div class="role">The leader. Sets the need, closes decisions, approves what ships.</div>
+      <ul>
+        <li><b>Say what you need.</b> <span>One line is enough. Everything below starts from it.</span></li>
+        <li><b>Decide once.</b> <span>Stack, scope, order of work. Written into the PRD; nobody re-opens it in chat.</span></li>
+        <li><b>Answer only reserved questions.</b> <span>Blocked work reaches you as options, not essays.</span></li>
+        <li><b>Approve by evidence.</b> <span>You read the scorecard on the PR, not the green checks. You merge what agents may not.</span></li>
+      </ul>
+    </div>
+    <div class="d-link"><span>direction</span><span>evidence: PRs, scorecards, notes</span></div>
+    <div class="d-node">
+      <h2>Coordinator</h2><div class="role">One Claude Code session per track. Judgment, not typing.</div>
+      <ul>
+        <li><b>Reads before acting.</b> <span>Last handoff, memory, the repo.</span></li>
+        <li><b>Writes the briefs.</b> <span>Scope with file:line, pattern to copy, test pins, the decisions a lane may not make.</span></li>
+        <li><b>Gates every PR.</b> <span>Cold review at the exact sha, ten items, a mutation per guard. Rework goes back as a file.</span></li>
+        <li><b>Merges and hands off.</b> <span>Squash-merge, dated note, handoff for the next session. Writes no feature code.</span></li>
+      </ul>
+    </div>
+    <svg class="d-fan" viewBox="0 0 760 44" aria-hidden="true">
+      <path class="dir" d="M380 0 V22 H127 V44"/><path class="dir" d="M380 22 V44"/><path class="dir" d="M380 22 H633 V44"/>
+    </svg>
+    <div class="d-lanes">
+      <div class="d-node"><h2>Lane</h2><div class="role">a pane, one brief</div><ul><li><span>Own worktree and branch. Types step by step where it can be seen. No subagents.</span></li></ul></div>
+      <div class="d-node"><h2>Lane</h2><div class="role">a pane, one brief</div><ul><li><span>Ends with one sentinel line and a PR that carries a "Go to read here" section for you.</span></li></ul></div>
+      <div class="d-node"><h2>Lane</h2><div class="role">a pane, one brief</div><ul><li><span>Reworks on request. Never amends pushed history. Never force-pushes.</span></li></ul></div>
+    </div>
+  </div>
+
+  <div class="d-flow">
+    <h2>What one piece of work goes through</h2>
+    <p>Seven stations. The blue ones are yours. Everything else runs while you are away from the keyboard.</p>
+    <div class="d-steps">
+      <div class="d-step you"><b>Need</b><span>One line from you.</span><em class="who">You</em></div>
+      <div class="d-step you"><b>Decision</b><span>Closed once, in the PRD.</span><em class="who">You</em></div>
+      <div class="d-step"><b>Brief</b><span>Scope, pattern, pins, reserved decisions.</span><em class="who">Coordinator</em></div>
+      <div class="d-step"><b>Build</b><span>Visible typing in a pane.</span><em class="who">Lane</em></div>
+      <div class="d-step"><b>Gate</b><span>Ten items at the exact sha; CI green.</span><em class="who">Coordinator, CI</em></div>
+      <div class="d-step you"><b>Approval</b><span>Scorecard read; blocked merges done by hand.</span><em class="who">You</em></div>
+      <div class="d-step"><b>Note and handoff</b><span>What was learned, in the repo, dated.</span><em class="who">Coordinator</em></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===================== E ===================== -->
+<section class="variant lead" data-v="E" data-name="The leader's desk: you decide, you direct, you approve">
+<div class="wrap">
+  <h1>Three things only you do. Everything else is delegated.</h1>
+  <p class="lede"><strong>Decide. Direct. Approve.</strong> Under each, what the coordinator and the lanes do with it while you are away.</p>
+
+  <div class="e-cols">
+    <div class="e-col">
+      <h2>Decide</h2>
+      <p class="you">You name the need in a line and close the decisions that shape it: stack, scope, order of work. Once written, they stay closed.</p>
+      <div class="then">Then, without you</div>
+      <ol>
+        <li><span class="w">Coordinator</span><p>Reads the last handoff and the repo. Diagnoses on real data before anyone builds. <span>Never re-opens a closed decision.</span></p></li>
+        <li><span class="w">Coordinator</span><p>Turns the need into briefs: scope with file:line, a pattern to copy, test pins. <span>Anything you reserved is named as yours.</span></p></li>
+      </ol>
+    </div>
+    <div class="e-col">
+      <h2>Direct</h2>
+      <p class="you">You talk to one coordinator per track. It talks to the lanes. Questions come back to you only when a brief reserved them, and always as options.</p>
+      <div class="then">Then, without you</div>
+      <ol>
+        <li><span class="w">Coordinator</span><p>Dispatches each brief to a pane and waits for one sentinel line. <span>Nudges stalls. Writes no feature code.</span></p></li>
+        <li><span class="w">Lanes</span><p>Type step by step where it can be seen, in their own worktrees. <span>No subagents. No amended history.</span></p></li>
+        <li><span class="w">Lanes</span><p>Open a PR with a gate-ready checklist and a "Go to read here" section. <span>Written for you, the reader learning Go.</span></p></li>
+      </ol>
+    </div>
+    <div class="e-col">
+      <h2>Approve</h2>
+      <p class="you">You read the scorecard on the PR, not the green checks. You merge what agents are not allowed to. You say what bit you, and it becomes a rule.</p>
+      <div class="then">Before it reaches you</div>
+      <ol>
+        <li><span class="w">Coordinator</span><p>Cold review at the exact sha: ten items, one mutation per guard, a pass for over-engineering. <span>Rework goes back as a file.</span></p></li>
+        <li><span class="w">CI</span><p>Runs the race suite; the merge state must be clean, not just green.</p></li>
+        <li><span class="w">Coordinator</span><p>Squash-merges, writes the dated note, leaves a handoff. <span>The next session starts from it.</span></p></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="e-back">
+    <h2>What stays</h2>
+    <p><b>Decisions in the PRD, findings in dated notes, a handoff per session, rules that do not bend.</b> All in the repo, all merged by PR. The next coordinator reads them before it types a word, so you never explain the same thing twice.</p>
+  </div>
+</div>
+</section>
+
 <div class="proto" role="group" aria-label="Prototype variant switcher">
   <button type="button" id="prev" aria-label="Previous variant">←</button>
   <span id="label"></span>
@@ -217,8 +370,8 @@ p{margin:0}a{color:inherit}
 
 <script>
 // ---- switcher
-var V=['A','B','C'];
-function cur(){var v=new URLSearchParams(location.search).get('variant');return V.indexOf(v)>=0?v:'A'}
+var V=['A','B','C','D','E'];
+function cur(){var v=new URLSearchParams(location.search).get('variant');return V.indexOf(v)>=0?v:'D'}
 function show(v){
   document.querySelectorAll('.variant').forEach(function(s){s.classList.toggle('on',s.dataset.v===v)});
   var s=document.querySelector('.variant[data-v="'+v+'"]');
