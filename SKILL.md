@@ -108,8 +108,11 @@ herdr moves text between panes; OCH records the facts. With the `och` CLI and th
 installed, the conventions below are protocol, not memory:
 
 - **Claim before you dispatch.** `och claim --scope … --intent "<brief title> — <lane>"` for the
-  lane's scope; the lane claims its own scope from the brief. CONFLICT and SIMILAR tell you who is
-  already there before you brief anyone.
+  lane's scope; put the returned claim id in the brief, and the lane claims its own scope with
+  `--parent <that id>` so the hub links executor to coordinator instead of reporting a CONFLICT
+  between them (every other overlap still conflicts). CONFLICT and SIMILAR tell you who is
+  already there before you brief anyone. After the merge, `och resolve done` the lane's claim; the
+  parent, having no report of its own, is closed with `och release … --no-handoff-reason`.
 - **Blocked means `och ask`.** A lane that hits a reserved decision runs `och ask <claim> "<q>"
   --option A --option B`; its claim waits. You see it first in `och context` and answer with
   `och resolve answer <id> --option N`. LANE-BLOCKED stays as the pane sentinel.
