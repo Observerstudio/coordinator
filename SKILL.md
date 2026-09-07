@@ -91,15 +91,19 @@ database state. Treat the suite as ONE slot per machine:
 3. Run it yourself — never dispatch a lane to run the exclusive suite.
 4. Print `SLOT-RELEASED` when done.
 
-## Confirm-submit when driving panes
+## Driving panes: `herdr agent prompt`, then wait, then read back
 
-Send work as separate calls: literal text, then Enter. A long message arrives as paste
-chunks and gets chopped or its trailing Enter absorbed — write anything longer than a few
-lines to a file and send a one-line pointer; ALWAYS read the pane back afterwards and
-confirm the message shows in the transcript with the composer empty before assuming
-submission. Composer text can be ghost text, not input. Watching: grep panes for the
-sentinel but EXCLUDE your own dispatch text and any placeholder like `<branch>` from the
-pattern, or it false-fires; lanes stall randomly — nudge with "continue", don't alert.
+Once a lane's agent is booted, drive it with `herdr agent prompt <pane> "<text>" --wait
+--timeout <ms>` — one call submits the text plus Enter (bracketed paste honoured) and blocks
+until the agent settles. Never restrict `--until` to `idle`: an unfocused pane settles as
+`done`, so `--until idle` alone runs to the timeout. Ghost text in the composer (`❯ …`) is
+never input — do not send a bare Enter at it; prompt again. A brief still goes in a file with
+a one-line pointer in the prompt. ALWAYS read back afterwards (`herdr agent read <pane>
+--source recent-unwrapped --lines 120`) and confirm your text shows in the transcript.
+Settled is NOT finished: after the wait, grep the read-back for the sentinel, EXCLUDING your
+own dispatch text and any placeholder like `<branch>`, or it false-fires; settled without a
+sentinel means nudge with "continue", don't alert. Raw `pane send-text`/`send-keys` are for
+booting the agent and for shell panes only.
 Spawn/boot/mechanics details: `docs/herdr-runbook.md`.
 
 ## OCH is the ledger (when the repo uses it)

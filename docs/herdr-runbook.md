@@ -45,24 +45,43 @@ Before dispatching any work:
 
 ## Sending work
 
-`send-text` then `send-keys enter` as **SEPARATE calls**. A long message arrives as
-paste chunks and the trailing Enter gets absorbed — **ALWAYS read the pane afterwards**
-to confirm the message shows in the transcript with the composer empty:
+Once the agent is up (`herdr agent list` shows the pane), use `agent prompt`, not
+`pane send-text`. One call submits text + Enter, honours bracketed paste, and waits for
+the agent to settle:
 
 ```bash
-herdr pane read <id> --source recent-unwrapped --lines 120
+herdr agent prompt <id> "/ponytail full — cd <worktree> and read LANE-BRIEF.md …" --wait --timeout 600000
+herdr agent read <id> --source recent-unwrapped --lines 120
 ```
 
-Composer text (`❯ …`) can be ghost text, not input. If the transcript does not show
-your message, resend — do not assume.
+- `--wait` matches `idle`, `done` or `blocked` by default. Keep the default: an unfocused
+  pane settles as `done`, so `--until idle` alone runs to the timeout (verified 2026-09-07).
+- `agent_blocked` means the agent is sitting on an approval or question — read the pane and
+  answer it, don't resubmit. `agent_prompt_stalled` means nothing changed within 5 s —
+  read the pane; the text may not have landed.
+- A brief still goes in a file; the prompt carries a one-line pointer.
+- Composer text (`❯ …`) can be ghost text, not input. Never send a bare Enter at it — a
+  ghost line does not submit. Prompt again instead.
+- ALWAYS read back and confirm the transcript shows your text.
+
+For a pane with no agent yet (booting, or a shell/hub pane), `pane send-text` then
+`pane send-keys enter` as separate calls, then read back.
 
 ## Watching for completion
 
-Monitors grep the pane for the sentinel (`herdr pane wait-output --match/--regex`, or
-your own loop over `herdr pane read`):
+Settled is NOT finished — `LANE-DONE` is. Wait for the agent, then read the transcript:
 
-- **EXCLUDE your own dispatch text from the pattern**, or it false-fires.
-- Lanes stall randomly — nudge with "continue"; don't alert.
+```bash
+herdr agent wait <id> --timeout 1800000      # idle|done|blocked
+herdr agent read <id> --source recent-unwrapped --lines 120
+```
+
+- Grep the read-back for the sentinel and **EXCLUDE your own dispatch text** from the
+  pattern, or it false-fires.
+- Settled with no sentinel → the lane stalled; nudge with `agent prompt <id> "continue"`.
+- `blocked` → an approval/question UI is up; read the pane and answer it.
+- `pane wait-output --regex` still works when you want a raw output match without agent
+  lifecycle interpretation.
 
 ## Cross-tab etiquette
 
