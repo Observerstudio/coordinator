@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Track workflow</title>
+<meta name="description" content="How a PR moves through a coordinated track: who owns each station, what enforces it, and where to read more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#eef0f3; --surface:#f7f8fa; --ink:#16191f; --muted:#5c6470; --line:#cfd4dc; --line-strong:#a9b1bd;
+  --accent:#0e7c86; --accent-ink:#ffffff; --dim:.28;
+  --sans:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1318; --surface:#161b22; --ink:#e6eaf0; --muted:#8b95a3; --line:#2a323d; --line-strong:#3d4755;
+    --accent:#3fb6bf; --accent-ink:#0f1318;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1318; --surface:#161b22; --ink:#e6eaf0; --muted:#8b95a3; --line:#2a323d; --line-strong:#3d4755;
+  --accent:#3fb6bf; --accent-ink:#0f1318;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+code,kbd{font-family:var(--mono);font-size:.86em;background:var(--surface);border:1px solid var(--line);
+  border-radius:3px;padding:.05em .35em}
+h1,h2{font-weight:600;letter-spacing:-.01em;text-wrap:balance;margin:0}
+h1{font-size:clamp(28px,4vw,40px);line-height:1.1;font-stretch:90%}
+h2{font-size:20px;line-height:1.25}
+p{margin:0}
+.wrap{max-width:1160px;margin:0 auto;padding:40px 24px 80px}
+
+/* header */
+.top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px 48px;align-items:end;padding-bottom:28px;border-bottom:1px solid var(--line)}
+.top p{max-width:56ch;color:var(--muted);margin-top:12px}
+.top p strong{color:var(--ink);font-weight:500}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.filters button{font:inherit;font-size:13px;font-weight:500;color:var(--ink);background:transparent;border:1px solid var(--line-strong);
+  border-radius:999px;padding:6px 12px;cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.filters button:active{transform:translateY(1px)}
+
+/* swimlanes */
+.track{margin-top:32px;overflow-x:auto}
+.grid{display:grid;grid-template-columns:132px repeat(7,minmax(150px,1fr));min-width:1180px;
+  border-top:1px solid var(--line-strong)}
+.phase{padding:14px 12px 10px;border-bottom:1px solid var(--line-strong);font-size:13px;color:var(--muted)}
+.phase b{display:block;color:var(--ink);font-weight:600;font-size:14px}
+.phase i{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--accent);margin-right:6px}
+.actor{padding:16px 12px;border-bottom:1px solid var(--line);font-weight:600;font-size:14px;line-height:1.3;
+  position:sticky;left:0;background:var(--bg);z-index:1}
+.actor small{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:4px}
+.cell{padding:16px 12px 18px;border-bottom:1px solid var(--line);border-left:1px solid var(--line);font-size:13.5px;line-height:1.45;
+  transition:opacity .18s ease}
+.cell:empty{background:repeating-linear-gradient(135deg,transparent 0 7px,var(--line) 7px 8px);opacity:.35}
+.cell b{display:block;font-weight:600;margin-bottom:4px}
+.cell code{font-size:.84em}
+.cell a{display:inline-block;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.grid[data-filter="human"] .row:not(.human) .cell,
+.grid[data-filter="coord"] .row:not(.coord) .cell,
+.grid[data-filter="lane"] .row:not(.lane) .cell,
+.grid[data-filter="ledger"] .row:not(.ledger) .cell{opacity:var(--dim)}
+.grid[data-filter="human"] .row:not(.human) .actor,
+.grid[data-filter="coord"] .row:not(.coord) .actor,
+.grid[data-filter="lane"] .row:not(.lane) .actor,
+.grid[data-filter="ledger"] .row:not(.ledger) .actor{opacity:var(--dim)}
+.row{display:contents}
+.hint{margin-top:10px;font-size:12.5px;color:var(--muted)}
+
+/* trace */
+.trace{margin-top:64px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px 48px;align-items:start}
+.trace p{color:var(--muted);margin-top:12px;max-width:44ch}
+.trace p strong{color:var(--ink);font-weight:500}
+pre{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px 20px;overflow-x:auto;
+  font-family:var(--mono);font-size:12.5px;line-height:1.65;color:var(--ink)}
+pre .c{color:var(--muted)}
+pre .a{color:var(--accent)}
+
+/* rules */
+.rules{margin-top:64px;padding-top:28px;border-top:1px solid var(--line-strong);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px 48px}
+.rules ul{list-style:none;margin:0;padding:0;columns:2;column-gap:32px}
+.rules li{break-inside:avoid;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.rules li b{font-weight:600}
+.rules li span{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+
+/* links */
+.links{margin-top:64px;padding-top:28px;border-top:1px solid var(--line-strong);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px 48px}
+.links dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 20px;font-size:14px}
+.links dt{font-family:var(--mono);font-size:12.5px;color:var(--muted);padding-top:2px}
+.links dd{margin:0}
+footer{margin-top:64px;font-size:12.5px;color:var(--muted)}
+
+@media (max-width:820px){
+  .top,.trace,.rules,.links{grid-template-columns:1fr}
+  .rules ul{columns:1}
+  .links dl{grid-template-columns:1fr;gap:4px}
+  .links dt{padding-top:10px}
+}
+@media (prefers-reduced-motion:reduce){.cell{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div>
+    <h1>How a PR moves through a track</h1>
+    <p><strong>People own the judgment. The coordinator owns the gate. Lanes own the typing. The hub remembers.</strong>
+       Seven stations, four actors. Every cell links to the thing that enforces it, so this page stays a map, not a manual.</p>
+  </div>
+  <div class="filters" role="group" aria-label="Show one actor">
+    <button type="button" data-f="all" aria-pressed="true">Everyone</button>
+    <button type="button" data-f="human" aria-pressed="false">You</button>
+    <button type="button" data-f="coord" aria-pressed="false">Coordinator</button>
+    <button type="button" data-f="lane" aria-pressed="false">Lane</button>
+    <button type="button" data-f="ledger" aria-pressed="false">Hub and CI</button>
+  </div>
+</header>
+
+<section class="track" aria-label="Stations by actor and phase">
+<div class="grid" data-filter="all" id="grid">
+  <div class="phase"></div>
+  <div class="phase"><i>1</i><b>Take up</b>Where the track is</div>
+  <div class="phase"><i>2</i><b>Brief</b>Decide, then write</div>
+  <div class="phase"><i>3</i><b>Dispatch</b>Text to a pane</div>
+  <div class="phase"><i>4</i><b>Build</b>Visible, in the pane</div>
+  <div class="phase"><i>5</i><b>Gate</b>One reviewer, ten items</div>
+  <div class="phase"><i>6</i><b>Land</b>Merge and clean up</div>
+  <div class="phase"><i>7</i><b>Hand off</b>Leave it findable</div>
+
+  <div class="row human">
+    <div class="actor">You<small>Ahmed, or whoever owns the track</small></div>
+    <div class="cell"><b>Say what you want.</b>One line is enough. "Fix the bug" started a lane, a rework and a merge today.</div>
+    <div class="cell"><b>Closed decisions stay closed.</b>Go vs TS, hosting, plugin order live on the hub as decisions. The brief cites them; nobody re-opens them.</div>
+    <div class="cell"></div>
+    <div class="cell"><b>Blocked comes to you rarely.</b>Only when the brief reserved a decision and the coordinator can't pick. Answer the ask; work resumes.</div>
+    <div class="cell"><b>Read the score, not the checks.</b>A green CI with an empty review is unreviewed. The scorecard comment on the PR is what you read.</div>
+    <div class="cell"><b>Some merges are yours.</b>The skill repo, and anything the session's permission classifier blocks. The coordinator tells you which.</div>
+    <div class="cell"><b>Every PR teaches Go.</b>The "Go to read here" section is written for you. Skip it and the repo stops being a course.</div>
+  </div>
+
+  <div class="row coord">
+    <div class="actor">Coordinator<small>one session per track</small></div>
+    <div class="cell"><b>Handoff, memory, repo. In that order.</b><code>och handoff show</code>, then memory search, then CLAUDE.md. From a cold start, done, in flight and decided all look like todo.
+      <a href="SKILL.md">SKILL.md, "Your role"</a></div>
+    <div class="cell"><b>Diagnose, then brief.</b>Worktree and branch, pattern to copy, scope with file:line, test pins, delivery, STOP conditions. Reserved decisions are named, not delegated. Claim the umbrella.
+      <a href="docs/lane-brief-template.md">lane-brief-template.md</a></div>
+    <div class="cell"><b>Prompt, wait, read back.</b><code>herdr agent prompt &lt;pane&gt; "…" --wait --timeout</code>. Brief goes in a file, the prompt carries a pointer. Ghost text in the composer is not input.
+      <a href="docs/herdr-runbook.md">herdr-runbook.md</a></div>
+    <div class="cell"><b>Settled is not finished.</b><code>herdr agent wait</code>, then read the transcript for the sentinel, excluding your own dispatch text. Idle with no sentinel: nudge "continue".
+      <a href="docs/herdr-runbook.md#watching-for-completion">Watching for completion</a></div>
+    <div class="cell"><b>Cold review at the exact sha.</b>Ten-item rubric, <code>/ponytail-review</code>, one mutation per guard, <code>gate.sh check</code>. Then CI green and <code>mergeStateStatus</code> CLEAN. Rework goes back as a review file.
+      <a href="docs/review-rubric.md">review-rubric.md</a></div>
+    <div class="cell"><b>One command lands it.</b><code>gate.sh merge &lt;PR&gt; --scorecard --reason --umbrella</code>: comment, squash-merge, release claims, restart the hub, summary. Second of two sibling PRs: re-gate after the first merges.
+      <a href="SKILL.md#the-gate--every-pr-no-exceptions">The gate</a></div>
+    <div class="cell"><b>Findings become files.</b>A dated note merged by PR, then <code>och handoff --name</code>. Something bit you: publish a bite with a trigger so the next agent sees it before the command runs.
+      <a href="SKILL.md#och-is-the-ledger-when-the-repo-uses-it">OCH is the ledger</a></div>
+  </div>
+
+  <div class="row lane">
+    <div class="actor">Lane<small>a pane the coordinator drives</small></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"><b>Worktree, claim, read.</b>Create the worktree the brief names, <code>och claim … --parent &lt;umbrella&gt;</code>, read the whole brief before touching code.</div>
+    <div class="cell"><b>Type where it can be seen.</b>Step by step in the pane, ponytail on, one runnable check per non-trivial piece of logic. Never a subagent. A reserved decision comes back as <code>LANE-BLOCKED</code> with options.</div>
+    <div class="cell"><b>One sentinel line.</b><code>LANE-DONE — &lt;branch&gt; &lt;sha&gt; &lt;summary&gt;</code>. Push, open the PR with a gate-ready checklist and a "Go to read here" section. Then wait for review.</div>
+    <div class="cell"><b>Release your own claim.</b>The child claim is on the lane's token; the coordinator's release returns NOT_OWNER. The gate prints the exact command for you.</div>
+    <div class="cell"></div>
+  </div>
+
+  <div class="row ledger">
+    <div class="actor">Hub and CI<small>OCH plus GitHub</small></div>
+    <div class="cell"><b>First block of the session.</b>Rules, decisions, bites and the current handoff arrive ranked before anyone types. The HUD line shows unread and handoff name.</div>
+    <div class="cell"><b>Claims collide or nest.</b><code>och claim</code> answers CONFLICT or SIMILAR when someone is already there. A lane's child claim under the coordinator's umbrella is not a conflict.</div>
+    <div class="cell"><b>Heartbeats are free.</b>The plugin heartbeats on every tool use; a claim that goes quiet expires on its TTL instead of squatting.</div>
+    <div class="cell"><b>Blocked is a question with options.</b><code>och ask</code> parks the claim; the coordinator sees it in context and answers with <code>och resolve answer</code>.</div>
+    <div class="cell"><b>The sentinel becomes a report.</b>The plugin's Stop hook turns <code>LANE-DONE</code> into <code>och report</code> with the sha as evidence. CI runs the race suite on the PR.</div>
+    <div class="cell"><b>Merge resolves the umbrella.</b>REPORTED children are marked done, others released; the hub restarts only when <code>cmd/</code> or <code>internal/</code> changed.</div>
+    <div class="cell"><b>Handoff supersedes handoff.</b>Same name, new id. The next session reads it first; the statusline names it.</div>
+  </div>
+</div>
+<p class="hint">Hatched cells: that actor has nothing to do at that station. Scroll sideways on narrow screens.</p>
+</section>
+
+<section class="trace" aria-labelledby="trace-h">
+  <div>
+    <h2 id="trace-h">One PR, as it actually ran</h2>
+    <p><strong>#63, 2026-09-07.</strong> A fix to the gate script, proven by merging itself with the script it fixed. Every line below is a real command or a real output from that afternoon.</p>
+  </div>
+<pre><span class="c"># take up</span>
+och handoff show session-0907-tooling-landed
+<span class="c"># brief + claim</span>
+och claim --scope repo:och/scripts --intent "gate.sh post-merge fix — coordinator umbrella"
+<span class="a">c_sx1ddkrx04 · CLAIMED</span>
+<span class="c"># dispatch</span>
+herdr agent prompt wE:p8 "/ponytail full — you are LANE-J. read docs/lanes/LANE-BRIEF-gate-postmerge.md …" --wait --until working
+herdr agent wait wE:p8 --timeout 580000
+<span class="a">LANE-DONE — fix/gate-postmerge 70677f3 gate.sh post-merge steps now never abort</span>
+<span class="c"># gate: rework 1 (a duplication the lane had flagged and kept)</span>
+herdr agent prompt wE:p8 "Rework requested: read docs/lanes/REVIEW-gate-postmerge-1.md …" --wait --until working
+<span class="a">LANE-DONE — fix/gate-postmerge 6ac83d7 rework 1</span>
+scripts/gate.sh check 63                    <span class="c"># gofmt, vet, go test -race in .worktrees/gate-63</span>
+bash -c 'source scripts/gate.sh --lib; step a true; step b false; step_summary'   <span class="c"># exit 1, as it must</span>
+<span class="c"># land</span>
+GATE_REPO=$PWD .worktrees/gate-63/scripts/gate.sh merge 63 --scorecard scorecard-63.md \
+  --umbrella c_sx1ddkrx04 --reason "gate 10/10 at 6ac83d7; PR #63 squash-merged"
+<span class="a">gate: post-merge summary:</span>
+<span class="a">  release c_9mvtzqpr6f skipped</span>          <span class="c"># lane-owned; command printed for the lane</span>
+<span class="a">  release umbrella c_sx1ddkrx04 ok</span>
+<span class="a">  remove gate worktree ok</span>
+<span class="a">  make hub-restart ok</span>
+<span class="c"># hand off</span>
+och handoff "gate.sh post-merge bug fixed and dogfooded (#63) …" --name session-0907-gate-postmerge-fixed</pre>
+</section>
+
+<section class="rules" aria-labelledby="rules-h">
+  <div>
+    <h2 id="rules-h">Six things that do not bend</h2>
+  </div>
+  <ul>
+    <li><b>Never force-push.</b><span>Amended history goes on a new branch with a new PR.</span></li>
+    <li><b>Lanes never delegate.</b><span>If a lane spawns a subagent, stop it, keep the files, continue in the pane.</span></li>
+    <li><b>Idle is not finished.</b><span>Only the sentinel line is. A quiet pane gets a nudge, not a merge.</span></li>
+    <li><b>The coordinator writes no feature code.</b><span>Even the urgent fix goes to a lane. Briefs, reviews, notes and the skill are the coordinator's files.</span></li>
+    <li><b>One integration slot per machine.</b><span>Announce, check nothing is live, run it yourself, release the lease.</span></li>
+    <li><b>Findings that live only in chat did not happen.</b><span>A dated note, merged by PR, or a bite on the hub.</span></li>
+  </ul>
+</section>
+
+<section class="links" aria-labelledby="links-h">
+  <div><h2 id="links-h">Where each rule is enforced</h2></div>
+  <dl>
+    <dt>SKILL.md</dt><dd><a href="SKILL.md">The coordinator skill</a>: role, gate, sentinel contract, slot, ledger conventions. Install with <code>npx skills add Observerstudio/coordinator</code>.</dd>
+    <dt>docs/</dt><dd><a href="docs/coordinator-playbook.md">Playbook</a>, <a href="docs/lane-brief-template.md">brief template</a>, <a href="docs/review-rubric.md">review rubric</a>, <a href="docs/herdr-runbook.md">herdr runbook</a>.</dd>
+    <dt>scripts/</dt><dd><code>gate.sh</code> and <code>hub-restart.sh</code> in the OCH repo make the mechanical half of the gate one command each.</dd>
+    <dt>och</dt><dd>The hub CLI. <code>och context</code>, <code>och status --all</code>, <code>och handoff show --track t_och</code> are the live state; this page is not.</dd>
+    <dt>herdr</dt><dd><a href="https://herdr.dev/docs/agent-automation/">Agent automation</a>: <code>agent prompt</code>, <code>agent wait</code>, <code>agent read</code>.</dd>
+  </dl>
+</section>
+
+<footer>Observer Studio. Replaces the 2026 "From idea to shipped" page. If a cell here disagrees with SKILL.md, SKILL.md wins and this page needs a PR.</footer>
+</div>
+
+<script>
+(function(){
+  var grid=document.getElementById('grid');
+  var buttons=document.querySelectorAll('.filters button');
+  buttons.forEach(function(b){
+    b.addEventListener('click',function(){
+      grid.dataset.filter=b.dataset.f;
+      buttons.forEach(function(x){x.setAttribute('aria-pressed',String(x===b));});
+    });
+  });
+})();
+</script>
+</body>
+</html>
