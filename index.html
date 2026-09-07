@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Track workflow</title>
-<meta name="description" content="How a PR moves through a coordinated track: who owns each station, what enforces it, and where to read more.">
+<title>From idea to shipped</title>
+<meta name="description" content="How work moves through Observer Studio: idea, decision, track, lanes, gate, ship, and what flows back into the next session.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
@@ -52,7 +52,7 @@ p{margin:0}
 
 /* swimlanes */
 .track{margin-top:32px;overflow-x:auto}
-.grid{display:grid;grid-template-columns:128px repeat(7,minmax(136px,1fr));min-width:1100px;
+.grid{display:grid;grid-template-columns:120px repeat(8,minmax(124px,1fr));min-width:1110px;
   border-top:1px solid var(--line-strong)}
 .phase{padding:14px 12px 10px;border-bottom:1px solid var(--line-strong);font-size:13px;color:var(--muted)}
 .phase b{display:block;color:var(--ink);font-weight:600;font-size:14px}
@@ -60,7 +60,7 @@ p{margin:0}
 .actor{padding:16px 12px;border-bottom:1px solid var(--line);font-weight:600;font-size:14px;line-height:1.3;
   position:sticky;left:0;background:var(--bg);z-index:1}
 .actor small{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:4px}
-.cell{padding:16px 12px 18px;border-bottom:1px solid var(--line);border-left:1px solid var(--line);font-size:13.5px;line-height:1.45;
+.cell{padding:14px 10px 16px;border-bottom:1px solid var(--line);border-left:1px solid var(--line);font-size:13px;line-height:1.45;
   transition:opacity .18s ease}
 .cell:empty{background:repeating-linear-gradient(135deg,transparent 0 7px,var(--line) 7px 8px);opacity:.35}
 .cell b{display:block;font-weight:600;margin-bottom:4px}
@@ -77,12 +77,22 @@ p{margin:0}
 .row{display:contents}
 .hint{margin-top:10px;font-size:12.5px;color:var(--muted)}
 
+/* what flows back */
+.loop{margin-top:56px;padding-top:28px;border-top:1px solid var(--line-strong);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px 48px}
+.loop p{color:var(--muted);margin-top:12px;max-width:44ch}
+.loop ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:0}
+.loop li{padding:0 14px 0 0;border-left:2px solid var(--accent);padding-left:12px;font-size:13px;line-height:1.45}
+.loop li+li{margin-left:10px}
+.loop li b{display:block;font-weight:600;margin-bottom:3px}
+.loop li span{color:var(--muted)}
+@media (max-width:820px){.loop{grid-template-columns:1fr}.loop ol{grid-template-columns:1fr;gap:12px}.loop li+li{margin-left:0}}
+
 /* trace */
 .trace{margin-top:64px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px 48px;align-items:start}
 .trace p{color:var(--muted);margin-top:12px;max-width:44ch}
 .trace p strong{color:var(--ink);font-weight:500}
 pre{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px 20px;overflow-x:auto;
-  font-family:var(--mono);font-size:12.5px;line-height:1.65;color:var(--ink)}
+  font-family:var(--mono);font-size:12.5px;line-height:1.65;color:var(--ink);white-space:pre-wrap}
 pre .c{color:var(--muted)}
 pre .a{color:var(--accent)}
 
@@ -114,113 +124,110 @@ footer{margin-top:64px;font-size:12.5px;color:var(--muted)}
 
 <header class="top">
   <div>
-    <h1>How a PR moves through a track</h1>
-    <p><strong>People own the judgment. The coordinator owns the gate. Lanes own the typing. The hub remembers.</strong>
-       Seven stations, four actors. Every cell links to the thing that enforces it, so this page stays a map, not a manual.</p>
+    <h1>From idea to shipped, and remembered</h1>
+    <p><strong>People own the judgment. Agents own the build. The hub remembers what both decided.</strong>
+       Eight stations in the life of one piece of work, four seats around it. Pick a seat to see only its part.</p>
   </div>
-  <div class="filters" role="group" aria-label="Show one actor">
+  <div class="filters" role="group" aria-label="Show one seat">
     <button type="button" data-f="all" aria-pressed="true">Everyone</button>
-    <button type="button" data-f="human" aria-pressed="false">You</button>
+    <button type="button" data-f="human" aria-pressed="false">Human in the loop</button>
     <button type="button" data-f="coord" aria-pressed="false">Coordinator</button>
-    <button type="button" data-f="lane" aria-pressed="false">Lane</button>
-    <button type="button" data-f="ledger" aria-pressed="false">Hub and CI</button>
+    <button type="button" data-f="lane" aria-pressed="false">Lanes</button>
+    <button type="button" data-f="ledger" aria-pressed="false">Hub, CI, herdr</button>
   </div>
 </header>
 
-<section class="track" aria-label="Stations by actor and phase">
+<section class="track" aria-label="Stations by seat and phase">
 <div class="grid" data-filter="all" id="grid">
   <div class="phase"></div>
-  <div class="phase"><i>1</i><b>Take up</b>Where the track is</div>
-  <div class="phase"><i>2</i><b>Brief</b>Decide, then write</div>
-  <div class="phase"><i>3</i><b>Dispatch</b>Text to a pane</div>
-  <div class="phase"><i>4</i><b>Build</b>Visible, in the pane</div>
-  <div class="phase"><i>5</i><b>Gate</b>One reviewer, ten items</div>
-  <div class="phase"><i>6</i><b>Land</b>Merge and clean up</div>
-  <div class="phase"><i>7</i><b>Hand off</b>Leave it findable</div>
+  <div class="phase"><i>1</i><b>Idea</b>A need shows up</div>
+  <div class="phase"><i>2</i><b>Decide</b>Close it once</div>
+  <div class="phase"><i>3</i><b>Track</b>One session owns it</div>
+  <div class="phase"><i>4</i><b>Split</b>Briefs and claims</div>
+  <div class="phase"><i>5</i><b>Build</b>Away from keyboard</div>
+  <div class="phase"><i>6</i><b>Gate</b>One reviewer, every PR</div>
+  <div class="phase"><i>7</i><b>Ship</b>Merge, restart, release</div>
+  <div class="phase"><i>8</i><b>Learn</b>Back into the next session</div>
 
   <div class="row human">
-    <div class="actor">You<small>Ahmed, or whoever owns the track</small></div>
-    <div class="cell"><b>Say what you want.</b>One line is enough. "Fix the bug" started a lane, a rework and a merge today.</div>
-    <div class="cell"><b>Closed decisions stay closed.</b>Go vs TS, hosting, plugin order live on the hub as decisions. The brief cites them; nobody re-opens them.</div>
-    <div class="cell"></div>
-    <div class="cell"><b>Blocked comes to you rarely.</b>Only when the brief reserved a decision and the coordinator can't pick. Answer the ask; work resumes.</div>
-    <div class="cell"><b>Read the score, not the checks.</b>A green CI with an empty review is unreviewed. The scorecard comment on the PR is what you read.</div>
-    <div class="cell"><b>Some merges are yours.</b>The skill repo, and anything the session's permission classifier blocks. The coordinator tells you which.</div>
-    <div class="cell"><b>Every PR teaches Go.</b>The "Go to read here" section is written for you. Skip it and the repo stops being a course.</div>
+    <div class="actor">Human in the loop<small>plan, decide, review</small></div>
+    <div class="cell"><b>A need, in one line.</b>From a client, an incident, or a day of friction. "Nine gate cycles by hand" was enough to start a track.</div>
+    <div class="cell"><b>Decide once.</b>Stack, hosting, scope, order of work. The decision goes to the PRD and the hub, and nobody re-opens it in chat.</div>
+    <div class="cell"><b>Open the track.</b>One coordinator session per track. You talk to it; it talks to the lanes.</div>
+    <div class="cell"><b>Only reserved decisions reach you.</b>A brief names what the lane may not decide. Everything else is the coordinator's call.</div>
+    <div class="cell"><b>You are not watching.</b>Blocked work arrives as a question with options. Answer it and the work resumes.</div>
+    <div class="cell"><b>Read the score, not the checks.</b>Green CI with no review is unreviewed. The scorecard on the PR is what you read.</div>
+    <div class="cell"><b>You merge what machines may not.</b>The skill repo, and anything the permission classifier blocks. Every PR also carries a "Go to read here" section: the repo is your Go course.</div>
+    <div class="cell"><b>Say what bit you.</b>It becomes a rule or a bite on the hub, not one person's memory.</div>
   </div>
 
   <div class="row coord">
-    <div class="actor">Coordinator<small>one session per track</small></div>
-    <div class="cell"><b>Handoff, memory, repo. In that order.</b><code>och handoff show</code>, then memory search, then CLAUDE.md. From a cold start, done, in flight and decided all look like todo.
-      <a href="SKILL.md">SKILL.md, "Your role"</a></div>
-    <div class="cell"><b>Diagnose, then brief.</b>Worktree and branch, pattern to copy, scope with file:line, test pins, delivery, STOP conditions. Reserved decisions are named, not delegated. Claim the umbrella.
-      <a href="docs/lane-brief-template.md">lane-brief-template.md</a></div>
-    <div class="cell"><b>Prompt, wait, read back.</b><code>herdr agent prompt &lt;pane&gt; "…" --wait --timeout</code>. Brief goes in a file, the prompt carries a pointer. Ghost text in the composer is not input.
-      <a href="docs/herdr-runbook.md">herdr-runbook.md</a></div>
-    <div class="cell"><b>Settled is not finished.</b><code>herdr agent wait</code>, then read the transcript for the sentinel, excluding your own dispatch text. Idle with no sentinel: nudge "continue".
-      <a href="docs/herdr-runbook.md#watching-for-completion">Watching for completion</a></div>
-    <div class="cell"><b>Cold review at the exact sha.</b>Ten-item rubric, <code>/ponytail-review</code>, one mutation per guard, <code>gate.sh check</code>. Then CI green and <code>mergeStateStatus</code> CLEAN. Rework goes back as a review file.
-      <a href="docs/review-rubric.md">review-rubric.md</a></div>
-    <div class="cell"><b>One command lands it.</b><code>gate.sh merge &lt;PR&gt; --scorecard --reason --umbrella</code>: comment, squash-merge, release claims, restart the hub, summary. Second of two sibling PRs: re-gate after the first merges.
-      <a href="SKILL.md#the-gate--every-pr-no-exceptions">The gate</a></div>
-    <div class="cell"><b>Findings become files.</b>A dated note merged by PR, then <code>och handoff --name</code>. Something bit you: publish a bite with a trigger so the next agent sees it before the command runs.
-      <a href="SKILL.md#och-is-the-ledger-when-the-repo-uses-it">OCH is the ledger</a></div>
+    <div class="actor">Coordinator<small>judgment, not typing</small></div>
+    <div class="cell"><b>Reads before acting.</b>Handoff, then memory, then the repo. From a cold start, done, in flight and decided all look like todo.</div>
+    <div class="cell"><b>Diagnoses on real data.</b>Counts rows before calling anything a blocker. The need is the client's; the mechanism is ours.</div>
+    <div class="cell"><b>Claims the umbrella.</b>The track's scope goes on the hub so parallel tracks see each other before they collide.</div>
+    <div class="cell"><b>Writes the brief.</b>Worktree, pattern to copy, scope with file:line, test pins, STOP conditions. Reserved decisions are named, not delegated.</div>
+    <div class="cell"><b>Drives, never types.</b>Dispatches to panes, waits for the sentinel, nudges stalls. Even the urgent fix goes to a lane.</div>
+    <div class="cell"><b>Cold review at the exact sha.</b>Ten items, one mutation per guard, a ponytail pass. Rework goes back as a review file, not a chat message.</div>
+    <div class="cell"><b>Lands it in one move.</b>Squash-merge, release the claims, restart the hub. The second of two sibling PRs is re-gated after the first lands.</div>
+    <div class="cell"><b>Leaves it findable.</b>Findings in a dated note merged by PR; a handoff the next session reads first; bites with triggers.</div>
   </div>
 
   <div class="row lane">
-    <div class="actor">Lane<small>a pane the coordinator drives</small></div>
+    <div class="actor">Lanes<small>build, visibly</small></div>
     <div class="cell"></div>
     <div class="cell"></div>
-    <div class="cell"><b>Worktree, claim, read.</b>Create the worktree the brief names, <code>och claim … --parent &lt;umbrella&gt;</code>, read the whole brief before touching code.</div>
-    <div class="cell"><b>Type where it can be seen.</b>Step by step in the pane, ponytail on, one runnable check per non-trivial piece of logic. Never a subagent. A reserved decision comes back as <code>LANE-BLOCKED</code> with options.</div>
-    <div class="cell"><b>One sentinel line.</b><code>LANE-DONE — &lt;branch&gt; &lt;sha&gt; &lt;summary&gt;</code>. Push, open the PR with a gate-ready checklist and a "Go to read here" section. Then wait for review.</div>
-    <div class="cell"><b>Release your own claim.</b>The child claim is on the lane's token; the coordinator's release returns NOT_OWNER. The gate prints the exact command for you.</div>
+    <div class="cell"></div>
+    <div class="cell"><b>Takes a worktree and a child claim.</b>Under the coordinator's umbrella, on its own branch. Reads the whole brief before touching code.</div>
+    <div class="cell"><b>Types where it can be seen.</b>Step by step in its own pane, ponytail on, one runnable check per piece of logic. Never a subagent.</div>
+    <div class="cell"><b>One sentinel line.</b>Branch, sha, summary. Opens the PR with a gate-ready checklist and the Go section. Reworks on request, never amends pushed history.</div>
+    <div class="cell"><b>Releases its own claim.</b>The pane is cleared and reused for the next brief.</div>
     <div class="cell"></div>
   </div>
 
   <div class="row ledger">
-    <div class="actor">Hub and CI<small>OCH plus GitHub</small></div>
-    <div class="cell"><b>First block of the session.</b>Rules, decisions, bites and the current handoff arrive ranked before anyone types. The HUD line shows unread and handoff name.</div>
-    <div class="cell"><b>Claims collide or nest.</b><code>och claim</code> answers CONFLICT or SIMILAR when someone is already there. A lane's child claim under the coordinator's umbrella is not a conflict.</div>
-    <div class="cell"><b>Heartbeats are free.</b>The plugin heartbeats on every tool use; a claim that goes quiet expires on its TTL instead of squatting.</div>
-    <div class="cell"><b>Blocked is a question with options.</b><code>och ask</code> parks the claim; the coordinator sees it in context and answers with <code>och resolve answer</code>.</div>
-    <div class="cell"><b>The sentinel becomes a report.</b>The plugin's Stop hook turns <code>LANE-DONE</code> into <code>och report</code> with the sha as evidence. CI runs the race suite on the PR.</div>
-    <div class="cell"><b>Merge resolves the umbrella.</b>REPORTED children are marked done, others released; the hub restarts only when <code>cmd/</code> or <code>internal/</code> changed.</div>
-    <div class="cell"><b>Handoff supersedes handoff.</b>Same name, new id. The next session reads it first; the statusline names it.</div>
+    <div class="actor">Hub, CI, herdr<small>the machines</small></div>
+    <div class="cell"><b>First block of every session.</b>Rules, decisions, bites, facts and the current handoff, ranked, before anyone types.</div>
+    <div class="cell"><b>Published once, served forever.</b>Decisions and rules reach every later session. Facts expire on a TTL so stale ones stop being served.</div>
+    <div class="cell"><b>Claims collide or nest.</b>CONFLICT or SIMILAR when someone is already there; a child under an umbrella is not a conflict.</div>
+    <div class="cell"><b>Brief in the repo, claim on the hub.</b>docs/lanes holds the text; the hub holds who is where and until when.</div>
+    <div class="cell"><b>State without asking.</b>herdr reads the pane to know idle, working or blocked. The plugin heartbeats on every tool use. A question parks the claim.</div>
+    <div class="cell"><b>Evidence, not assertion.</b>CI runs the race suite. The Stop hook turns the sentinel into a report with the sha attached.</div>
+    <div class="cell"><b>Merge resolves the umbrella.</b>Children done or released, hub rebuilt when code changed, plugin shipped through the marketplace.</div>
+    <div class="cell"><b>Handoff supersedes handoff.</b>Same name, new id. A bite fires before the command that caused it, once, then gets out of the way.</div>
   </div>
 </div>
-<p class="hint">Hatched cells: that actor has nothing to do at that station. Scroll sideways on narrow screens.</p>
+<p class="hint">Hatched cells: that seat has nothing to do at that station. Scroll sideways on narrow screens.</p>
+</section>
+
+<section class="loop" aria-labelledby="loop-h">
+  <div>
+    <h2 id="loop-h">What flows back</h2>
+    <p>GitHub keeps the code. The hub keeps what the team learned while writing it, ranked into the first block of the next session. This is the part the old workflow did not have.</p>
+  </div>
+  <ol>
+    <li><b>Rules</b><span>Never force-push. Lanes never delegate. Every PR passes the gate. Served to everyone, always.</span></li>
+    <li><b>Decisions</b><span>Go over TS. VM over Cloud Run. Plugin before daemon. Closed, dated, signed.</span></li>
+    <li><b>Bites</b><span>What bit us, as an imperative with a trigger. Shown before the command runs; denied once.</span></li>
+    <li><b>Facts</b><span>Measured, not remembered. Hub latency, environment shape. Expire on a TTL.</span></li>
+    <li><b>Handoff</b><span>Where the track is right now. Supersedes the last one. Read first.</span></li>
+  </ol>
 </section>
 
 <section class="trace" aria-labelledby="trace-h">
   <div>
-    <h2 id="trace-h">One PR, as it actually ran</h2>
-    <p><strong>#63, 2026-09-07.</strong> A fix to the gate script, proven by merging itself with the script it fixed. Every line below is a real command or a real output from that afternoon.</p>
+    <h2 id="trace-h">One week, in this shape</h2>
+    <p><strong>2026-09-07.</strong> The same eight stations, as they actually ran.</p>
   </div>
-<pre><span class="c"># take up</span>
-och handoff show session-0907-tooling-landed
-<span class="c"># brief + claim</span>
-och claim --scope repo:och/scripts --intent "gate.sh post-merge fix — coordinator umbrella"
-<span class="a">c_sx1ddkrx04 · CLAIMED</span>
-<span class="c"># dispatch</span>
-herdr agent prompt wE:p8 "/ponytail full — you are LANE-J. read docs/lanes/LANE-BRIEF-gate-postmerge.md …" --wait --until working
-herdr agent wait wE:p8 --timeout 580000
-<span class="a">LANE-DONE — fix/gate-postmerge 70677f3 gate.sh post-merge steps now never abort</span>
-<span class="c"># gate: rework 1 (a duplication the lane had flagged and kept)</span>
-herdr agent prompt wE:p8 "Rework requested: read docs/lanes/REVIEW-gate-postmerge-1.md …" --wait --until working
-<span class="a">LANE-DONE — fix/gate-postmerge 6ac83d7 rework 1</span>
-scripts/gate.sh check 63                    <span class="c"># gofmt, vet, go test -race in .worktrees/gate-63</span>
-bash -c 'source scripts/gate.sh --lib; step a true; step b false; step_summary'   <span class="c"># exit 1, as it must</span>
-<span class="c"># land</span>
-GATE_REPO=$PWD .worktrees/gate-63/scripts/gate.sh merge 63 --scorecard scorecard-63.md \
-  --umbrella c_sx1ddkrx04 --reason "gate 10/10 at 6ac83d7; PR #63 squash-merged"
-<span class="a">gate: post-merge summary:</span>
-<span class="a">  release c_9mvtzqpr6f skipped</span>          <span class="c"># lane-owned; command printed for the lane</span>
-<span class="a">  release umbrella c_sx1ddkrx04 ok</span>
-<span class="a">  remove gate worktree ok</span>
-<span class="a">  make hub-restart ok</span>
-<span class="c"># hand off</span>
-och handoff "gate.sh post-merge bug fixed and dogfooded (#63) …" --name session-0907-gate-postmerge-fixed</pre>
+<pre><span class="c">idea    </span> Ahmed: "we want to build what will actually help you." Nine PRs gated by hand the day before.
+<span class="c">decide  </span> Tooling before knowledge features. Shell for scripts, Go only for the register change. On the hub.
+<span class="c">track   </span> Coordinator session opens on the handoff; umbrella claim on repo:och/scripts.
+<span class="c">split   </span> Brief for LANE-I: gate script, hub restart, register defaults. Reserved: nothing the hub stores.
+<span class="c">build   </span> LANE-I types in its pane. <span class="a">LANE-DONE — feat/coordinator-tooling 0eb3fa4</span>
+<span class="c">gate    </span> 10/10, mutation caught by the new test only. Merged as #60. Its first real run finds its own bug.
+<span class="c">split   </span> "Fix the bug." Brief for LANE-J. One rework: a duplication the lane had flagged and kept.
+<span class="c">ship    </span> #63 merges itself with the script it fixed: umbrella released, hub restarted, summary printed.
+<span class="c">learn   </span> Note #61, brief and review #64, two observations in the handoff, this page.</pre>
 </section>
 
 <section class="rules" aria-labelledby="rules-h">
@@ -228,27 +235,27 @@ och handoff "gate.sh post-merge bug fixed and dogfooded (#63) …" --name sessio
     <h2 id="rules-h">Six things that do not bend</h2>
   </div>
   <ul>
+    <li><b>Build the spec, nothing around it.</b><span>Do not shrink the product; enhance it. A guard for a caller that does not exist is an issue, not a gate.</span></li>
     <li><b>Never force-push.</b><span>Amended history goes on a new branch with a new PR.</span></li>
-    <li><b>Lanes never delegate.</b><span>If a lane spawns a subagent, stop it, keep the files, continue in the pane.</span></li>
+    <li><b>Lanes never delegate.</b><span>Work happens where it can be seen. A subagent is stopped, its files kept, the lane continues.</span></li>
     <li><b>Idle is not finished.</b><span>Only the sentinel line is. A quiet pane gets a nudge, not a merge.</span></li>
-    <li><b>The coordinator writes no feature code.</b><span>Even the urgent fix goes to a lane. Briefs, reviews, notes and the skill are the coordinator's files.</span></li>
-    <li><b>One integration slot per machine.</b><span>Announce, check nothing is live, run it yourself, release the lease.</span></li>
-    <li><b>Findings that live only in chat did not happen.</b><span>A dated note, merged by PR, or a bite on the hub.</span></li>
+    <li><b>The coordinator writes no feature code.</b><span>Briefs, reviews, notes and the skill are its files. Everything else goes to a lane.</span></li>
+    <li><b>Findings that live only in chat did not happen.</b><span>A dated note merged by PR, or a rule, bite or decision on the hub.</span></li>
   </ul>
 </section>
 
 <section class="links" aria-labelledby="links-h">
-  <div><h2 id="links-h">Where each rule is enforced</h2></div>
+  <div><h2 id="links-h">Where to read more</h2></div>
   <dl>
-    <dt>SKILL.md</dt><dd><a href="SKILL.md">The coordinator skill</a>: role, gate, sentinel contract, slot, ledger conventions. Install with <code>npx skills add Observerstudio/coordinator</code>.</dd>
-    <dt>docs/</dt><dd><a href="docs/coordinator-playbook.md">Playbook</a>, <a href="docs/lane-brief-template.md">brief template</a>, <a href="docs/review-rubric.md">review rubric</a>, <a href="docs/herdr-runbook.md">herdr runbook</a>.</dd>
-    <dt>scripts/</dt><dd><code>gate.sh</code> and <code>hub-restart.sh</code> in the OCH repo make the mechanical half of the gate one command each.</dd>
-    <dt>och</dt><dd>The hub CLI. <code>och context</code>, <code>och status --all</code>, <code>och handoff show --track t_och</code> are the live state; this page is not.</dd>
-    <dt>herdr</dt><dd><a href="https://herdr.dev/docs/agent-automation/">Agent automation</a>: <code>agent prompt</code>, <code>agent wait</code>, <code>agent read</code>.</dd>
+    <dt>PRD</dt><dd>The agreed scope of the hub, with the closed decisions in its last section. Private repo, <code>docs/prd-v0.2.md</code>.</dd>
+    <dt>notes</dt><dd>Dated findings, newest first, merged by PR. <code>docs/notes/</code>. Briefs and reviews sit beside them in <code>docs/lanes/</code>.</dd>
+    <dt>skill</dt><dd><a href="SKILL.md">The coordinator skill</a> and its <a href="docs/coordinator-playbook.md">playbook</a>, <a href="docs/lane-brief-template.md">brief template</a>, <a href="docs/review-rubric.md">review rubric</a>, <a href="docs/herdr-runbook.md">herdr runbook</a>. Install with <code>npx skills add Observerstudio/coordinator</code>.</dd>
+    <dt>hub</dt><dd>OCH, the coordination and memory layer beside GitHub. <code>och context</code>, <code>och status --all</code> and <code>och handoff show</code> are the live state; this page is not.</dd>
+    <dt>herdr</dt><dd><a href="https://herdr.dev/docs/">The terminal that hosts the panes</a> and reports what the agents in them are doing.</dd>
   </dl>
 </section>
 
-<footer>Observer Studio. Replaces the 2026 "From idea to shipped" page. If a cell here disagrees with SKILL.md, SKILL.md wins and this page needs a PR.</footer>
+<footer>Observer Studio, September 2026. If a cell here disagrees with the PRD, the skill, or the hub, they win and this page needs a PR.</footer>
 </div>
 
 <script>
