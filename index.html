@@ -123,6 +123,7 @@ button{font:inherit;cursor:pointer}
 .num span{display:block;font-size:13px;color:var(--muted);margin-top:8px}
 .after{margin-top:14px;font-size:15px}
 .after b{font-weight:700}
+.sec.first{margin-top:40px;border-top:0;padding-top:0}
 @media (max-width:820px){.sec{grid-template-columns:1fr}.layers div,.sec dl{grid-template-columns:1fr;gap:2px}.nums{grid-template-columns:1fr}}
 
 /* below */
@@ -144,8 +145,26 @@ footer{margin-top:56px;font-size:13.5px;color:var(--muted);max-width:70ch}
 
 <header>
   <h1>From the client's message to master.</h1>
-  <p class="lede"><strong>One person owns every request.</strong> You hear the client, decide what only you can, and push to master. In between, a coordinator briefs lanes and gates every PR. Press play to watch one request go through.</p>
+  <p class="lede"><strong>One person owns every request.</strong> You hear the client, decide what only you can, and push to master. In between, a coordinator briefs lanes and gates every PR. Below: how it works, then one request played through.</p>
 </header>
+
+<section class="sec first" aria-labelledby="w-h">
+  <div><h2 id="w-h">What our workflow is</h2><p>Three layers, one gate. Everything still runs on git, gh and GitHub PRs. No new tool for humans.</p></div>
+  <div class="layers">
+    <div><b>A human</b><span>Sets direction and keeps the calls that are theirs: client decisions, production data, the push to master.</span></div>
+    <div><b>A coordinator</b><span>One agent per work track does the judgment: diagnoses, writes a one-page brief per task, cold-reviews every PR against a ten-item rubric, runs the shared integration slot, merges. It never writes feature code.</span></div>
+    <div><b>Lanes</b><span>Cheap agents in their own worktrees do the typing. One brief in, one PR out, one sentinel line saying done or blocked.</span></div>
+    <div><b>Memory</b><span>Dated notes in the repo, a bites file per hard lesson, an incident registry every agent reads before touching money code.</span></div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="r-h">
+  <div><h2 id="r-h">How to read the replay</h2></div>
+  <div>
+    <p>One request, nine stations, three phases. Blue stations are yours; the rest run while you are away from the keyboard.</p>
+    <p>Press play, or step through. When the page waits for you, it says so and stops until you answer.</p>
+  </div>
+</section>
 
 <div class="bar">
   <div class="ctl">
@@ -197,16 +216,6 @@ footer{margin-top:56px;font-size:13.5px;color:var(--muted);max-width:70ch}
   </svg>
   <div class="link grey hidden" id="link2" aria-hidden="true"><span>brief</span><span>sentinel: LANE-DONE, PR</span></div>
   <div class="tracks one" id="tracks"></div>
-</section>
-
-<section class="sec" aria-labelledby="w-h">
-  <div><h2 id="w-h">What our workflow is</h2><p>Three layers, one gate. Everything still runs on git, gh and GitHub PRs. No new tool for humans.</p></div>
-  <div class="layers">
-    <div><b>A human</b><span>Sets direction and keeps the calls that are theirs: client decisions, production data, the push to master.</span></div>
-    <div><b>A coordinator</b><span>One agent per work track does the judgment: diagnoses, writes a one-page brief per task, cold-reviews every PR against a ten-item rubric, runs the shared integration slot, merges. It never writes feature code.</span></div>
-    <div><b>Lanes</b><span>Cheap agents in their own worktrees do the typing. One brief in, one PR out, one sentinel line saying done or blocked.</span></div>
-    <div><b>Memory</b><span>Dated notes in the repo, a bites file per hard lesson, an incident registry every agent reads before touching money code.</span></div>
-  </div>
 </section>
 
 <section class="sec" aria-labelledby="e-h">
