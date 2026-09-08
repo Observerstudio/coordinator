@@ -17,9 +17,23 @@ body is not a review either.
 | 5 | **Season off the fact** | Any new season stamp is resolved from the entity/original leg, never from the actor's live season; fenced when correcting a closed book. |
 | 6 | **Mutation controls bite** | The PR body pastes red output for each guard, and each control kills exactly the guard it claims. If a guard has a redundant sibling, say so (a single mutation can survive a redundant guard). |
 | 7 | **Diff hygiene** | `git diff --numstat` per file is proportional to the change. Whole-file rewrites (CRLF loss, `prisma format`, reformatters) = FAIL. schema.prisma must be additive and small. |
-| 8 | **Repo hard rules** | No `useEffect`; date-only in UI; counted Arabic nouns agree; plain Arabic labels; no client-prescribed mechanism promoted to a rule; no email/name passed on a commit command line. |
+| 8 | **Repo hard rules and engineering standards** | The repo's `AGENTS.md` rules (no `useEffect`; date-only in UI; counted Arabic nouns agree; plain Arabic labels; no client-prescribed mechanism promoted to a rule; no email/name on a commit command line) AND its `## Engineering standards` section. Name every standard the diff touches and whether it held; a refactor PR that changes behaviour, a ledger row edited in place, an outbound call with no timeout, a new cached counter without its CHECK and rebuild, a second derivation of a money fact, or a cross-area import outside the published index is a FAIL here. |
 | 9 | **Migration & template** | Migration is hand-checked for live data (nullable → backfill → NOT NULL), DB-only DDL is allow-listed in `ci.yml`, and the PR says "rebuild the local integration template". |
 | 10 | **What it deletes** | The PR names what it removes or corrects (a wrong comment, a dead test, a superseded guard). "Nothing" is acceptable only when stated. Ponytail is on for every lane (2026-08-29): run `/ponytail-review` against the PR diff as part of this item — an abstraction with one caller, a guard for a caller that does not exist, or a helper the stdlib already provides is a FAIL here. |
+
+## The gate comment (every merge, same shape)
+
+```
+Gate — <sha> · review: <passed>/10 · N/A=<n> · reworks=<k> · second-reader=<none|1>
+Standards touched: S1 refactor-no-behaviour HELD · S3 ledger-immutable HELD · S4 timeouts FAIL→fixed in <sha>
+Standards not touched: S2 S5 S6 S7 S8 S9 S10 S11
+Reference used: <none | book/paper + section, recorded in <ADR or brief>>
+Deletes: <what the PR removes, or "nothing, stated">
+```
+
+The "Standards touched" line is the point: it is what makes the monthly "which standards caught what"
+report a grep instead of a memory exercise, and it shows within a month which standards work and which
+are decoration. A standard that never fires is either working or dead; the line tells you which.
 
 ## Metrics to keep per PR (one line in the merge comment)
 
