@@ -33,6 +33,24 @@ protected-branch vocabulary, where notes live, repo-only deltas — in its agent
 (usually `CLAUDE.md` plus `docs/agents/`). Check those before dispatching anything; this
 skill is the shared model, not a substitute for the repo's rules.
 
+## The graph — follow the declared routes
+
+The track is a graph, declared in [`docs/graph.md`](docs/graph.md): human nodes, coordinator
+nodes, lane nodes, three routers (ASSIGN, SENTINEL, VERDICT) with labelled edges, and one
+state object that rides every edge. You follow it; you do not improvise a route.
+
+- **First act of a session:** read the track's state file
+  ([`docs/track-state-template.md`](docs/track-state-template.md)), then the repo's
+  standards, then memory. Update the state file at every node you pass.
+- **Routers are tables.** Pick the matching row. No row matches → a question to the human,
+  never a new route.
+- **Loop-backs are bounded.** Two rejects on the same finding, two blocks on the same block,
+  two nudges on a silent lane → the human, with the state file. Not round again.
+- **One brief → one lane → one worktree.** A dispatch that looked failed is still queued; never
+  send the same brief twice.
+- **COLD REVIEW is a separate, read-only verifier.** It never edits the lane's branch; findings
+  go back along the reject edge as a follow-up commit by the lane.
+
 ## The gate — every PR, no exceptions
 
 1. Cold review at the exact SHA, scoring all ten items of
@@ -156,6 +174,8 @@ session's context; this file keeps only the mechanics.
 
 | File | Read it for |
 |------|-------------|
+| [`docs/graph.md`](docs/graph.md) | The declared graph: nodes, the three routers as tables, bounded loop-backs, fan-out rules, the checkpoint |
+| [`docs/track-state-template.md`](docs/track-state-template.md) | The state object that rides the edges; read first, updated at every node; the handoff is a snapshot of it |
 | [`docs/coordinator-playbook.md`](docs/coordinator-playbook.md) | Full operating model: roles, gate, slot, standing rules, evidence standards, worked examples |
 | [`docs/lane-brief-template.md`](docs/lane-brief-template.md) | The exact brief format + worked example + teardown discipline for shared-ledger integration files |
 | [`docs/herdr-runbook.md`](docs/herdr-runbook.md) | Pane mechanics: split/rename, agent boot + model check, send/read discipline, cross-tab etiquette |
