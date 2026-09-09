@@ -15,6 +15,18 @@ concrete shape, look for the **Example from selal-v2** blocks.
   dispatch them, never touch another tab's panes.
 - A designated **Master coordinator** arbitrates cross-track questions.
 
+## The graph
+
+The operating model is a declared graph — see [graph.md](graph.md). Three routers decide the
+path from tables (ASSIGN: dev or coordinator; SENTINEL: DONE / BLOCKED / NEEDS-SLOT / silence;
+VERDICT: pass / reject), every dashed loop-back has a ceiling of two before it routes to a
+human, and one state file per track ([track-state-template.md](track-state-template.md)) rides
+the edges so nothing is re-explained. The gate below is the VERDICT router's input.
+
+> **Example from selal-v2 (2026-09-09):** one audit finding went round the reject edge twice on
+> the same test fixture before the third brief named the exact lookup by file and line. The
+> ceiling now makes round three a human decision, not a fourth lane turn.
+
 ## The gate (every PR, no exceptions)
 
 1. Cold review at the exact SHA, scoring all ten items of
