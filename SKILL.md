@@ -66,7 +66,7 @@ the repo's protected-branch vocabulary.
 
 ## Lane briefs and the sentinel contract
 
-Every lane gets a brief following `docs/lane-brief-template.md`: title + issue link;
+Every lane gets a brief written with the `writing-lane-briefs` skill (its template supersedes `docs/lane-brief-template.md`): title + issue link;
 worktree + branch setup; pattern-to-copy files in reading order; scope with file:line
 for every writer/reader plus explicit do-NOT-change rules; fixture-scoped test pins
 (integration files WRITTEN, not run); delivery rules; STOP conditions. If a decision is
@@ -131,6 +131,44 @@ installed, the conventions below are protocol, not memory:
 
 Rules and settled decisions live on the hub (`och publish rule|decision`), ranked into every
 session's context; this file keeps only the mechanics.
+
+## Skills the coordinator reaches for (added 2026-09-12)
+
+Invoke these by name when the moment fits; do not re-implement what they do.
+
+| Moment | Skill | Why |
+|--------|-------|-----|
+| Before diagnosing or dispatching | `claude-mem:mem-search` | Memory does not lag; the tracker and chat do. Cite the observation id. |
+| Writing any lane brief | `tdd` / `superpowers:test-driven-development` | Every brief carries a TDD section: the test is written and shown RED first, then the code; red + green output pasted in the report. The red-first run IS the mutation proof. |
+| Gating a PR | `ponytail:ponytail-review` | Named step of rubric item 10; its findings go in the PR body. |
+| Gating a PR over ~800 lines or touching money | `code-review` (Standards + Spec axes) | The ONE allowed second reader — never a fan-out. |
+| Before accepting a lane's LANE-DONE | `superpowers:verification-before-completion` | Evidence before claims; lanes have faked completion with no commit. |
+| Waiting on a PR's checks and comments | `claude-mem:babysit` | Polls CI + review comments until mergeable; never merge on a flag (`gh pr merge --auto` merges on the spot here). |
+| Long waits on lanes or CI | `loop` | Self-paced re-check instead of blocking sleeps. |
+| Dependent PRs (B contains A) | `gh-stack` | Review and land them as a stack; the second needs a rebase, not a rewrite. |
+| A backlog of 30+ bugs | `claude-mem:oh-my-issues` | Cluster by root cause before briefing symptom fixes. |
+| The operator reports bugs in chat | `qa` | Files the issues with the domain language. |
+| Explaining a flow or a choice | `show-me` | Diagram, not prose. |
+| Any client-facing text | `client-update-ar` | Arabic, jargon-free, financial impact stated. |
+| End of session | `handoff` | Writes the handoff the next session reads first. |
+| Turning a ruling into tracker items | `to-spec` / `to-issues` / `to-tickets` | Spec first, then independently grabbable issues, then tracer-bullet tickets. |
+| A plan that must survive scrutiny | `grill-me` / `mattpocock-skills:grilling` | Stress-test before briefing. |
+| Root-causing a hard bug before briefing | `diagnosing-bugs` / `superpowers:systematic-debugging` | Diagnosis is the coordinator's job; the fix is the lane's. |
+| Writing ANY brief (new, rework, DIAG) | `writing-lane-briefs` | The brief contract: two-part shape, fixture contract, `.feature`, per-task sentinel, STOP conditions, lane toolkit. Supersedes the old template. |
+| A track with no spec yet (new subsystem, restructure) | `superpowers:brainstorming` | Architectural path: questions → approaches → spec the operator approves. Nothing is briefed before the spec (the operator's own rule on #2182). |
+| A spec approved, several PRs ahead | `superpowers:writing-plans` | Slices the spec into tasks with files, interfaces and red→green steps; each task becomes one brief. |
+| A rework brief | `superpowers:receiving-code-review` | The lane verifies the finding against the code before implementing; wrong findings come back with evidence, not compliance. |
+| Two or more independent briefs ready | `superpowers:dispatching-parallel-agents` | One lane per domain, same response, only when no shared files or fixtures. Two panes max. |
+| Reading a large module before briefing | `claude-mem:smart-explore` | Structure without the file dump; keeps the coordinator's context for judgment. |
+| A lane's branch conflicts with base | `mattpocock-skills:resolving-merge-conflicts` | Brief a rebase onto a NEW branch + new PR; never force-push. |
+| A refactor track over duplicated features | `claude-mem:pathfinder` then `ponytail:ponytail-debt` | Map the duplication, then price the debt, before any brief. |
+| The operator asks for an audit or a roadmap | `improve` (`quick`/`deep`/`next`) | Findings with evidence, plans for a stranger; not for briefing panes. |
+| A design question a sketch can settle | `mattpocock-skills:prototype` | Throwaway, labelled as such; the answer is the deliverable. |
+| Any new task or dispatch | `observer:task` | Every task gets an Observer task at creation; status moves on merge (operator rule 2026-09-13). |
+| Rehearsing a promotion | `neon-postgres-branches` | Fork production, `migrate status`, build DB steps, delete fork, then merge. |
+
+`handoff`, `to-*`, `grill-me`, `implement`, `triage`, `wayfinder` are `disable-model-invocation`
+skills — only the operator can type them; the coordinator asks for them by name when the moment comes.
 
 ## Standing rules
 

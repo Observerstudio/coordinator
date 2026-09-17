@@ -10,7 +10,7 @@ body is not a review either.
 
 | # | Item | What counts as evidence |
 |---|------|-------------------------|
-| 1 | **Spec match** | Every acceptance criterion of the issue maps to a change or a stated deferral. Name the AC that is missing, if any. |
+| 1 | **Spec match** | Scored against the brief's `.feature` file (since 2026-09-13): every `Scenario:` title greps to a green test carrying it verbatim, or the PR states the deferral. No `.feature` for a code-writing lane = the brief was wrong, not the lane; fix the brief, then score. Name the scenario that is missing, if any. |
 | 2 | **Meaning, not just safety** | For any closed set of verdicts/classifications/statuses: one POSITIVE fixture per member exists and the healthy path asserts the *clean* verdict. (A negative control proves nothing about meaning — #1362.) |
 | 3 | **Writes** | List the tables the change writes. Compare to what the ticket allows. Anything else = FAIL. Money paths only through the existing command/facade; new ledger readers registered in `ledger-site-registry.ts`. |
 | 4 | **Idempotency is DB-decided** | Exactly-once comes from a unique index, a compare-and-set `updateMany … WHERE`, or a `clientRequestId` replay with input-hash conflict — not from a read-then-act alone. Say which. |

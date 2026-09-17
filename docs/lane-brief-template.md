@@ -32,10 +32,22 @@ What does NOT change (hard rules):
 - <invariant>
 
 ## Tests
+Acceptance file: `.worktrees/LANE-ACCEPT-<issue>.feature` — one it() per Scenario, titles verbatim (see Acceptance below).
 Pin: <behavior>. Fixture-scoped ONLY — create your own rows, filter every assertion
 by your own ids, never assert raw table counts.
 Integration files are WRITTEN not run: when done, print LANE-NEEDS-INTEGRATION-SLOT.
+Local runs are the test files you touched ONLY — never the full unit suite, tsc, or `next build` on this
+machine (Ahmed 2026-09-13: CI runs those on the PR; the laptop does not).
 Teardown deletes your own rows in FK order.
+
+## TDD — the order of work (since 2026-09-12)
+Test first, then code. For every behaviour change in Scope: write the test case from the
+fixture contract BEFORE touching the implementation, run that one file, and paste its RED
+output into your report. Then implement, run again, paste GREEN. A test that was never red
+proves nothing — the red-first run is your mutation proof; do it instead of reverting code
+afterwards. Commit the test and the implementation together (red never merges).
+When a change has no honest test (a UI-only mirror in a repo with no component harness),
+say so in the report instead of inventing one.
 
 ### The fixture contract — write this section, don't leave it to the lane
 
@@ -63,6 +75,28 @@ the feature code was never wrong once. So the brief names, explicitly:
 **Coordinator's own half of this:** read the lane's test file BEFORE spending a slot run on it.
 A hardcoded date, a missing role, an unseeded row and a leaked session are all visible by eye in
 thirty seconds; the slot run costs minutes and is serialised machine-wide.
+
+## Acceptance — the Gherkin file is the gate (since 2026-09-13)
+The coordinator writes `.worktrees/LANE-ACCEPT-<issue>.feature` next to the brief: one `Feature`,
+one `Scenario` per acceptance criterion, plain Given/When/Then, one observable outcome each, in the
+domain's words (baskets, book, receipt), never implementation words (table, column, hook). Pointer to
+it goes in the brief's Tests section.
+The lane maps scenarios to tests 1:1: each `Scenario:` title becomes the `it()` title VERBATIM, and
+the red-first run above is run on exactly those tests. The report and the PR body carry the whole
+`.feature` plus a `scenario → test file:line` table. A scenario with no test is a LANE-BLOCKED
+(missing fixture, no honest harness), never a silent skip. The lane never edits the `.feature`; a
+scenario that turns out wrong comes back as LANE-BLOCKED with the reason.
+Gate: rubric item 1 is scored against the `.feature`, not the issue prose — every scenario title
+greps to a green test, or the PR states the deferral.
+
+Example (one scenario is enough to show the shape):
+```gherkin
+Feature: Day sheet print survives corrections (#2081)
+  Scenario: a corrected line prints its current quantity as a plain number
+    Given a wholesaler day with one sale line adjusted from 5 to 3 baskets
+    When the day sheet is read for printing
+    Then the line shows 3 and the document serialises without error
+```
 
 ## Simplicity
 Ponytail is ON for every code-writing lane: build the simplest thing that satisfies this brief —

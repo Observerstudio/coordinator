@@ -43,3 +43,16 @@ the skill reads first.
 
 Used with [OCH — Observer Coordination Hub](https://github.com/Observerstudio/observer-coordination-hub),
 where claims, messages and knowledge live on a hub and the `och` plugin feeds them to every session.
+
+## writing-lane-briefs — the brief contract
+
+`writing-lane-briefs/` is the sibling skill the coordinator invokes for every brief (new, rework,
+diagnosis). It merges the lane contract (worktree, fixture contract, `.feature` gate, per-task
+sentinel, STOP conditions) with the plan disciplines of superpowers `writing-plans` (one-action
+red→green steps, interfaces, no placeholders) and `improve` plans (base-SHA drift check,
+current-state excerpts, machine-checkable done criteria). Two parts, always: **What changes for
+the team** first, then the technical brief. Its template supersedes `docs/lane-brief-template.md`.
+
+```bash
+npx skills add Observerstudio/coordinator --skill writing-lane-briefs
+```
