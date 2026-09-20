@@ -32,10 +32,23 @@ What does NOT change (hard rules):
 - <invariant>
 
 ## Tests
+Acceptance file: `.worktrees/LANE-ACCEPT-<issue>.feature` — one it() per Scenario, titles verbatim (see Acceptance below).
 Pin: <behavior>. Fixture-scoped ONLY — create your own rows, filter every assertion
 by your own ids, never assert raw table counts.
 Integration files are WRITTEN not run: when done, print LANE-NEEDS-INTEGRATION-SLOT.
+Local runs are the test files you touched ONLY — never the full unit suite, tsc, or `next build` on this
+machine (Ahmed 2026-09-13: CI runs those on the PR; the laptop does not).
 Teardown deletes your own rows in FK order.
+
+## TDD — the order of work (since 2026-09-12)
+Test first, then code. For every behaviour change in Scope: write the test case from the
+fixture contract BEFORE touching the implementation, run that one file, and paste its RED
+output into your report. Then implement, run again, paste GREEN. A test that was never red
+proves nothing — but a red is evidence only when its failure message names the missing
+behaviour; a red from a fixture or import error proves nothing either, so read it. The
+coordinator's gate still deletes the wired code once to confirm only the dependent cases go red. Commit the test and the implementation together (red never merges).
+When a change has no honest test (a UI-only mirror in a repo with no component harness),
+say so in the report instead of inventing one.
 
 ### The fixture contract — write this section, don't leave it to the lane
 
@@ -64,6 +77,29 @@ the feature code was never wrong once. So the brief names, explicitly:
 A hardcoded date, a missing role, an unseeded row and a leaked session are all visible by eye in
 thirty seconds; the slot run costs minutes and is serialised machine-wide.
 
+## Acceptance — the Gherkin file is the gate (since 2026-09-13)
+The coordinator writes `.worktrees/LANE-ACCEPT-<issue>.feature` next to the brief: one `Feature`,
+one `Scenario` per acceptance criterion, plain Given/When/Then, one observable outcome each, in the
+domain's words (baskets, book, receipt), never implementation words (table, column, hook). Pointer to
+it goes in the brief's Tests section.
+The lane maps scenarios to tests 1:1: each `Scenario:` title becomes the `it()` title VERBATIM. Unit
+scenarios get the red-first run above from the lane; integration scenarios are WRITTEN by the lane and
+run red-first by the coordinator in the slot (the brief forbids the lane running them). The report and the PR body carry the whole
+`.feature` plus a `scenario → test file:line` table. A scenario with no test is a LANE-BLOCKED
+(missing fixture, no honest harness), never a silent skip. The lane never edits the `.feature`; a
+scenario that turns out wrong comes back as LANE-BLOCKED with the reason.
+Gate: rubric item 1 is scored against the `.feature`, not the issue prose — every scenario title
+greps to a green test, or the PR states the deferral.
+
+Example (one scenario is enough to show the shape):
+```gherkin
+Feature: Day sheet print survives corrections (#2081)
+  Scenario: a corrected line prints its current quantity as a plain number
+    Given a wholesaler day with one sale line adjusted from 5 to 3 baskets
+    When the day sheet is read for printing
+    Then the line shows 3
+```
+
 ## Simplicity
 Ponytail is ON for every code-writing lane: build the simplest thing that satisfies this brief —
 YAGNI → stdlib → native → one line → minimum. Before opening the PR run `/ponytail-review` on your
@@ -72,9 +108,9 @@ own diff and fix what it names (or state in the PR body why not).
 ## Delivery
 Small commits. No push unless told. No PR unless told. NEVER amend pushed commits.
 Finish by printing EXACTLY one sentinel line:
-- LANE-DONE — <branch> <sha> <one-line summary>
-- LANE-BLOCKED — <what + the options>
-- LANE-NEEDS-INTEGRATION-SLOT
+- LANE-DONE-<issue> — <branch> <sha> <one-line summary>
+- LANE-BLOCKED-<issue> — <what + the options>
+(LANE-NEEDS-INTEGRATION-SLOT is printed earlier, when the integration files are written; it is not the final line.)
 Idle is NOT finished — only the sentinel counts.
 
 ## STOP conditions

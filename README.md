@@ -33,7 +33,7 @@ Update: `npx skills update`, or `git -C ~/.claude/skills/coordinator pull`.
 | `SKILL.md` | The skill: role, the gate, sentinel contract, one integration slot, pane discipline, OCH-as-ledger conventions, standing rules |
 | `docs/onboarding.md` | Start here as a new coordinator |
 | `docs/coordinator-playbook.md` | Full operating model with worked examples |
-| `docs/lane-brief-template.md` | The exact brief format lanes receive, plus the fixture contract |
+| `writing-lane-briefs/brief-template.md` | The brief format lanes receive, plus the fixture contract (`docs/lane-brief-template.md` stays for its worked example) |
 | `docs/review-rubric.md` | The ten-item cold-review scorecard and the metrics line |
 | `docs/herdr-runbook.md` | Pane mechanics: split, boot, send/read, watch |
 
@@ -43,3 +43,16 @@ the skill reads first.
 
 Used with [OCH — Observer Coordination Hub](https://github.com/Observerstudio/observer-coordination-hub),
 where claims, messages and knowledge live on a hub and the `och` plugin feeds them to every session.
+
+## writing-lane-briefs — the brief contract
+
+`writing-lane-briefs/` is the sibling skill the coordinator invokes for every brief (new, rework,
+diagnosis). It merges the lane contract (worktree, fixture contract, `.feature` gate, per-task
+sentinel, STOP conditions) with the plan disciplines of superpowers `writing-plans` (one-action
+red→green steps, interfaces, no placeholders) and `improve` plans (base-SHA drift check,
+current-state excerpts, machine-checkable done criteria). Two parts, always: **What changes for
+the team** first, then the technical brief. Its template supersedes `docs/lane-brief-template.md`.
+
+```bash
+npx skills add Observerstudio/coordinator --skill writing-lane-briefs
+```

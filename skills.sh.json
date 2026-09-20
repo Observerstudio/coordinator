@@ -3,8 +3,11 @@
   "groupings": [
     {
       "title": "Coordination",
-      "description": "Run a whole work track as the coordinator — brief lanes, gate every PR, hold the one integration slot.",
-      "skills": ["coordinator"]
+      "description": "Run a whole work track as the coordinator \u2014 brief lanes with writing-lane-briefs, gate every PR, hold the one integration slot.",
+      "skills": [
+        "coordinator",
+        "writing-lane-briefs"
+      ]
     }
   ]
 }
