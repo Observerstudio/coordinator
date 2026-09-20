@@ -35,7 +35,7 @@ writes it from scratch.
 - **Steps** are one action each with the command and the expected output. A correction feature is proved by a SEQUENCE (up-then-down ≠ down-then-up).
 - **Done criteria** are commands with expected results, never "works correctly".
 - **STOP conditions** name the specific assumptions that, if false, end the lane with LANE-BLOCKED + options.
-- Per-task sentinel (`LANE-DONE-<issue>`), never the generic one — the grep must not match the brief's own text.
+- Per-task sentinel `LANE-DONE-<issue> — <branch> <sha> <summary>` (and `LANE-BLOCKED-<issue> — …`), never the bare `LANE-DONE` — the `<issue>` keeps the monitor's grep off the brief's own text, the `<branch> <sha>` is what the gate verifies. `LANE-NEEDS-INTEGRATION-SLOT` is a progress marker, not the final line.
 
 ## Rework and diagnosis briefs (folded in from superpowers)
 

@@ -33,7 +33,7 @@ Update: `npx skills update`, or `git -C ~/.claude/skills/coordinator pull`.
 | `SKILL.md` | The skill: role, the gate, sentinel contract, one integration slot, pane discipline, OCH-as-ledger conventions, standing rules |
 | `docs/onboarding.md` | Start here as a new coordinator |
 | `docs/coordinator-playbook.md` | Full operating model with worked examples |
-| `docs/lane-brief-template.md` | The exact brief format lanes receive, plus the fixture contract |
+| `writing-lane-briefs/brief-template.md` | The brief format lanes receive, plus the fixture contract (`docs/lane-brief-template.md` stays for its worked example) |
 | `docs/review-rubric.md` | The ten-item cold-review scorecard and the metrics line |
 | `docs/herdr-runbook.md` | Pane mechanics: split, boot, send/read, watch |
 
