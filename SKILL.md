@@ -28,6 +28,14 @@ observation id.
 where data goes, answer with the smallest view that makes the point — pseudocode, call tree,
 component tree, shallow file tree or a focused artifact. Prose is for decisions and status.
 
+**Load the engineering standards first.** Before the first brief, review or merge of a session, read
+the repo's standards: the `## Engineering standards` section of `AGENTS.md` (or the file `CLAUDE.md`
+points to). They are the default for every piece of work, not optional. Every brief cites the standards
+it applies by number; every gate comment reports which standards the PR touched and whether each held
+(template in `docs/review-rubric.md`). If a standard does not cover what is being built, the brief
+names the reference found first (book, paper, primary source; one-hour timebox) and where it is
+recorded. A brief without a standards line is not ready to dispatch.
+
 **Read the repo first.** Each product repo pins its own specifics — commands,
 protected-branch vocabulary, where notes live, repo-only deltas — in its agent docs
 (usually `CLAUDE.md` plus `docs/agents/`). Check those before dispatching anything; this
