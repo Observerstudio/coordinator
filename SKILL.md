@@ -75,9 +75,13 @@ LANE-BLOCKED with options, and you pick.
 
 A lane is finished ONLY when it prints exactly one sentinel line:
 
-- `LANE-DONE — <branch> <sha> <one-line summary>`
-- `LANE-BLOCKED — <what + the options>`
-- `LANE-NEEDS-INTEGRATION-SLOT`
+- `LANE-DONE-<issue> — <branch> <sha> <one-line summary>`
+- `LANE-BLOCKED-<issue> — <what + the options>`
+
+`LANE-NEEDS-INTEGRATION-SLOT` is a progress marker printed when the integration files are
+written, never the final line; the lane still ends with exactly one of the two above. The
+`<issue>` suffix keeps the monitor's grep from matching the brief's own text; `<branch> <sha>`
+is what `och report` and the gate verify (`git log origin/<base>..<branch>` before believing it).
 
 Idle is NOT finished. Do not treat a quiet pane as completion; wait for the sentinel.
 
@@ -117,7 +121,7 @@ installed, the conventions below are protocol, not memory:
 - **Blocked means `och ask`.** A lane that hits a reserved decision runs `och ask <claim> "<q>"
   --option A --option B`; its claim waits. You see it first in `och context` and answer with
   `och resolve answer <id> --option N`. LANE-BLOCKED stays as the pane sentinel.
-- **Done means `och report` with evidence.** The plugin turns a `LANE-DONE — <branch> <sha>`
+- **Done means `och report` with evidence.** The plugin turns a `LANE-DONE-<issue> — <branch> <sha>`
   sentinel into the report. The gate ends with `och resolve done <claim> --reason "<gate>"`
   after the merge, then release with the PR as reason.
 - **The slot is a lease.** `och lease integration-slot`; LEASE_HELD names the holder and the
@@ -139,7 +143,7 @@ Invoke these by name when the moment fits; do not re-implement what they do.
 | Moment | Skill | Why |
 |--------|-------|-----|
 | Before diagnosing or dispatching | `claude-mem:mem-search` | Memory does not lag; the tracker and chat do. Cite the observation id. |
-| Writing any lane brief | `tdd` / `superpowers:test-driven-development` | Every brief carries a TDD section: the test is written and shown RED first, then the code; red + green output pasted in the report. The red-first run IS the mutation proof. |
+| Writing any lane brief | `tdd` / `superpowers:test-driven-development` | Every implementation or rework brief carries a TDD section: the test is written and shown RED first, then the code; red + green output pasted in the report. A DIAG brief carries the failing case as evidence instead — it is forbidden to fix. |
 | Gating a PR | `ponytail:ponytail-review` | Named step of rubric item 10; its findings go in the PR body. |
 | Gating a PR over ~800 lines or touching money | `code-review` (Standards + Spec axes) | The ONE allowed second reader — never a fan-out. |
 | Before accepting a lane's LANE-DONE | `superpowers:verification-before-completion` | Evidence before claims; lanes have faked completion with no commit. |
@@ -195,6 +199,6 @@ skills — only the operator can type them; the coordinator asks for them by nam
 | File | Read it for |
 |------|-------------|
 | [`docs/coordinator-playbook.md`](docs/coordinator-playbook.md) | Full operating model: roles, gate, slot, standing rules, evidence standards, worked examples |
-| [`docs/lane-brief-template.md`](docs/lane-brief-template.md) | The exact brief format + worked example + teardown discipline for shared-ledger integration files |
+| [`writing-lane-briefs/brief-template.md`](writing-lane-briefs/brief-template.md) | The brief format lanes receive; `docs/lane-brief-template.md` is kept only for its worked example and the teardown discipline for shared-ledger integration files |
 | [`docs/herdr-runbook.md`](docs/herdr-runbook.md) | Pane mechanics: split/rename, agent boot + model check, send/read discipline, cross-tab etiquette |
 | [`docs/review-rubric.md`](docs/review-rubric.md) | The ten-item cold-review scorecard, the per-PR metrics line, and what a non-10/10 score forces |

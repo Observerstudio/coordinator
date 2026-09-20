@@ -11,7 +11,7 @@ what could go wrong. Becomes the PR body's first section, under this same headin
 - No branch switching, no `git add/commit/push` (coordinator commits). No subagents. Never run: `scripts/ci-local*`, the full unit suite, whole-repo tsc, `next build`, any integration file. Write the integration cases; the coordinator runs them and pastes RED/GREEN.
 
 ## Skills to load (read each `~/.agents/skills/<name>/SKILL.md` before starting)
-`tdd`, `verification-before-completion`, `ponytail-review`<, plus the task-shape ones from the skill's toolkit table>
+`tdd`, `verification-before-completion`, `ponytail-review` — plus the task-shape ones from the skill's toolkit table
 
 ## Decision being implemented
 <Who decided, when, in one paragraph. Link the issue comment. This is a REFACTOR / FEATURE / FIX with exactly N behaviour changes: list them.>
@@ -54,8 +54,8 @@ Ponytail on. Run `/ponytail-review` on your own diff before reporting; fix what 
 
 ## Delivery
 - eslint on touched files only. tsc only when the coordinator asks.
-- Print `LANE-NEEDS-INTEGRATION-SLOT` when the integration cases are written; then exactly one final line:
-  `LANE-DONE-<issue> — <files changed> <summary>` or `LANE-BLOCKED-<issue> — <what + options>`.
+- Print `LANE-NEEDS-INTEGRATION-SLOT` when the integration cases are written (a progress marker, not the end); then exactly one final line:
+  `LANE-DONE-<issue> — <branch> <sha> <summary>` or `LANE-BLOCKED-<issue> — <what + options>`.
 - Report carries: RED + GREEN output, the scenario → test table, the ponytail-review findings, and the "What changes for the team" paragraph unchanged.
 
 ## STOP conditions (LANE-BLOCKED-<issue>)
