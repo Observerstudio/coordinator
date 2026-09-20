@@ -14,7 +14,9 @@ no placeholders) and `improve` plans (drift stamp, current-state excerpts, machi
 done criteria, STOP conditions). **If a decision is not in the brief, the lane does not make it.**
 
 Two parts, always: **What changes for the team** (plain English, becomes the PR body's first
-section) then the technical brief. Never head the plain part "In plain English".
+section) then the technical brief. Never head the plain part "In plain English". The lane hands
+back the PR body too, written with `writing-pr-bodies` — the coordinator corrects it, never
+writes it from scratch.
 
 ## Before writing (the coordinator's half — never skip)
 
@@ -22,7 +24,8 @@ section) then the technical brief. Never head the plain part "In plain English".
 2. Read the sibling code you will name: the writer, its callers, its nearest test. A type says the shape, never the value.
 3. Record `git rev-parse --short origin/<base>`; the brief stamps it.
 4. Decide every reserved question yourself or with the operator. A brief with an open question is a LANE-BLOCKED waiting to happen. Two questions are ALWAYS the operator's, never yours: **any Arabic label with no precedent in `messages/ar.json`** (the app never coins a term — client-text rule 2026-09-17) and **any rule that changes money or holdings**. Ask before writing the brief; do not "flag it" inside the brief.
-5. Write the `.feature` first (`LANE-ACCEPT-<issue>.feature`): one Scenario per acceptance criterion, domain words only. Item 1 of the gate is scored against it.
+5. **Architecture pass, written down** (Ahmed 2026-09-17: never jump from decision to execution). Using `codebase-design` vocabulary: which module owns the fact; where the seam goes; what is reused vs new; the one derivation for every money/holdings fact; how the next visible case fits without a new branch. Draw the flow as a mermaid graph when more than two modules talk (`show-me`). This section goes into the brief verbatim; a brief without it is not ready.
+6. Write the `.feature` first (`LANE-ACCEPT-<issue>.feature`): one Scenario per acceptance criterion, domain words only. Item 1 of the gate is scored against it.
 
 ## Writing (fill `brief-template.md` — every section, even when short)
 
@@ -48,7 +51,7 @@ Lanes (OpenCode / Codex panes) read `~/.agents/skills/<name>/SKILL.md` when the 
 
 | Task shape | Lane loads |
 |---|---|
-| Every brief | `tdd` (red first), `verification-before-completion` (paste output, never "should"), `ponytail-review` (own diff before reporting) |
+| Every brief | `tdd` (red first), `verification-before-completion` (paste output, never "should"), `ponytail-review` (own diff before reporting), `writing-pr-bodies` (the lane drafts `PR-BODY-<issue>.md`; the coordinator opens the PR from it) |
 | Rework brief | `receiving-code-review` (verify the finding before implementing) |
 | DIAG brief | `systematic-debugging` / `diagnosing-bugs` (root cause, no fix) |
 | Prisma query or migration | `prisma-client-api`, `prisma-cli` |
