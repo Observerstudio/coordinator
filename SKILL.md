@@ -45,7 +45,7 @@ state object that rides every edge. You follow it; you do not improvise a route.
 - **Routers are tables.** Pick the matching row. No row matches → a question to the human,
   never a new route.
 - **Loop-backs are bounded.** Two rejects on the same finding, two blocks on the same block,
-  two nudges on a silent lane → the human, with the state file. Not round again.
+  two nudges on a silent lane → kill and re-dispatch on a fresh worktree; old pane gets `/new`. Not round again.
 - **One brief → one lane → one worktree.** A dispatch that looked failed is still queued; never
   send the same brief twice.
 - **COLD REVIEW is a separate, read-only verifier.** It never edits the lane's branch; findings

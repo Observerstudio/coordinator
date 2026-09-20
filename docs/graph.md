@@ -12,7 +12,7 @@ node does work a single loop could not, and the whole thing fits in one breath".
 ## The graph
 
 ```
-                state = { need, diagnosis, decision, briefs[], changes[], verdicts[], lessons[] }
+                state = { need, diagnosis, plan, issues[], decision, briefs[], changes[], corrections[], verdicts[], merged[], promoted[], lessons[] }
 
  START ─► [PROBLEM] ─► (INVESTIGATE) ─► (PLAN) ─► [ISSUE] ─► [DECIDE] ─► ◇ ASSIGN
                                                                     a dev ◄─┴─► coordinator
@@ -34,7 +34,7 @@ node does work a single loop could not, and the whole thing fits in one breath".
                                                                                         │
                                                                                    [PROMOTE]   human; the ladder is a CI check
                                                                                         │
-                                                                                   (LESSON) ─► CHECKPOINT: memory · dated note · rule
+                                                                                   (LESSON) ─► CHECKPOINT: state file · memory · dated note · rule
                                                                                         │
                                                                                        END  ╌╌► the next START reads the checkpoint
 
@@ -56,7 +56,7 @@ node does work a single loop could not, and the whole thing fits in one breath".
 | COLD REVIEW | coordinator | Read-only verifier at the exact SHA: rubric ×10, standards, own slot run, mutation check on money paths. | `verdicts[]` |
 | MERGE | coordinator | Squash into the repo's default integration branch. Never further. | `merged[]` |
 | PROMOTE | human | Each rung of the branch ladder; production-side checks. | `promoted[]` |
-| LESSON | coordinator + human | What bit, as a dated note, a memory entry, and — if it is a rule — AGENTS.md / the standards. | `lessons[]` |
+| LESSON | coordinator + human | What bit, as a `lessons[]` state-file entry, a memory entry, a dated note, and — if it is a rule — AGENTS.md / the standards. | `lessons[]` |
 | CHECKPOINT | system | The persisted state file + memory. The next START reads it first. | — |
 
 ## Routers — the only places the path branches
@@ -100,9 +100,14 @@ round again.
 |---|---|---|
 | reject → BRIEF on the **same finding** | 2 rounds | human decides: re-brief with a fixture contract by line range, or reassign |
 | BLOCKED → same lane on the **same block** | 2 | human decides |
-| nudge on a silent lane | 2 | kill and re-dispatch on a fresh worktree; old pane gets `/new` |
-| lanes live per track | 2 (3 with the human's word) | do not dispatch; queue in state |
+| nudge on the same silent pane | 2 nudges | kill and re-dispatch on a fresh worktree; old pane gets `/new` |
+| live lanes per track | 2 (3 with the human's word) | do not dispatch another lane; queue in state |
 | one brief | exactly 1 lane, exactly 1 worktree | a failed-looking dispatch is still queued — never re-dispatch the same brief |
+
+The ceilings count different things. A pane that settles without a sentinel remains the same lane while
+WATCH & CORRECT handles its silence; the two-nudge ceiling is what permits killing that pane and
+re-dispatching its brief on a fresh worktree. The live-lanes ceiling applies to additional concurrent
+lanes, so it does not prevent that replacement or turn the silent-pane route into a queue-only route.
 
 ## Fan-out and fan-in
 

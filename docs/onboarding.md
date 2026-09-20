@@ -14,10 +14,11 @@ Your repo may add specifics in its own `docs/agents/` pages — read both.
 ## First-session checklist
 
 1. Open Claude Code at the repo root → it loads the repo's agent guide (`CLAUDE.md`).
-2. Read [docs/coordinator-playbook.md](coordinator-playbook.md) — the operating model.
-3. Read the track's state file (`TRACK-STATE.md`, see [track-state-template.md](track-state-template.md));
+2. Read [graph.md](graph.md) — the declared route; read this first.
+3. Read [docs/coordinator-playbook.md](coordinator-playbook.md) — the operating model.
+4. Read the track's state file (`TRACK-STATE.md`, see [track-state-template.md](track-state-template.md));
    it is the handoff. If none exists, ask in the team channel and create it before dispatching.
-4. Verify herdr works: `herdr pane list`.
+5. Verify herdr works: `herdr pane list`.
 
 ## The documents
 
