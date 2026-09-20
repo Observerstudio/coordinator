@@ -56,3 +56,16 @@ the team** first, then the technical brief. Its template supersedes `docs/lane-b
 ```bash
 npx skills add Observerstudio/coordinator --skill writing-lane-briefs
 ```
+
+## writing-pr-bodies — the PR body a lane hands back
+
+`writing-pr-bodies/` is the lane-side skill (install it under `~/.agents/skills/` so OpenCode /
+Codex panes can read it). Every brief names it; the lane writes `PR-BODY-<issue>.md` next to the
+brief — **What changes for the team** in plain English first, then the code, a Gate of pasted
+RED/GREEN output, Does NOT change, the ponytail-review findings, Deploy order when there is a
+migration or repair, `Part of #N` never `Closes`. The coordinator opens the PR with `--body-file`
+and corrects, never writes from scratch.
+
+```bash
+npx skills add Observerstudio/coordinator --skill writing-pr-bodies
+```
