@@ -63,7 +63,6 @@ Ponytail on. Run `/ponytail-review` on your own diff before reporting; fix what 
 - eslint on touched files only. tsc only when the coordinator asks.
 - Print `LANE-NEEDS-INTEGRATION-SLOT` when the integration cases are written (a progress marker, not the end); then exactly one final line:
   `LANE-DONE-<issue> — <branch> <sha> <summary>` or `LANE-BLOCKED-<issue> — <what + options>`.
-- Report carries: RED + GREEN output, the scenario → test table, the ponytail-review findings, and the "What changes for the team" paragraph unchanged.
 - Write the PR body with `writing-pr-bodies` (its `pr-body-template.md`) to `<abs path>/.worktrees/PR-BODY-<issue>.md`: plain part first, then code, Gate with pasted RED/GREEN, Does NOT change, Ponytail review; `Part of #<issue>`, never `Closes`. The coordinator opens the PR with `--body-file`.
 - Report carries: RED + GREEN output, the scenario → test table, the ponytail-review findings, and the path of `PR-BODY-<issue>.md`.
 
