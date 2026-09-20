@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>You lead, agents build</title>
+<meta name="description" content="How Observer Studio ships software: you give the master one line, it opens tracks, coordinators brief lanes, evidence comes back up to you. Press play to watch a day.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+:root{
+  --bg:#f6f5f1; --card:#fffefb; --ink:#1d2230; --muted:#6a7080; --line:#d9d8d2; --line-strong:#b9b8b0;
+  --accent:#2d4fb5; --accent-ink:#ffffff; --ok:#2f7d4f;
+  --sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2{margin:0;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+h1{font-size:clamp(30px,4.6vw,48px);line-height:1.06;font-weight:800}
+h2{font-size:22px;line-height:1.2}
+p{margin:0}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:1080px;margin:0 auto;padding:56px 24px 72px}
+.lede{color:var(--muted);max-width:60ch;margin-top:16px;font-size:18px}
+.lede strong{color:var(--ink);font-weight:700}
+
+/* controls + stations */
+.bar{margin-top:40px;display:grid;grid-template-columns:auto 1fr;gap:18px 28px;align-items:start}
+.ctl{display:grid;gap:8px}
+.ctl .row{display:flex;gap:6px}
+.ctl button{border:1px solid var(--line-strong);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 16px;font-weight:700;font-size:14px}
+.ctl button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ctl button:active{transform:translateY(1px)}
+.ctl button[disabled]{opacity:.45;cursor:default}
+.ctl label{font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center;cursor:pointer}
+.ctl input{accent-color:var(--accent)}
+.phases{display:grid;grid-template-columns:4fr 3fr 2fr;gap:8px;font-size:12px;color:var(--muted);font-weight:700}
+.phases span{border-bottom:1px solid var(--line-strong);padding-bottom:6px}
+.phases span.you{color:var(--accent);border-bottom-color:var(--accent)}
+.steps{display:grid;grid-template-columns:repeat(9,1fr);gap:8px;margin-top:8px}
+.step{border-top:3px solid var(--line-strong);padding:8px 0 0;font-size:12.5px;color:var(--muted);background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;line-height:1.35}
+.step b{display:block;font-weight:700;color:var(--ink);font-size:13.5px}
+.step.done{border-top-color:var(--ink)}
+.step.now{border-top-color:var(--accent)}
+.step.now b{color:var(--accent)}
+.step.you b::after{content:" · you";font-weight:500;color:var(--accent)}
+@media (max-width:820px){.bar{grid-template-columns:1fr}.phases{display:none}.steps{grid-template-columns:repeat(3,1fr)}}
+
+/* the tree */
+.tree{margin-top:36px;display:grid;justify-items:center;position:relative}
+.node{background:var(--card);border:1px solid var(--line-strong);border-radius:10px;padding:16px 20px;max-width:560px;width:100%}
+.node.you{border:2px solid var(--accent);box-shadow:0 14px 34px -20px rgba(45,79,181,.5)}
+.node.you.waiting{background:#eef1fb}
+.node.client{background:transparent;border-style:dashed;max-width:480px}
+.node h2{font-size:20px;display:flex;align-items:baseline;gap:10px}
+.node h2 small{font-size:12px;font-weight:700;color:var(--muted);border:1px solid var(--line-strong);border-radius:999px;padding:1px 8px}
+.node .role{font-size:13px;color:var(--muted);margin-top:2px}
+.ar{direction:rtl;text-align:right;font-size:17px;line-height:1.7;margin-top:10px}
+.en{font-size:14px;color:var(--muted);margin-top:2px}
+.line{margin-top:12px;font-size:15px;min-height:1.5em}
+.line em{font-style:normal;color:var(--muted)}
+.ask{margin-top:12px;display:none;gap:8px;flex-wrap:wrap;align-items:center}
+.ask.on{display:flex}
+.ask .wait{flex-basis:100%;font-weight:700;color:var(--accent)}
+.ask .wait b{color:var(--ink)}
+.ask button{border:1px solid var(--accent);color:var(--accent-ink);background:var(--accent);border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px}
+.ask button:hover{background:#1f3a8f}
+.log{margin-top:10px;font-size:14px;color:var(--muted);display:grid;gap:4px}
+.log div::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--line-strong);margin-right:8px;vertical-align:middle}
+.log div.hot::before{background:var(--accent)}
+.link{height:40px;width:100%;max-width:560px;display:grid;grid-template-columns:1fr 1fr;font-size:12.5px;color:var(--muted)}
+.link span{display:flex;align-items:center;gap:8px;padding:0 6px}
+.link span:first-child{justify-content:flex-end;color:var(--accent);font-weight:700}
+.link span:first-child::after{content:"";width:2px;height:40px;background:var(--accent)}
+.link span:last-child::before{content:"";width:1px;height:40px;background:var(--line-strong)}
+.link.grey span:first-child{color:var(--muted);font-weight:500}
+.link.grey span:first-child::after{background:var(--line-strong);width:1px}
+.fan{width:100%;max-width:900px;height:40px;display:block}
+.fan path{fill:none;stroke:var(--accent);stroke-width:1.5}
+.tracks{display:grid;grid-template-columns:repeat(var(--n,1),1fr);grid-template-rows:auto auto auto auto;gap:10px 14px;max-width:900px;width:100%}
+.tracks.one{max-width:560px}
+.track{display:grid;grid-template-rows:subgrid;grid-row:span 4;gap:10px}
+.track .node{max-width:none;padding:14px 16px;min-height:150px}
+.track h2{font-size:17px}
+.track .title{font-size:12.5px;font-weight:700;color:var(--muted)}
+.lanes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lane{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px;min-height:74px}
+.lane b{display:block;font-weight:700;font-size:13px;margin-bottom:4px}
+.lane span{color:var(--muted)}
+.lane.busy{border-color:var(--accent)}
+.pr{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;border:1px solid var(--line-strong);border-radius:999px;padding:4px 12px;color:var(--muted);background:var(--card)}
+.pr.pass{border-color:var(--ok);color:var(--ok)}
+.pr.fail{border-color:#b5542d;color:#b5542d}
+.pr.staging{background:var(--ok);border-color:var(--ok);color:#fff}
+.pr.master{background:var(--ink);border-color:var(--ink);color:#fff}
+.hidden{display:none!important}
+.wire{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.wire path{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-dasharray:4 4}
+.pill{position:absolute;font-size:12.5px;font-weight:700;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:4px 10px;pointer-events:none;white-space:nowrap}
+@media (max-width:820px){.tracks{grid-template-columns:1fr;grid-template-rows:none}.track{grid-template-rows:none;grid-row:auto}.fan,.wire,.pill{display:none}}
+
+/* prose sections */
+.sec{margin-top:64px;padding-top:30px;border-top:1px solid var(--line-strong);display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:20px 48px}
+.sec p{color:var(--muted);font-size:15.5px;max-width:64ch}
+.sec p b,.sec dd b{color:var(--ink);font-weight:700}
+.sec p+p{margin-top:12px}
+.layers{display:grid;gap:0}
+.layers div{padding:12px 0;border-bottom:1px solid var(--line);font-size:15px;display:grid;grid-template-columns:130px 1fr;gap:16px}
+.layers div b{font-weight:700}
+.layers div span{color:var(--muted)}
+.sec dl{margin:0;display:grid;grid-template-columns:130px 1fr;gap:10px 16px;font-size:15px}
+.sec dt{font-weight:700}.sec dd{margin:0;color:var(--muted)}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.num{background:var(--card);border:1px solid var(--line-strong);border-radius:10px;padding:16px 18px}
+.num b{display:block;font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.num.hot{border-color:var(--accent)}.num.hot b{color:var(--accent)}
+.num span{display:block;font-size:13px;color:var(--muted);margin-top:8px}
+.after{margin-top:14px;font-size:15px}
+.after b{font-weight:700}
+.sec.first{margin-top:40px;border-top:0;padding-top:0}
+@media (max-width:820px){.sec{grid-template-columns:1fr}.layers div,.sec dl{grid-template-columns:1fr;gap:2px}.nums{grid-template-columns:1fr}}
+
+/* below */
+.stays{margin-top:60px;background:var(--card);border:1px solid var(--line-strong);border-radius:10px;padding:22px 26px;display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:baseline}
+.stays h2{font-size:20px}
+.stays p{color:var(--muted);font-size:15.5px}
+.stays p b{color:var(--ink);font-weight:700}
+.rules{margin-top:64px;padding-top:30px;border-top:1px solid var(--line-strong);display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:20px 48px}
+.rules ul{list-style:none;margin:0;padding:0;columns:2;column-gap:32px}
+.rules li{break-inside:avoid;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+.rules li b{font-weight:700}
+.rules li span{display:block;color:var(--muted);font-size:14px;margin-top:2px}
+footer{margin-top:56px;font-size:13.5px;color:var(--muted);max-width:70ch}
+@media (max-width:820px){.rules{grid-template-columns:1fr}.rules ul{columns:1}.stays{grid-template-columns:1fr;gap:8px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>From the client's message to master.</h1>
+  <p class="lede"><strong>One person owns every request.</strong> You hear the client, decide what only you can, and push to master. In between, a coordinator briefs lanes and gates every PR. Below: how it works, then one request played through.</p>
+</header>
+
+<section class="sec first" aria-labelledby="w-h">
+  <div><h2 id="w-h">What our workflow is</h2><p>Three layers, one gate. Everything still runs on git, gh and GitHub PRs. No new tool for humans.</p></div>
+  <div class="layers">
+    <div><b>A human</b><span>Sets direction and keeps the calls that are theirs: client decisions, production data, the push to master.</span></div>
+    <div><b>A coordinator</b><span>One agent per work track does the judgment: diagnoses, writes a one-page brief per task, cold-reviews every PR against a ten-item rubric, runs the shared integration slot, merges. It never writes feature code.</span></div>
+    <div><b>Lanes</b><span>Cheap agents in their own worktrees do the typing. One brief in, one PR out, one sentinel line saying done or blocked.</span></div>
+    <div><b>Memory</b><span>Dated notes in the repo, a bites file per hard lesson, an incident registry every agent reads before touching money code.</span></div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="r-h">
+  <div><h2 id="r-h">How to read the replay</h2></div>
+  <div>
+    <p>One request, nine stations, three phases. Blue stations are yours; the rest run while you are away from the keyboard.</p>
+    <p>Press play, or step through. When the page waits for you, it says so and stops until you answer.</p>
+  </div>
+</section>
+
+<div class="bar">
+  <div class="ctl">
+    <div class="row">
+      <button class="primary" id="play">Play the request</button>
+      <button id="back" aria-label="Step back">‹</button>
+      <button id="fwd" aria-label="Step forward">›</button>
+      <button id="reset">Reset</button>
+    </div>
+    <label><input type="checkbox" id="heavy"> Heavy day: three tracks and a master</label>
+  </div>
+  <div>
+    <div class="phases"><span class="you">Understand · you</span><span>Build · away from keyboard</span><span class="you">Ship · you</span></div>
+    <div class="steps" id="steps" aria-label="Stations">
+      <button class="step" data-i="0"><b>Client</b>The need, in their words.</button>
+      <button class="step you" data-i="1"><b>Issue</b>Need, not mechanism.</button>
+      <button class="step" data-i="2"><b>Diagnose</b>On real data first.</button>
+      <button class="step you" data-i="3"><b>Decide</b>Closed once, in the PRD.</button>
+      <button class="step" data-i="4"><b>Brief</b>Scope, pattern, pins.</button>
+      <button class="step you" data-i="5"><b>Lanes</b>Type, visibly. You steer.</button>
+      <button class="step" data-i="6"><b>Gate</b>Ten items. Merge to staging.</button>
+      <button class="step you" data-i="7"><b>Promote</b>You push to master.</button>
+      <button class="step" data-i="8"><b>Tell</b>Client, note, handoff.</button>
+    </div>
+  </div>
+</div>
+
+<section class="tree" id="tree" aria-label="One request, end to end">
+  <svg class="wire" id="wire"></svg>
+  <div class="node client hidden" id="client">
+    <h2>Client <small>WhatsApp</small></h2>
+    <div class="ar" id="car"></div><div class="en" id="cen"></div>
+  </div>
+  <div class="link grey hidden" id="link0" aria-hidden="true"><span>need</span><span>status, in their language</span></div>
+  <div class="node you" id="you">
+    <h2>You <small>owner, or the dev on the account</small></h2>
+    <div class="role">Hears the client, writes the issue, closes decisions, pushes to master.</div>
+    <div class="line" id="youline"><em>Waiting for the client's message. Press play.</em></div>
+    <div class="ask" id="ask"></div>
+  </div>
+  <div class="link hidden" id="link1" aria-hidden="true"><span>direction</span><span>evidence: PRs, scorecards, notes</span></div>
+  <div class="node hidden" id="master">
+    <h2 id="mtitle">Coordinator <small>Opus</small></h2>
+    <div class="role" id="mrole">One Claude Code session for this request. Reads before it acts. Writes no feature code.</div>
+    <div class="log" id="mlog"></div>
+  </div>
+  <svg class="fan hidden" id="fan" viewBox="0 0 900 40" aria-hidden="true">
+    <path d="M450 0 V20 H150 V40"/><path d="M450 20 V40"/><path d="M450 20 H750 V40"/>
+  </svg>
+  <div class="link grey hidden" id="link2" aria-hidden="true"><span>brief</span><span>sentinel: LANE-DONE, PR</span></div>
+  <div class="tracks one" id="tracks"></div>
+</section>
+
+<section class="sec" aria-labelledby="e-h">
+  <div><h2 id="e-h">Why it is efficient</h2></div>
+  <div>
+    <p><b>Attention goes where it is scarce.</b> The expensive model reads and decides. The cheap model types. One brief per task means nothing is re-explained.</p>
+    <p><b>Parallel by default, safe by construction.</b> A worktree per lane, one integration slot, CI that cannot skip to green. The gate catches what CI cannot, and each catch becomes a rule the next agent reads.</p>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="m-h">
+  <div><h2 id="m-h">How we measure it</h2></div>
+  <dl>
+    <dt>Throughput</dt><dd>Merged PRs per week. Distinct issues touched.</dd>
+    <dt>Flow</dt><dd>PR open-to-merge time.</dd>
+    <dt>Quality</dt><dd>Staging CI green on the combined head. Reverts per PR. New post-mortems: zero since 3 August.</dd>
+    <dt>Waste</dt><dd>Dispatches on work that was already fixed.</dd>
+    <dt>Cost</dt><dd>Model tier per lane.</dd>
+  </dl>
+</section>
+
+<section class="sec" aria-labelledby="n-h">
+  <div><h2 id="n-h">What it did</h2><p>Merged PRs per week on Selal, 2026.</p></div>
+  <div>
+    <div class="nums">
+      <div class="num"><b>22</b><span>June to July. Agents assisting, no coordinator.</span></div>
+      <div class="num"><b>53</b><span>Late July to mid August. Claude Code, single session.</span></div>
+      <div class="num hot"><b>107 · 162 · 201</b><span>Since 25 August. Coordinator plus lanes, week by week.</span></div>
+    </div>
+    <p class="after"><b>65x on the year, 4x on last month.</b> Three humans now merge under the same gate. The same workflow took OCH, the coordination hub started on a Thursday, from a PRD to 21.8k lines of Go and 33 merged PRs in three days.</p>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="d-h">
+  <div><h2 id="d-h">Three principles</h2><p>The replay above is built on them. So is every real day.</p></div>
+  <dl>
+    <dt>Clarity</dt><dd>One brief in, one sentinel line out, one gate comment per PR. Nothing is explained twice. Above: the Brief station, the LANE-DONE line, the 10/10 chip.</dd>
+    <dt>Simplicity</dt><dd>The workflow is markdown in the repo plus git and gh. A skill file, a brief template, a review rubric. No new tool for humans.</dd>
+    <dt>Adoption</dt><dd>Three humans merge under the same gate today. The skill loads itself every session. A lane needs nothing but a worktree and a brief.</dd>
+  </dl>
+</section>
+
+<section class="rules sec" aria-labelledby="rules-h">
+  <div><h2 id="rules-h">Six things that do not bend</h2></div>
+  <ul>
+    <li><b>Build the spec, nothing around it.</b><span>Do not shrink the product; enhance it.</span></li>
+    <li><b>Never force-push.</b><span>Amended history goes on a new branch with a new PR.</span></li>
+    <li><b>Lanes never delegate.</b><span>Work happens where it can be seen.</span></li>
+    <li><b>Idle is not finished.</b><span>Only the sentinel line is. A quiet pane gets a nudge, not a merge.</span></li>
+    <li><b>Coordinators write no feature code.</b><span>Briefs, reviews and notes are their files.</span></li>
+    <li><b>Findings that live only in chat did not happen.</b><span>A dated note, merged by PR.</span></li>
+  </ul>
+</section>
+
+<footer>The master and every coordinator run the same <a href="SKILL.md">coordinator skill</a>: it is how they read, brief, gate and hand off. Lanes run plain Claude Code in their own panes. Observer Studio, September 2026.</footer>
+</div>
+
+<script>
+(function(){
+var ONE=[{key:'tax',name:'Issue 128 · tax on returns',lanes:['lane-tax-1','lane-tax-2'],pr:128}];
+var THREE=[
+ {key:'pdf',name:'Invoice PDF',lanes:['lane-pdf-1','lane-pdf-2'],pr:127},
+ {key:'tax',name:'Tax on returns',lanes:['lane-tax-1','lane-tax-2'],pr:128},
+ {key:'csv',name:'CSV export',lanes:['lane-csv-1','lane-csv-2'],pr:129}
+];
+var $=function(id){return document.getElementById(id)};
+var tracksEl=$('tracks'),steps=[].slice.call(document.querySelectorAll('.step'));
+var state={i:-1,answer:null};
+var timer=null,playing=false,pending=[],resume=false;
+var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,quiet=reduced,D=0.35;
+function heavy(){return $('heavy').checked}
+function T(){return heavy()?THREE:ONE}
+
+function later(fn,ms){if(quiet){fn();return}pending.push(setTimeout(fn,ms))}
+function clearLater(){pending.forEach(clearTimeout);pending=[]}
+function trackHTML(t){return '<div class="track" data-k="'+t.key+'">'+
+ '<div class="title">'+t.name+'</div>'+
+ '<div class="node"><h2>'+(heavy()?'Coordinator <small>Sonnet</small>':'Track <small>this request</small>')+'</h2><div class="log" data-role="clog"></div></div>'+
+ '<div class="lanes">'+t.lanes.map(function(l){return '<div class="lane" data-l="'+l+'"><b>'+l+'</b><span>waiting for a brief</span></div>'}).join('')+'</div>'+
+ '<div><span class="pr" data-role="pr">no PR yet</span></div></div>'}
+function log(el,text,hot){if(!el)return;var d=document.createElement('div');d.textContent=text;if(hot)d.className='hot';el.appendChild(d);while(el.children.length>(el.id==='mlog'?4:3))el.removeChild(el.firstChild);if(!quiet)gsap.from(d,{opacity:0,y:4,duration:D})}
+function setLane(k,l,text,busy){var e=tracksEl.querySelector('[data-k="'+k+'"] [data-l="'+l+'"]');if(!e)return;e.querySelector('span').textContent=text;e.classList.toggle('busy',!!busy)}
+function setPR(k,cls,text){var e=tracksEl.querySelector('[data-k="'+k+'"] [data-role="pr"]');if(!e)return;e.className='pr '+cls;e.textContent=text}
+function clog(k){return tracksEl.querySelector('[data-k="'+k+'"] [data-role="clog"]')}
+function show(el){el.classList.remove('hidden');if(!quiet)gsap.from(el,{opacity:0,y:8,duration:D})}
+function you(html){$('youline').innerHTML=html}
+function wire(fromK,toK,text){clearWire();
+  var a=tracksEl.querySelector('[data-k="'+fromK+'"] .node'),b=tracksEl.querySelector('[data-k="'+toK+'"] .node'),tree=$('tree');
+  if(!a||!b||innerWidth<821)return;
+  var r=tree.getBoundingClientRect(),ra=a.getBoundingClientRect(),rb=b.getBoundingClientRect();
+  var x1=ra.left+ra.width/2-r.left,y1=ra.top-r.top-6,x2=rb.left+rb.width/2-r.left,y2=rb.top-r.top-6,cy=Math.min(y1,y2)-62;
+  var svg=$('wire');svg.setAttribute('width',r.width);svg.setAttribute('height',r.height);
+  var p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d','M'+x1+' '+y1+' Q '+((x1+x2)/2)+' '+cy+' '+x2+' '+y2);svg.appendChild(p);
+  var pill=document.createElement('div');pill.className='pill';pill.textContent=text;tree.appendChild(pill);
+  if(quiet){pill.style.left=((x1+x2)/2-90)+'px';pill.style.top=(cy-2)+'px';return}
+  gsap.fromTo(pill,{left:x1-40,top:y1-14,opacity:0},{left:(x1+x2)/2-90,top:cy-2,opacity:1,duration:1.2,ease:'power1.inOut'})}
+function clearWire(){$('wire').innerHTML='';[].forEach.call(document.querySelectorAll('.pill'),function(p){p.remove()})}
+function eachTrack(fn){T().forEach(fn)}
+
+var STEPS=[
+ function client(){ // 0
+  $('car').textContent='الفواتير بتطلع ضريبة غلط على المرتجعات، والعميل بيسأل.';
+  $('cen').textContent='"Invoices show the wrong tax on returns, and the customer is asking."';
+  show($('client'));show($('link0'));you('<em>You read it. This is a need. The mechanism is ours to choose.</em>')},
+ function issue(){ // 1
+  you('<em>You write issue 128:</em> "Wrong tax on returned invoices. Reproduce with last month\'s returns. Do not change the tax table."');
+  show($('link1'));show($('master'));
+  $('mtitle').innerHTML=heavy()?'Master <small>Opus</small>':'Coordinator <small>Opus</small>';
+  $('mrole').textContent=heavy()?'One session for the whole request. Reads first, then splits into tracks.':'One Claude Code session for this request. Reads before it acts. Writes no feature code.';
+  log($('mlog'),'Read the issue, the last handoff, and the notes on invoicing. Nothing in flight touches returns.')},
+ function diagnose(){ // 2
+  log($('mlog'),'Counted before calling it a bug: 412 of 9,300 returned invoices are off. All by one cent. The rounding path, not the tax table.',true);
+  log($('mlog'),heavy()?'Three tracks: Invoice PDF, Tax on returns, CSV export. Opening a tab for each.':'One track. Two lanes: the fix and its test.',true);
+  if(heavy())show($('fan'));else show($('link2'));tracksEl.style.setProperty('--n',T().length);tracksEl.classList.toggle('one',!heavy());
+  tracksEl.innerHTML=T().map(trackHTML).join('');if(!quiet)gsap.from('.track',{opacity:0,y:10,duration:D,stagger:0.25});
+  eachTrack(function(t){log(clog(t.key),heavy()?'Tab open. Reading the handoff and the files in scope.':'Scope: money/round.go and the return path. Nothing else.')})},
+ function decide(){ // 3
+  log($('mlog'),'One thing only you can close: half-up or banker\'s rounding on returns?',true);
+  if(state.answer){answered(state.answer,true)}else{
+    $('ask').innerHTML='<div class="wait">Waiting for you. <b>Rounding on returns?</b></div><button data-a="Half-up">Half-up</button><button data-a="Banker\'s">Banker\'s</button>';
+    $('ask').classList.add('on');resume=playing;hold();paint()}},
+ function brief(){ // 4
+  eachTrack(function(t){log(clog(t.key),'Brief written: scope, the pattern to copy, test pins on last month\'s returns. Reserved: nothing left.',true);
+    t.lanes.forEach(function(l){setLane(t.key,l,'has the brief, opened a worktree',true)})})},
+ function lanes(){ // 5
+  eachTrack(function(t){setLane(t.key,t.lanes[0],'writing the fix, small commits',true);setLane(t.key,t.lanes[1],'writing the test on real returns',true);
+    log(clog(t.key),'Lanes typing in their panes. Watching for the sentinel.')});
+  you('<em>You steer mid-flight:</em> "Keep the PDF layout exactly as is. Only the numbers change."');
+  later(function(){log($('mlog'),'Turned your note into a review file for the lane. It reads it, not a chat message.',true)},900);
+  if(heavy()){log(clog('csv'),'money/format.ts is inside Invoice PDF\'s scope. Messaging their coordinator.',true);
+    log(clog('pdf'),'CSV asked for money/format.ts. Told them: wait for our merge, then rebase.');
+    later(function(){wire('csv','pdf','money/format.ts is yours, we wait')},600)}},
+ function gate(){ // 6
+  clearWire();
+  eachTrack(function(t){t.lanes.forEach(function(l){setLane(t.key,l,'LANE-DONE, PR open',false)});setPR(t.key,'pass','PR '+t.pr+' · 10/10');
+    log(clog(t.key),'Cold review at the exact sha: 10/10. CI green. Merged to staging.')});
+  setPR('tax','fail','PR 128 · 9/10');log(clog('tax'),'Item 6 failed: the mutation did not bite. Rework sent as a file.',true);setLane('tax','lane-tax-2','rework: strengthen the test',true);
+  later(function(){setPR('tax','staging','PR 128 · on staging');setLane('tax','lane-tax-2','LANE-DONE, rework 1',false);log(clog('tax'),'Rework back. 10/10. Squash-merged to staging by the coordinator.')},1400);
+  if(heavy()){later(function(){setPR('pdf','staging','PR 127 · on staging');setPR('csv','staging','PR 129 · on staging');log(clog('csv'),'Rebased on staging. Suite green. Merged.')},2000)}
+  log($('mlog'),'Staging CI on the combined head: green.',true)},
+ function promote(){ // 7
+  you('<em>You read the scorecard and the staging run.</em> You push staging to master. That call is yours.');
+  eachTrack(function(t){setPR(t.key,'master','PR '+t.pr+' · on master')});log($('mlog'),'Master moved. Client can be told.')},
+ function tell(){ // 8
+  $('car').textContent='تم إصلاح ضريبة المرتجعات، والتحديث على الإنتاج الآن. الفواتير القديمة صحيحة بدون أي إجراء منكم.';
+  $('cen').textContent='"The tax on returns is fixed and live now. Older invoices are correct with no action from you."';
+  you('<em>You send the client one message, in their language.</em>');
+  eachTrack(function(t){log(clog(t.key),'Wrote the dated note. Handoff written for the next session.')});
+  log($('mlog'),'Lesson kept: test on last month\'s returns before touching rounding. Next agent reads it first.',true)}
+];
+
+function answered(a,silent){state.answer=a;$('ask').classList.remove('on');$('ask').innerHTML='';
+  you('<em>You decide:</em> '+a+'. Written into the PRD. It stays closed.');
+  log($('mlog'),'Decision recorded: '+a+'. Nothing left reserved.');
+  if(!silent&&resume){resume=false;playing=true;paint();schedule()}}
+$('ask').addEventListener('click',function(e){if(e.target.dataset.a)answered(e.target.dataset.a)});
+
+function asking(){return $('ask').classList.contains('on')}
+function paint(){steps.forEach(function(s,i){s.classList.toggle('done',i<state.i);s.classList.toggle('now',i===state.i)});
+  $('back').disabled=state.i<0;$('fwd').disabled=state.i>=STEPS.length-1;$('you').classList.toggle('waiting',asking());
+  $('play').textContent=asking()?'Waiting for you':playing?'Pause':(state.i>=STEPS.length-1?'Play again':(state.i<0?'Play the request':'Play'))}
+function blank(){clearLater();clearWire();['client','link0','link1','link2','master','fan'].forEach(function(id){$(id).classList.add('hidden')});
+  $('mlog').innerHTML='';tracksEl.innerHTML='';$('ask').classList.remove('on');$('ask').innerHTML='';you('<em>Waiting for the client\'s message. Press play.</em>')}
+function goto(n){var keep=state.answer;blank();state={i:-1,answer:keep};var was=quiet;quiet=true;for(var k=0;k<n;k++){state.i=k;STEPS[k]()}quiet=was;if(n>=0){state.i=n;STEPS[n]()}paint()}
+function next(){if(state.i>=STEPS.length-1){hold();return}state.i++;STEPS[state.i]();paint()}
+function schedule(){clearTimeout(timer);if(!playing)return;timer=setTimeout(function(){if(!playing)return;next();if(!asking())schedule()},reduced?400:2800)}
+function hold(){playing=false;clearTimeout(timer);paint()}
+function play(){if(state.i>=STEPS.length-1)goto(-1);playing=true;next();if(!asking())schedule();paint()}
+
+$('play').onclick=function(){if(asking())return;playing?hold():play()};
+$('fwd').onclick=function(){hold();next()};
+$('back').onclick=function(){hold();goto(state.i-1)};
+$('reset').onclick=function(){hold();state.answer=null;goto(-1)};
+$('heavy').onchange=function(){hold();goto(state.i)};
+steps.forEach(function(s){s.onclick=function(){hold();goto(+s.dataset.i)}});
+document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'){hold();next()}else if(e.key==='ArrowLeft'){hold();goto(state.i-1)}else if(e.key===' '){e.preventDefault();if(!asking())playing?hold():play()}});
+addEventListener('resize',function(){if(state.i===5&&heavy()){var q=quiet;quiet=true;wire('csv','pdf','money/format.ts is yours, we wait');quiet=q}});
+paint();
+
+var m=/^#go=(\d)$/.exec(location.hash);if(m){quiet=true;state.answer='Half-up';goto(+m[1]);quiet=reduced}
+/* self-check: open index.html#selftest, read the console */
+if(location.hash==='#selftest'){var f=[];quiet=true;state.answer='Half-up';goto(8);
+  if(document.querySelectorAll('.pr.master').length!==1)f.push('one PR on master at the end');
+  $('heavy').checked=true;goto(8);if(document.querySelectorAll('.pr.master').length!==3)f.push('three PRs on master on a heavy day');
+  $('heavy').checked=false;goto(3);if(asking())f.push('no question when already answered');
+  state.answer=null;goto(3);if(!asking())f.push('question shown when unanswered');
+  goto(-1);if(!$('master').classList.contains('hidden'))f.push('reset hides the coordinator');
+  console.assert(f.length===0,'selftest failures',f);if(!f.length)console.log('selftest: OK')}
+})();
+</script>
+</body>
+</html>
