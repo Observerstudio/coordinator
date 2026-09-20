@@ -24,6 +24,10 @@ Mirror these shipped files, in reading order:
 1. <path/to/existing/file.ts>
 2. <path/to/other/existing/file.ts>
 
+## Standards / reference
+- Standards: <S# ...> — cite every engineering standard this brief applies.
+- Reference used: <none — the repo standards cover this> or <book/paper/primary source + section>.
+
 ## Scope
 What changes — with file:line for EVERY writer and reader involved:
 - <change> (<file>:<line>)

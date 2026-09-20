@@ -24,7 +24,7 @@ body is not a review either.
 ## The gate comment (every merge, same shape)
 
 ```
-Gate — <sha> · review: <passed>/10 · N/A=<n> · reworks=<k> · second-reader=<none|1>
+Gate — <sha> · review: <passed>/10 pass · N/A=<n> · reworks=<k> · reviewer=coordinator · second-reader=<none|1>
 Standards touched: S1 refactor-no-behaviour HELD · S3 ledger-immutable HELD · S4 timeouts FAIL→fixed in <sha>
 Standards not touched: S2 S5 S6 S7 S8 S9 S10 S11 S12 S13
 Reference used: <none | book/paper + section, recorded in <ADR or brief>>
