@@ -62,10 +62,10 @@ state object that rides every edge. You follow it; you do not improvise a route.
 ## The gate — every PR, no exceptions
 
 1. Cold review at the exact SHA, scoring all ten items of
-   [`docs/review-rubric.md`](docs/review-rubric.md); then run `/ponytail-review` on the diff
-   as a named step and list its findings in the PR body. ONE reviewer — you. A single
-   second-reader subagent only for a PR over ~800 lines or one that touches money;
-   never a fan-out, never one reader per dimension.
+   [`docs/review-rubric.md`](docs/review-rubric.md); then run `code-review` (Standards + Spec)
+   and `/ponytail-review` on the diff as named steps and list their findings in the PR body.
+   Every gate, every PR — not gated on size or money. ONE reviewer — you, running these three
+   passes yourself; never a fan-out, never one reader per dimension.
 2. CI green.
 3. YOUR own local run of the lane's touched integration suite.
 4. Squash-merge (merge-commit for back-merges).
@@ -97,18 +97,26 @@ worktree + branch setup; pattern-to-copy files in reading order; scope with file
 for every writer/reader plus explicit do-NOT-change rules; fixture-scoped test pins
 (integration files WRITTEN, not run); delivery rules; STOP conditions. If a decision is
 not in the brief, the lane does not make it — reserved decisions come back as
-LANE-BLOCKED with options, and you pick. Every brief names `implement` in its skills line, with the
-lane override (no whole-repo tsc, no full suite, no commit); see "Routing by situation".
+LANE-BLOCKED with options, and you pick. An **implementation or rework** brief names `implement`
+in its skills line, with the lane override (no whole-repo tsc, no full suite, no commit); see
+"Routing by situation". A DIAG brief forbids any fix and never names `implement`; briefs that
+route through `wayfinder`/`to-spec`/`to-tickets` produce a map, a spec, or tickets, not code, and
+don't carry it either.
 
-A lane is finished ONLY when it prints exactly one sentinel line:
+A lane is finished ONLY when it prints exactly one sentinel line. The lane never commits (part of
+the `implement` override under "Routing by situation" below), so its sentinel names the worktree,
+not a SHA:
 
-- `LANE-DONE-<issue> — <branch> <sha> <one-line summary>`
+- `LANE-DONE-<issue> — <branch> <base-sha> (uncommitted) <one-line summary>`
 - `LANE-BLOCKED-<issue> — <what + the options>`
 
 `LANE-NEEDS-INTEGRATION-SLOT` is a progress marker printed when the integration files are
 written, never the final line; the lane still ends with exactly one of the two above. The
-`<issue>` suffix keeps the monitor's grep from matching the brief's own text; `<branch> <sha>`
-is what `och report` and the gate verify (`git log origin/<base>..<branch>` before believing it).
+`<issue>` suffix keeps the monitor's grep from matching the brief's own text. On `LANE-DONE`, the
+coordinator commits the worktree's output to `<branch>` first, THEN runs the whole gate — cold
+review, `code-review`, `ponytail-review`, CI, the touched integration suite — against that new
+commit's SHA, then pushes and opens the PR. A merge pins `--match-head-commit` to that gated SHA,
+never to whatever the branch points at later.
 
 Idle is NOT finished. Do not treat a quiet pane as completion; wait for the sentinel.
 
@@ -148,9 +156,9 @@ installed, the conventions below are protocol, not memory:
 - **Blocked means `och ask`.** A lane that hits a reserved decision runs `och ask <claim> "<q>"
   --option A --option B`; its claim waits. You see it first in `och context` and answer with
   `och resolve answer <id> --option N`. LANE-BLOCKED stays as the pane sentinel.
-- **Done means `och report` with evidence.** The plugin turns a `LANE-DONE-<issue> — <branch> <sha>`
-  sentinel into the report. The gate ends with `och resolve done <claim> --reason "<gate>"`
-  after the merge, then release with the PR as reason.
+- **Done means `och report` with evidence.** The plugin turns a `LANE-DONE-<issue> — <branch>
+  <base-sha> (uncommitted)` sentinel into the report. The gate ends with `och resolve done
+  <claim> --reason "<gate>"` after the merge, then release with the PR as reason.
 - **The slot is a lease.** `och lease integration-slot`; LEASE_HELD names the holder and the
   expiry. Release it instead of printing SLOT-RELEASED.
 - **Lessons are bites with triggers.** Something bit you? `och publish bite "<imperative>"
@@ -172,7 +180,7 @@ Invoke these by name when the moment fits; do not re-implement what they do.
 | Before diagnosing or dispatching | `claude-mem:mem-search` | Memory does not lag; the tracker and chat do. Cite the observation id. |
 | Writing any lane brief | `tdd` / `superpowers:test-driven-development` | Every implementation or rework brief carries a TDD section: the test is written and shown RED first, then the code; red + green output pasted in the report. A DIAG brief carries the failing case as evidence instead — it is forbidden to fix. |
 | Gating a PR | `ponytail:ponytail-review` | Named step of rubric item 10; its findings go in the PR body. |
-| Gating a PR over ~800 lines or touching money | `code-review` (Standards + Spec axes) | The ONE allowed second reader — never a fan-out. |
+| Gating a PR | `code-review` (Standards + Spec axes) | Runs on every gate alongside cold review + ponytail-review — one reviewer's pass covering both axes, never a fan-out. |
 | Before accepting a lane's LANE-DONE | `superpowers:verification-before-completion` | Evidence before claims; lanes have faked completion with no commit. |
 | Waiting on a PR's checks and comments | `claude-mem:babysit` | Polls CI + review comments until mergeable; never merge on a flag (`gh pr merge --auto` merges on the spot here). |
 | Long waits on lanes or CI | `loop` | Self-paced re-check instead of blocking sleeps. |
@@ -217,12 +225,31 @@ lives only in memory gets skipped under load (it did on 2026-09-27), so check th
 
 **`implement` in a lane (override):** lanes load `implement` for its red→green loop and its closing
 `code-review`, but the brief's standing rules override three of its lines: **no whole-repo typecheck, no full
-test suite, no commit.** The coordinator runs tsc, the full suite and the integration slot at the gate, and
-commits after the gate passes. Every brief states this override.
+test suite, no commit.** The lane ends with `LANE-DONE-<issue> — <branch> <base-sha> (uncommitted)`; the
+worktree output is still there, just not on the branch. On that sentinel the coordinator, in order: commits
+the worktree's output to `<branch>`, runs the whole gate (cold review + `code-review` + `ponytail-review`,
+CI, tsc, the full suite, the touched integration suite) against the resulting SHA, then pushes and opens the
+PR. Every brief states this override.
 
-`wayfinder`, `to-spec`, `to-tickets` and `implement` ship as `disable-model-invocation` in the upstream skill
-pack. The coordinator needs them model-invocable (unlock locally, and keep our own copies here so an upstream
-update cannot re-lock them — tracked in #20). `handoff`, `grill-me` and `triage` remain operator-typed.
+**Prerequisite:** `wayfinder`, `to-spec`, `to-tickets` and `implement` ship as `disable-model-invocation` in
+the upstream skill pack and must be model-invocable on this machine for the routes above to work. Unlock
+them once with:
+
+```
+cd ~/.agents/skills && for s in wayfinder to-spec to-tickets implement; do sed -i '' '/^disable-model-invocation: true$/d' $s/SKILL.md; done
+```
+
+An upstream skills update re-locks all four. This PR does not vendor copies of them here — they are a
+third party's skills, and copying invites license/ownership questions and drift from upstream; making them
+model-invocable stays tracked as #20. Until #20 lands, the coordinator checks at the top of a session
+whether any of the four are locked again and, if so, asks the operator to re-run the command above.
+
+Of the rest of the routing table, `research`, `domain-modeling`, `diagnosing-bugs` and `wizard`
+(`mattpocock-skills:wizard`) ship model-invocable as-is. `grill-with-docs`, `triage`, `to-issues` and
+`to-questionnaire` (`mattpocock-skills:to-questionnaire`) ship `disable-model-invocation: true` and are not
+touched by the unlock above; when a default route lands on one of these, the coordinator asks the operator
+to type it at that moment instead of invoking it — same as `handoff` and `grill-me`, which stay
+operator-typed for the same reason.
 
 ## Standing rules
 
