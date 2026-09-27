@@ -97,7 +97,8 @@ worktree + branch setup; pattern-to-copy files in reading order; scope with file
 for every writer/reader plus explicit do-NOT-change rules; fixture-scoped test pins
 (integration files WRITTEN, not run); delivery rules; STOP conditions. If a decision is
 not in the brief, the lane does not make it — reserved decisions come back as
-LANE-BLOCKED with options, and you pick.
+LANE-BLOCKED with options, and you pick. Every brief names `implement` in its skills line, with the
+lane override (no whole-repo tsc, no full suite, no commit); see "Routing by situation".
 
 A lane is finished ONLY when it prints exactly one sentinel line:
 
@@ -194,11 +195,34 @@ Invoke these by name when the moment fits; do not re-implement what they do.
 | A refactor track over duplicated features | `claude-mem:pathfinder` then `ponytail:ponytail-debt` | Map the duplication, then price the debt, before any brief. |
 | The operator asks for an audit or a roadmap | `improve` (`quick`/`deep`/`next`) | Findings with evidence, plans for a stranger; not for briefing panes. |
 | A design question a sketch can settle | `mattpocock-skills:prototype` | Throwaway, labelled as such; the answer is the deliverable. |
-| Any new task or dispatch | `observer:task` | Every task gets an Observer task at creation; status moves on merge (operator rule 2026-09-13). |
+| Any new task or dispatch | `observer:task` + the repo's Jira project | Every task gets an Observer task **and** a Jira issue at creation; both move on dispatch and on merge (operator rules 2026-09-13, 2026-09-27). |
 | Rehearsing a promotion | `neon-postgres-branches` | Fork production, `migrate status`, build DB steps, delete fork, then merge. |
 
-`handoff`, `to-*`, `grill-me`, `implement`, `triage`, `wayfinder` are `disable-model-invocation`
-skills — only the operator can type them; the coordinator asks for them by name when the moment comes.
+### Routing by situation — the default workflow (operator rule 2026-09-27)
+
+Pick the row **before** starting a new piece of work. These are the defaults, not options. A rule that
+lives only in memory gets skipped under load (it did on 2026-09-27), so check this table at every new task.
+
+| Situation | Skill chain |
+|-----------|-------------|
+| A new idea, still fuzzy | `grill-with-docs` + `domain-modeling`. Settled terms go into the repo's `CONTEXT.md`, and hard-to-reverse decisions go into `docs/adr/`. |
+| A huge, foggy effort (several sessions) | `wayfinder` (chart a `wayfinder:map` issue with sub-issue tickets and native blocking; one ticket per session) → `to-spec` → `to-tickets`. Never loop a map straight into a brief. |
+| Clear, scoped work | `writing-lane-briefs` → the lane runs `implement` (see the override below). |
+| Knowledge from outside the repo | `research`: a background agent writes a cited markdown file into the repo (e.g. `docs/notes/`). |
+| A decision someone else holds (the client, management) | `to-questionnaire`: a document for them to fill in, aimed at the gap. |
+| A raw issue someone else raised (client, a teammate) | `triage`. Never triage our own already-specified tickets. |
+| Steps only a human can take (production repair runs, secrets, dashboards) | `wizard`: a step-by-step script the operator runs, with confirm gates. |
+| A hard bug | `diagnosing-bugs`: feedback loop first, then a DIAG brief or a fix brief carrying the root cause. |
+| Every gate | `code-review` (Standards + Spec) + `ponytail-review` + a cold read-only review at the exact SHA. |
+
+**`implement` in a lane (override):** lanes load `implement` for its red→green loop and its closing
+`code-review`, but the brief's standing rules override three of its lines: **no whole-repo typecheck, no full
+test suite, no commit.** The coordinator runs tsc, the full suite and the integration slot at the gate, and
+commits after the gate passes. Every brief states this override.
+
+`wayfinder`, `to-spec`, `to-tickets` and `implement` ship as `disable-model-invocation` in the upstream skill
+pack. The coordinator needs them model-invocable (unlock locally, and keep our own copies here so an upstream
+update cannot re-lock them — tracked in #20). `handoff`, `grill-me` and `triage` remain operator-typed.
 
 ## Standing rules
 
