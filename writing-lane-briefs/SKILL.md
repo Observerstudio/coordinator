@@ -35,7 +35,7 @@ writes it from scratch.
 - **Steps** are one action each with the command and the expected output. A correction feature is proved by a SEQUENCE (up-then-down ≠ down-then-up).
 - **Done criteria** are commands with expected results, never "works correctly".
 - **STOP conditions** name the specific assumptions that, if false, end the lane with LANE-BLOCKED + options.
-- Per-task sentinel `LANE-DONE-<issue> — <branch> <sha> <summary>` (and `LANE-BLOCKED-<issue> — …`), never the bare `LANE-DONE` — the `<issue>` keeps the monitor's grep off the brief's own text, the `<branch> <sha>` is what the gate verifies. `LANE-NEEDS-INTEGRATION-SLOT` is a progress marker, not the final line.
+- Per-task sentinel `LANE-DONE-<issue> — <branch> <base-sha> (uncommitted) <summary>` (and `LANE-BLOCKED-<issue> — …`), never the bare `LANE-DONE` — the `<issue>` keeps the monitor's grep off the brief's own text. The lane never commits; on `LANE-DONE` the coordinator commits the worktree's output to `<branch>` and gates that new SHA. `LANE-NEEDS-INTEGRATION-SLOT` is a progress marker, not the final line.
 
 ## Rework and diagnosis briefs (folded in from superpowers)
 
@@ -52,6 +52,7 @@ Lanes (OpenCode / Codex panes) read `~/.agents/skills/<name>/SKILL.md` when the 
 | Task shape | Lane loads |
 |---|---|
 | Every brief | `tdd` (red first), `verification-before-completion` (paste output, never "should"), `ponytail-review` (own diff before reporting), `writing-pr-bodies` (the lane drafts `PR-BODY-<issue>.md`; the coordinator opens the PR from it) |
+| Implementation or rework brief | `implement` (its red→green loop and closing code-review), with the coordinator's override: no whole-repo typecheck, no full suite, no commit — the coordinator runs those at the gate. Not for a DIAG brief, which forbids any fix. |
 | Rework brief | `receiving-code-review` (verify the finding before implementing) |
 | DIAG brief | `systematic-debugging` / `diagnosing-bugs` (root cause, no fix) |
 | Prisma query or migration | `prisma-client-api`, `prisma-cli` |
