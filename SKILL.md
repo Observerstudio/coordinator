@@ -236,7 +236,7 @@ the upstream skill pack and must be model-invocable on this machine for the rout
 them once with:
 
 ```
-cd ~/.agents/skills && for s in wayfinder to-spec to-tickets implement; do sed -i '' '/^disable-model-invocation: true$/d' $s/SKILL.md; done
+cd ~/.agents/skills && for s in wayfinder to-spec to-tickets implement; do sed -i.bak '/^disable-model-invocation: true$/d' "$s/SKILL.md" && rm -f "$s/SKILL.md.bak"; done
 ```
 
 An upstream skills update re-locks all four. This PR does not vendor copies of them here — they are a
