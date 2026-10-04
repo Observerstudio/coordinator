@@ -63,16 +63,20 @@ state object that rides every edge. You follow it; you do not improvise a route.
 
 1. Cold review at the exact SHA, scoring all ten items of
    [`docs/review-rubric.md`](docs/review-rubric.md); then run `code-review` (Standards + Spec)
-   and `/ponytail-review` on the diff as named steps and list their findings in the PR body.
-   Every gate, every PR — not gated on size or money. ONE reviewer — you, running these three
-   passes yourself; never a fan-out, never one reader per dimension.
-2. CI green.
-3. YOUR own local run of the lane's touched integration suite.
-4. Squash-merge (merge-commit for back-merges).
+   and `/ponytail-review` on the diff as named steps and **write their outputs into the PR body
+   or a PR comment before merging** — a gate with no recorded review did not happen (a PR merged
+   with neither on 2026-10-04). Every gate, every PR — not gated on size or money. ONE reviewer —
+   you, running these three passes yourself; never a fan-out, never one reader per dimension.
+2. CI green: every check `pass` or `skipping`.
+3. YOUR own local run of the lane's touched integration suite; for a new test, a mutation
+   proof (break the rule it guards → only that test goes red).
+4. Merge commit, always (`gh pr merge --merge`) — features and back-merges alike.
 
 - Green checks are NOT readiness: an empty `reviewDecision` means unreviewed. Never
   merge on checks alone. Read `mergeStateStatus` as its own command after the checks
   watch; merge only when it says CLEAN.
+- Branch protection may be OFF (GitHub Free private repos report `protected=false`; a red
+  PR shows MERGEABLE). Then GitHub enforces nothing and this gate is the only gate.
 - A PR that conflicts with its base gets NO CI run at all — no suite, which looks like
   a stuck queue. Check `gh pr view N --json mergeable` before blaming the queue.
   The fix is rebase onto base as a NEW branch + new PR — never force-push.
@@ -171,7 +175,17 @@ installed, the conventions below are protocol, not memory:
 Rules and settled decisions live on the hub (`och publish rule|decision`), ranked into every
 session's context; this file keeps only the mechanics.
 
-## Skills the coordinator reaches for (added 2026-09-12)
+## Skills the coordinator reaches for (added 2026-09-12, revised 2026-10-04)
+
+**Every task carries the right skill that helps it do its job better** (operator rule
+2026-10-04). Concretely:
+
+- Before acting on a new task, name its routing row and skill chain (table below) in your reply.
+- Every brief, subagent prompt, advisor ask and review brief opens with a `Skills to load`
+  line; a prompt without one is not ready to send.
+- Every handoff lists the routing row and skills next to each open item.
+- Advisor and review-pane rounds are *inputs into* the chain (they are the grilling round
+  before `to-spec`), never a replacement for it.
 
 Invoke these by name when the moment fits; do not re-implement what they do.
 
@@ -182,6 +196,10 @@ Invoke these by name when the moment fits; do not re-implement what they do.
 | Gating a PR | `ponytail:ponytail-review` | Named step of rubric item 10; its findings go in the PR body. |
 | Gating a PR | `code-review` (Standards + Spec axes) | Runs on every gate alongside cold review + ponytail-review — one reviewer's pass covering both axes, never a fan-out. |
 | Before accepting a lane's LANE-DONE | `superpowers:verification-before-completion` | Evidence before claims; lanes have faked completion with no commit. |
+| Before relaying an advisor's or reviewer's finding | `superpowers:verification-before-completion` | Trace every money/holdings claim end to end (reader → writer → stored column) and say CONFIRMED only for the hops you read. |
+| A lane drafts its PR body | `pr` (`mattpocock-skills`) | Supersedes `writing-pr-bodies`: plain-English first section, door (one-way/two-way) and blast radius. |
+| Editing a skill, `AGENTS.md` or `CLAUDE.md` | `writing-for-agents` | Pointers, leading words, pruning. |
+| Any screen or page | `frontend-design` + `ux-copy` + `prototype` | UI comes LAST, after the backend slice lands. The app's own design system, labels only from the repo's existing translations; the operator reviews a runnable prototype before a lane builds it. |
 | Waiting on a PR's checks and comments | `claude-mem:babysit` | Polls CI + review comments until mergeable; never merge on a flag (`gh pr merge --auto` merges on the spot here). |
 | Long waits on lanes or CI | `loop` | Self-paced re-check instead of blocking sleeps. |
 | Dependent PRs (B contains A) | `gh-stack` | Review and land them as a stack; the second needs a rebase, not a rewrite. |
@@ -189,8 +207,9 @@ Invoke these by name when the moment fits; do not re-implement what they do.
 | The operator reports bugs in chat | `qa` | Files the issues with the domain language. |
 | Explaining a flow or a choice | `show-me` | Diagram, not prose. |
 | Any client-facing text | `client-update-ar` | Arabic, jargon-free, financial impact stated. |
-| End of session | `handoff` | Writes the handoff the next session reads first. |
-| Turning a ruling into tracker items | `to-spec` / `to-issues` / `to-tickets` | Spec first, then independently grabbable issues, then tracer-bullet tickets. |
+| End of session | `handoff` (+ suggest `retro`) | Handoff writes what the next session reads first, with each open item's routing row and skills; `retro` (operator-typed) turns a repeated miss into a deterministic check. |
+| Turning a ruling into tracker items | `to-spec` → `to-tickets` | Spec first, then tracer-bullet tickets with blocking edges. |
+| A spec with several tickets ahead | suggest `implement-spec` (operator-typed) | Use its ticket ordering (which ticket is unblocked next); lanes still build, the one integration slot still holds. |
 | A plan that must survive scrutiny | `grill-me` / `mattpocock-skills:grilling` | Stress-test before briefing. |
 | Root-causing a hard bug before briefing | `diagnosing-bugs` / `superpowers:systematic-debugging` | Diagnosis is the coordinator's job; the fix is the lane's. |
 | Writing ANY brief (new, rework, DIAG) | `writing-lane-briefs` | The brief contract: two-part shape, fixture contract, `.feature`, per-task sentinel, STOP conditions, lane toolkit. Supersedes the old template. |
@@ -199,7 +218,7 @@ Invoke these by name when the moment fits; do not re-implement what they do.
 | A rework brief | `superpowers:receiving-code-review` | The lane verifies the finding against the code before implementing; wrong findings come back with evidence, not compliance. |
 | Two or more independent briefs ready | `superpowers:dispatching-parallel-agents` | One lane per domain, same response, only when no shared files or fixtures. Two panes max. |
 | Reading a large module before briefing | `claude-mem:smart-explore` | Structure without the file dump; keeps the coordinator's context for judgment. |
-| A lane's branch conflicts with base | `mattpocock-skills:resolving-merge-conflicts` | Brief a rebase onto a NEW branch + new PR; never force-push. |
+| A lane's branch conflicts with base | `writing-lane-briefs` (rebase brief) | Brief a rebase onto a NEW branch + new PR; never force-push. |
 | A refactor track over duplicated features | `claude-mem:pathfinder` then `ponytail:ponytail-debt` | Map the duplication, then price the debt, before any brief. |
 | The operator asks for an audit or a roadmap | `improve` (`quick`/`deep`/`next`) | Findings with evidence, plans for a stranger; not for briefing panes. |
 | A design question a sketch can settle | `mattpocock-skills:prototype` | Throwaway, labelled as such; the answer is the deliverable. |
@@ -213,7 +232,8 @@ lives only in memory gets skipped under load (it did on 2026-09-27), so check th
 
 | Situation | Skill chain |
 |-----------|-------------|
-| A new idea, still fuzzy | `grill-with-docs` + `domain-modeling`. Settled terms go into the repo's `CONTEXT.md`, and hard-to-reverse decisions go into `docs/adr/`. |
+| A new idea, still fuzzy | `grill-with-docs` + `domain-modeling`. Settled terms go into the repo's `GLOSSARY.md`, and hard-to-reverse decisions go into `docs/adr/`. |
+| A design an advisor drafted | Review-pane round (devil's advocate, never accept round 1) → advisor round 2 → `to-spec` → `to-tickets` → briefs. Money/holdings rules found on the way go to the operator one at a time. |
 | A huge, foggy effort (several sessions) | `wayfinder` (chart a `wayfinder:map` issue with sub-issue tickets and native blocking; one ticket per session) → `to-spec` → `to-tickets`. Never loop a map straight into a brief. |
 | Clear, scoped work | `writing-lane-briefs` → the lane runs `implement` (see the override below). |
 | Knowledge from outside the repo | `research`: a background agent writes a cited markdown file into the repo (e.g. `docs/notes/`). |
@@ -249,7 +269,9 @@ Of the rest of the routing table, `research`, `domain-modeling`, `diagnosing-bug
 `to-questionnaire` (`mattpocock-skills:to-questionnaire`) ship `disable-model-invocation: true` and are not
 touched by the unlock above; when a default route lands on one of these, the coordinator asks the operator
 to type it at that moment instead of invoking it — same as `handoff` and `grill-me`, which stay
-operator-typed for the same reason.
+operator-typed for the same reason. mattpocock/skills v1.3 adds three more operator-typed skills the
+coordinator suggests at the right moment: `retro`, `implement-spec`, `wait-what`. v1.3 also removed
+`resolving-merge-conflicts` and renamed `CONTEXT.md` to `GLOSSARY.md`.
 
 ## Standing rules
 
