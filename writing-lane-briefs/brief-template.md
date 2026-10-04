@@ -11,7 +11,8 @@ what could go wrong. Becomes the PR body's first section, under this same headin
 - No branch switching, no `git add/commit/push` (coordinator commits). No subagents. Never run: `scripts/ci-local*`, the full unit suite, whole-repo tsc, `next build`, any integration file. Write the integration cases; the coordinator runs them and pastes RED/GREEN.
 
 ## Skills to load (read each `~/.agents/skills/<name>/SKILL.md` before starting)
-`tdd`, `verification-before-completion`, `ponytail-review`, `pr` — plus the task-shape ones from the skill's toolkit table. An implementation or rework brief also names `implement` (red→green loop + closing code-review), with the override: no whole-repo typecheck, no full suite, no commit — the coordinator runs those at the gate.
+Routing row: <exact situation from the coordinator's routing table>
+Read each `~/.agents/skills/<name>/SKILL.md` before starting: `tdd`, `verification-before-completion`, `ponytail-review`, `pr` — plus the task-shape ones from the skill's toolkit table. An implementation or rework brief also names `implement` (red→green loop + closing code-review), with the override: no whole-repo typecheck, no full suite, no commit — the coordinator runs those at the gate.
 
 ## Decision being implemented
 <Who decided, when, in one paragraph. Link the issue comment. This is a REFACTOR / FEATURE / FIX with exactly N behaviour changes: list them.>
