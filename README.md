@@ -59,7 +59,7 @@ npx skills add Observerstudio/coordinator --skill writing-lane-briefs
 
 ## writing-pr-bodies — the PR body a lane hands back
 
-> Superseded (2026-10-04): lanes now draft PR bodies with `pr` from mattpocock/skills v1.3 (door + blast radius). This folder stays until every repo's briefs have moved over.
+> Superseded (2026-10-04): new briefs use `pr` from mattpocock/skills v1.3 (door + blast radius). The legacy instructions below apply only to briefs that still reference this skill; this folder stays until every repo's briefs have moved over.
 
 `writing-pr-bodies/` is the lane-side skill (install it under `~/.agents/skills/` so OpenCode /
 Codex panes can read it). Every brief names it; the lane writes `PR-BODY-<issue>.md` next to the
