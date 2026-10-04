@@ -11,7 +11,8 @@ what could go wrong. Becomes the PR body's first section, under this same headin
 - No branch switching, no `git add/commit/push` (coordinator commits). No subagents. Never run: `scripts/ci-local*`, the full unit suite, whole-repo tsc, `next build`, any integration file. Write the integration cases; the coordinator runs them and pastes RED/GREEN.
 
 ## Skills to load (read each `~/.agents/skills/<name>/SKILL.md` before starting)
-`tdd`, `verification-before-completion`, `ponytail-review`, `writing-pr-bodies` — plus the task-shape ones from the skill's toolkit table. An implementation or rework brief also names `implement` (red→green loop + closing code-review), with the override: no whole-repo typecheck, no full suite, no commit — the coordinator runs those at the gate.
+Routing row: <exact situation from the coordinator's routing table>
+Read each `~/.agents/skills/<name>/SKILL.md` before starting: `tdd`, `verification-before-completion`, `ponytail-review`, `pr` — plus the task-shape ones from the skill's toolkit table. An implementation or rework brief also names `implement` (red→green loop + closing code-review), with the override: no whole-repo typecheck, no full suite, no commit — the coordinator runs those at the gate.
 
 ## Decision being implemented
 <Who decided, when, in one paragraph. Link the issue comment. This is a REFACTOR / FEATURE / FIX with exactly N behaviour changes: list them.>
@@ -63,7 +64,7 @@ Ponytail on. Run `/ponytail-review` on your own diff before reporting; fix what 
 - eslint on touched files only. tsc only when the coordinator asks.
 - Print `LANE-NEEDS-INTEGRATION-SLOT` when the integration cases are written (a progress marker, not the end); then exactly one final line:
   `LANE-DONE-<issue> — <branch> <base-sha> (uncommitted) <summary>` or `LANE-BLOCKED-<issue> — <what + options>`.
-- Write the PR body with `writing-pr-bodies` (its `pr-body-template.md`) to `<abs path>/.worktrees/PR-BODY-<issue>.md`: plain part first, then code, Gate with pasted RED/GREEN, Does NOT change, Ponytail review; `Part of #<issue>`, never `Closes`. The coordinator opens the PR with `--body-file`.
+- Write the PR body with the `pr` skill to `<abs path>/.worktrees/PR-BODY-<issue>.md`: plain part first, then code, Gate with pasted RED/GREEN, Does NOT change, Ponytail review; `Part of #<issue>`, never `Closes`. The coordinator opens the PR with `--body-file`.
 - Report carries: RED + GREEN output, the scenario → test table, the ponytail-review findings, and the path of `PR-BODY-<issue>.md`.
 
 ## STOP conditions (LANE-BLOCKED-<issue>)

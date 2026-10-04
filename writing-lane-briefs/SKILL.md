@@ -15,7 +15,7 @@ done criteria, STOP conditions). **If a decision is not in the brief, the lane d
 
 Two parts, always: **What changes for the team** (plain English, becomes the PR body's first
 section) then the technical brief. Never head the plain part "In plain English". The lane hands
-back the PR body too, written with `writing-pr-bodies` — the coordinator corrects it, never
+back the PR body too, written with `pr` — the coordinator corrects it, never
 writes it from scratch.
 
 ## Before writing (the coordinator's half — never skip)
@@ -51,13 +51,13 @@ Lanes (OpenCode / Codex panes) read `~/.agents/skills/<name>/SKILL.md` when the 
 
 | Task shape | Lane loads |
 |---|---|
-| Every brief | `tdd` (red first), `verification-before-completion` (paste output, never "should"), `ponytail-review` (own diff before reporting), `writing-pr-bodies` (the lane drafts `PR-BODY-<issue>.md`; the coordinator opens the PR from it) |
+| Every brief | `tdd` (red first), `verification-before-completion` (paste output, never "should"), `ponytail-review` (own diff before reporting), `pr` (the lane drafts `PR-BODY-<issue>.md`; the coordinator opens the PR from it) |
 | Implementation or rework brief | `implement` (its red→green loop and closing code-review), with the coordinator's override: no whole-repo typecheck, no full suite, no commit — the coordinator runs those at the gate. Not for a DIAG brief, which forbids any fix. |
 | Rework brief | `receiving-code-review` (verify the finding before implementing) |
 | DIAG brief | `systematic-debugging` / `diagnosing-bugs` (root cause, no fix) |
 | Prisma query or migration | `prisma-client-api`, `prisma-cli` |
 | Screen or component | `frontend-design`, `vercel-react-best-practices`, `ux-copy` for any label — and the memory rule: match the sibling page, never `useEffect` |
-| Domain vocabulary in names or copy | `domain-modeling`, repo `CONTEXT.md`; Arabic labels only from `messages/ar.json` |
+| Domain vocabulary in names or copy | `domain-modeling`, repo `GLOSSARY.md`; Arabic labels only from `messages/ar.json` |
 | Module boundary or new service | `codebase-design` |
 
 Never name a skill the lane cannot open — check `ls ~/.agents/skills/<name>` before writing the line.
