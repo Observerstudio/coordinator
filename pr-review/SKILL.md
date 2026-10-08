@@ -27,7 +27,7 @@ Run before the PR opens. Done when the PR body carries the self-review, stamped 
 
 ## gate <PR>
 
-Done when the gate comment is posted with a verdict of MERGE or CHANGES and an `Attacks:` line naming, per changed area, the strongest attack tried and its outcome; a MERGE with no attacks is invalid. Round 1 (`reworks=0`) lists at least one finding or nit, or states in writing why there is nothing to find.
+Done when the gate comment is posted with a verdict of MERGE or CHANGES and an Attacks block (`<details>`, summary `Attacks (<n>, …)`) with at least one attack per changed area, each naming the strongest attack tried and its outcome; a MERGE with no attacks is invalid. Round 1 (`reworks=0`) lists at least one finding or nit, or states in writing why there is nothing to find.
 
 1. Pin the head SHA in a read-only worktree.
 2. Start the touched tests in the background and watch CI read-only with `gh pr checks <n> --watch`.
