@@ -5,7 +5,7 @@ Valid in every repo. Score each PASS / FAIL / N/A with one line of evidence. The
 
 | # | Check | Evidence |
 |---|-------|----------|
-| 1 | **Spec match** | Scored against the brief's `.feature` file: every `Scenario:` title is, verbatim, the `it()` title of a test that is green in the gate run, or the PR states the deferral. No `.feature` for a code-writing lane means the brief was wrong, not the lane: fix the brief, then score. Name the scenario that is missing. |
+| 1 | **Spec match** | Scored against the brief's `.feature` file: every `Scenario:` title is, verbatim, the `it()` title of a test that is green in the gate run, or the PR states the deferral. That test asserts the scenario's expected outcome; a title-only or empty test fails the check. No `.feature` for a code-writing lane means the brief was wrong, not the lane: fix the brief, then score. Name the scenario that is missing. |
 | 2 | **Meaning, not just safety** | For any closed set of verdicts, classifications or statuses: one POSITIVE fixture per member exists and the healthy path asserts the *clean* verdict. A negative control proves nothing about meaning. |
 | 3 | **Mutation controls bite** | The PR body pastes red output for each guard, and each control kills exactly the guard it claims. A guard with a redundant sibling says so: a single mutation can survive a redundant guard. |
 | 4 | **Diff hygiene** | `git diff --numstat` per file is proportional to the change. Whole-file rewrites (CRLF loss, `prisma format`, reformatters) FAIL. Schema changes are additive and small. |

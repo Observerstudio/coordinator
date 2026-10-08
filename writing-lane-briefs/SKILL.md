@@ -25,7 +25,8 @@ writes it from scratch.
 3. Record `git rev-parse --short origin/<base>`; the brief stamps it.
 4. Decide every reserved question yourself or with the operator. A brief with an open question is a LANE-BLOCKED waiting to happen. Two questions are ALWAYS the operator's, never yours: **any Arabic label with no precedent in `messages/ar.json`** (the app never coins a term — client-text rule 2026-09-17) and **any rule that changes money or holdings**. Ask before writing the brief; do not "flag it" inside the brief.
 5. **Architecture pass, written down** (Ahmed 2026-09-17: never jump from decision to execution). Using `codebase-design` vocabulary: which module owns the fact; where the seam goes; what is reused vs new; the one derivation for every money/holdings fact; how the next visible case fits without a new branch. Draw the flow as a mermaid graph when more than two modules talk (`show-me`). This section goes into the brief verbatim; a brief without it is not ready.
-6. Write the `.feature` first (`LANE-ACCEPT-<issue>.feature`): one Scenario per acceptance criterion, domain words only. Item 1 of the gate is scored against it.
+6. Write the `.feature` first (`LANE-ACCEPT-<issue>.feature`): one Scenario per acceptance criterion, domain words only. General check 1 (spec match) of `pr-review` is scored against it.
+7. Read the repo's `docs/agents/review-standards.md` and cite it in the brief, so the lane reads it before it writes code.
 
 ## Writing (fill `brief-template.md` — every section, even when short)
 
