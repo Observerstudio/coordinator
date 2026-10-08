@@ -27,13 +27,16 @@ Run before the PR opens. Done when the PR body carries the self-review, stamped 
 
 ## gate <PR>
 
-Done when the gate comment is posted with a verdict of MERGE or CHANGES and an `Attacks:` line naming, per changed area, the strongest attack tried and its outcome; a MERGE with no attacks is invalid. Round 1 (`reworks=0`) lists at least one finding or nit, or states in writing why there is nothing to find.
+Done when the gate comment is posted with a verdict of MERGE or CHANGES and an Attacks block (`<details>`, summary `Attacks (<n>, …)`) with at least one attack per changed area, each naming the strongest attack tried and its outcome; a MERGE with no attacks is invalid. Round 1 (`reworks=0`) lists at least one finding or nit, or states in writing why there is nothing to find.
 
 1. Pin the head SHA in a read-only worktree.
-2. Start the touched tests in the background and watch CI read-only with `gh pr checks <n> --watch`.
+2. Start the touched tests in the background and read `gh pr checks <n>` once; never block on `--watch`.
 3. Run `code-review` (Standards + Spec) and `ponytail-review` on the diff, then read it as devil's advocate: assume a defect exists. A PR-body claim (tests pass, no other callers, counts) counts only once you re-check it; unchecked, it is a finding. Score it against [`general-checks.md`](general-checks.md) plus the repo file's checks. A type-check or lint failure in `gh pr checks` is a finding.
 4. Run your own mutation per new guard, even when the PR pastes one. A PR whose tests were written after the code (no red run) gets this step in full.
-5. Verdict: MERGE only when every gating check is green and no finding is open. Gating is the repo file's `## Gating checks`; with no such file or section, it is the required checks from `gh api repos/<owner>/<repo>/branches/<base>/protection`, and a verdict with none says so. A skipped check counts as passed. Checks still pending means CHANGES (or wait); never MERGE.
+5. Verdict on the code, without waiting for CI. Gating is the repo file's `## Gating checks`; with no such file or section, it is the required checks from `gh api repos/<owner>/<repo>/branches/<base>/protection`, and a verdict with none says so. A skipped check counts as passed.
+   - A gating check already red: CHANGES (a failure is a finding).
+   - Checks still pending: the verdict stands on the code, and the CI bullet says `pending — coordinator merges only when every gating check is green`.
+   - No finding open: MERGE. The coordinator executes it only once every gating check is green; never on pending checks.
 6. Post the comment in the shape of [`gate-comment.md`](gate-comment.md).
 
 Reviewer count and the second-reader rule: [`docs/coordinator-playbook.md`](../docs/coordinator-playbook.md) "The gate". Extras (`security-review`, the `pr-review-toolkit` agents) run only when the repo file names that kind of change.
