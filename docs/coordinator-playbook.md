@@ -29,8 +29,8 @@ the edges so nothing is re-explained. The gate below is the VERDICT router's inp
 
 ## The gate (every PR, no exceptions)
 
-1. Cold review at the exact SHA, scoring all ten items of
-   [`review-rubric.md`](review-rubric.md) — ONE reviewer (you); a single second reader
+1. Cold review at the exact SHA, running `pr-review` gate mode
+   ([`pr-review/SKILL.md`](../pr-review/SKILL.md)) — ONE reviewer (you); a single second reader
    only for a >800-line or money PR, never a fan-out.
 2. CI green.
 3. The coordinator's **own** local run of the lane's integration suite (see

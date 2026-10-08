@@ -34,7 +34,7 @@ this file, not a separate essay. Keep it under two screens; move history to date
 |---|---|---|---|
 
 ## verdicts
-| PR | sha | rubric | standards | slot run | mutation | outcome | round |
+| PR | sha | findings | standards | slot run | mutation | outcome | round |
 |---|---|---|---|---|---|---|---|
 
 ## merged / promoted
