@@ -7,6 +7,7 @@ Gate — <sha> · review: <passed>/<total> pass · N/A=<n> · reworks=<k> · rev
 Verdict: MERGE | CHANGES
 Findings: <open defects, each with file:line and the failing scenario; "none">
 Nits: <taste, never blocking; "none">
+Attacks: <per changed area: the strongest attack tried → outcome>
 Standards touched: <rule> HELD · <rule> FAIL→fixed in <sha>
 Standards not touched: <rules>
 Reference used: <none | book/paper + section, recorded in <ADR or brief>>
