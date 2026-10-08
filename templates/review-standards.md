@@ -18,7 +18,7 @@ Scored on top of the general checks, same PASS / FAIL / N/A shape.
 
 ## Gating checks
 
-The CI checks that must be green for MERGE; any other check is informational.
+The CI checks that must be green for MERGE; any other check is informational. A skipped check counts as passed.
 
 - <check name>
 

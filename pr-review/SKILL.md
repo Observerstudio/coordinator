@@ -22,17 +22,17 @@ Run before the PR opens. Done when the PR body carries the self-review, stamped 
 4. `tdd`: every new guard has a test that goes red when the guard is removed; paste the red. Then probe each guard: one test per input it should refuse (same id, wrong owner, wrong type, wrong season/book, …), paste that each is refused. A probe that resolves is a finding.
 5. `superpowers:verification-before-completion`: every claim is pasted output. Run the repo file's `## Commands` (type check, lint, unit tests) on the touched files and paste the results; a repo file with no `## Commands` is stated, and the repo's own scripts stand in.
 6. Fix the findings with `superpowers:receiving-code-review`. Verify each finding against the code first; a wrong finding gets an answer with evidence, not a fix.
-7. Write the self-review into the PR body, stamped with the head SHA.
+7. Write the self-review into the PR body with `pr`, stamped with the head SHA.
 
 ## gate <PR>
 
 Done when the gate comment is posted and the verdict is MERGE or CHANGES.
 
 1. Pin the head SHA in a read-only worktree.
-2. Start the touched tests and `gh pr checks` in the background.
+2. Start the touched tests in the background and watch CI with `claude-mem:babysit`.
 3. Read the diff as devil's advocate: assume a defect exists. Score it against [`general-checks.md`](general-checks.md) plus the repo file's checks. A type-check or lint failure in `gh pr checks` is a finding.
 4. Run your own mutation per new guard, even when the PR pastes one. A PR whose tests were written after the code (no red run) gets this step in full.
-5. Verdict: MERGE only when every check in the repo file's `## Gating checks` is green and no finding is open. Checks still pending means CHANGES (or wait); never MERGE.
+5. Verdict: MERGE only when every gating check is green and no finding is open. Gating is the repo file's `## Gating checks`; with no such file or section, it is the required checks from `gh api repos/<owner>/<repo>/branches/<base>/protection`, and a verdict with none says so. A skipped check counts as passed. Checks still pending means CHANGES (or wait); never MERGE.
 6. Post the comment in the shape of [`gate-comment.md`](gate-comment.md).
 
 Reviewer count and the second-reader rule: [`docs/coordinator-playbook.md`](../docs/coordinator-playbook.md) "The gate". Extras (`security-review`, the `pr-review-toolkit` agents) run only when the repo file names that kind of change.
