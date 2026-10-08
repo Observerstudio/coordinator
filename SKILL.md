@@ -32,7 +32,7 @@ component tree, shallow file tree or a focused artifact. Prose is for decisions 
 the repo's standards: the `## Engineering standards` section of `AGENTS.md` (or the file `CLAUDE.md`
 points to). They are the default for every piece of work, not optional. Every brief cites the standards
 it applies by number; every gate comment reports which standards the PR touched and whether each held
-(template in `docs/review-rubric.md`). If a standard does not cover what is being built, the brief
+(shape in `pr-review/gate-comment.md`). If a standard does not cover what is being built, the brief
 names the reference found first (book, paper, primary source; one-hour timebox) and where it is
 recorded. A brief without a standards line is not ready to dispatch.
 
@@ -61,9 +61,9 @@ state object that rides every edge. You follow it; you do not improvise a route.
 
 ## The gate — every PR, no exceptions
 
-1. Cold review at the exact SHA, scoring all ten items of
-   [`docs/review-rubric.md`](docs/review-rubric.md); then run `code-review` (Standards + Spec)
-   and `/ponytail-review` on the diff as named steps and **write their outputs into the PR body
+1. Cold review at the exact SHA with `pr-review` gate mode
+   ([`pr-review/SKILL.md`](pr-review/SKILL.md)), which runs `code-review` (Standards + Spec)
+   and `/ponytail-review` on the diff as named steps; **write their outputs into the PR body
    or a PR comment before merging** — a gate with no recorded review did not happen (a PR merged
    with neither on 2026-10-04). Every gate, every PR — not gated on size or money. ONE reviewer —
    you, running these three passes yourself; never a fan-out, never one reader per dimension.
@@ -302,4 +302,4 @@ coordinator suggests at the right moment: `retro`, `implement-spec`, `wait-what`
 | [`docs/coordinator-playbook.md`](docs/coordinator-playbook.md) | Full operating model: roles, gate, slot, standing rules, evidence standards, worked examples |
 | [`writing-lane-briefs/brief-template.md`](writing-lane-briefs/brief-template.md) | The brief format lanes receive; `docs/lane-brief-template.md` is kept only for its worked example and the teardown discipline for shared-ledger integration files |
 | [`docs/herdr-runbook.md`](docs/herdr-runbook.md) | Pane mechanics: split/rename, agent boot + model check, send/read discipline, cross-tab etiquette |
-| [`docs/review-rubric.md`](docs/review-rubric.md) | The ten-item cold-review scorecard, the per-PR metrics line, and what a non-10/10 score forces |
+| [`pr-review/SKILL.md`](pr-review/SKILL.md) | The review skill: author mode before a PR, gate mode at the gate; general checks, gate-comment shape and metrics line beside it |

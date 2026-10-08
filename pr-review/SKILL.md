@@ -1,0 +1,38 @@
+---
+name: pr-review
+description: Use before opening a PR (author mode: self-review so cheap misses never reach a reviewer) and when reviewing or gating a PR (gate mode: devil's-advocate pass ending in MERGE or CHANGES and a gate comment). Works in every Observer repo.
+---
+
+# pr-review
+
+Two modes, one set of checks. Read the repo's `docs/agents/review-standards.md` first in both. A
+missing file is stated out loud ("no review-standards file; general checks only") and the run
+continues on [`pr-review/general-checks.md`](general-checks.md). A repo adopts the skill by copying
+[`templates/review-standards.md`](../templates/review-standards.md).
+
+Invoke the named skills; never copy their steps here.
+
+## author
+
+Run before the PR opens. Done when the PR body carries the self-review, stamped with the head SHA.
+
+1. Read the repo file (or state it is missing).
+2. Run `code-review` (Standards + Spec).
+3. Run `ponytail-review`.
+4. `tdd`: every new guard has a test that goes red when the guard is removed; paste the red. Then probe each guard: one test per input it should refuse (same id, wrong owner, wrong type, wrong season/book, …), paste that each is refused. A probe that resolves is a finding.
+5. `superpowers:verification-before-completion`: every claim is pasted output. Run the repo file's `## Commands` (type check, lint, unit tests) on the touched files and paste the results; a repo file with no `## Commands` is stated, and the repo's own scripts stand in.
+6. Fix the findings with `superpowers:receiving-code-review`. Verify each finding against the code first; a wrong finding gets an answer with evidence, not a fix.
+7. Write the self-review into the PR body, stamped with the head SHA.
+
+## gate <PR>
+
+Done when the gate comment is posted and the verdict is MERGE or CHANGES.
+
+1. Pin the head SHA in a read-only worktree.
+2. Start the touched tests and `gh pr checks` in the background.
+3. Read the diff as devil's advocate: assume a defect exists. Score it against [`general-checks.md`](general-checks.md) plus the repo file's checks. A type-check or lint failure in `gh pr checks` is a finding.
+4. Run your own mutation per new guard, even when the PR pastes one. A PR whose tests were written after the code (no red run) gets this step in full.
+5. Verdict: MERGE only when every gating check is green and no finding is open. Checks still pending means CHANGES (or wait); never MERGE.
+6. Post the comment in the shape of [`gate-comment.md`](gate-comment.md).
+
+One reviewer. A second reader joins only over ~800 changed lines or on money. Extras (`security-review`, the `pr-review-toolkit` agents) run only when the repo file names that kind of change.

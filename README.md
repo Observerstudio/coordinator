@@ -1,7 +1,7 @@
 # coordinator — a Claude Code skill
 
 Claude acts as a **track coordinator**: it diagnoses, writes lane briefs, gates every PR with a
-ten-item cold review, and merges, while implementation happens in lanes (OpenCode or Claude Code
+`pr-review` cold review, and merges, while implementation happens in lanes (OpenCode or Claude Code
 panes it drives through herdr). One session per track; the coordinator writes no feature code.
 
 ## Install
@@ -34,7 +34,7 @@ Update: `npx skills update`, or `git -C ~/.claude/skills/coordinator pull`.
 | `docs/onboarding.md` | Start here as a new coordinator |
 | `docs/coordinator-playbook.md` | Full operating model with worked examples |
 | `writing-lane-briefs/brief-template.md` | The brief format lanes receive, plus the fixture contract (`docs/lane-brief-template.md` stays for its worked example) |
-| `docs/review-rubric.md` | The ten-item cold-review scorecard and the metrics line |
+| `pr-review/SKILL.md` | The review skill: author mode before a PR, gate mode at the gate; checks and gate-comment shape beside it |
 | `docs/herdr-runbook.md` | Pane mechanics: split, boot, send/read, watch |
 
 The skill triggers on coordinating multi-agent work, dispatching or briefing lanes, gating PRs, and
