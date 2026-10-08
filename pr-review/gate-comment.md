@@ -2,8 +2,10 @@
 
 Every gate posts one comment in this shape, MERGE or CHANGES. Keep the labels as written; the monthly report greps them.
 
+The heading is one of: `## ✅ Gate: MERGE · <sha>`, `## ✅ Gate: MERGE · CI pending · <sha>` (any gating check still pending), `## ❌ Gate: CHANGES · <sha>`.
+
 ````markdown
-## ✅ Gate: MERGE · `<sha>`            (or  ## ❌ Gate: CHANGES · `<sha>`)
+## ✅ Gate: MERGE · `<sha>`
 
 | Review | Reworks | Reviewer | Second reader |
 |---|---|---|---|
@@ -17,7 +19,7 @@ Every gate posts one comment in this shape, MERGE or CHANGES. Keep the labels as
 
 ### Checks
 - **Unit:** <what ran, the tail>
-- **CI:** <the gating checks and their state; "pending — coordinator merges only when green">
+- **CI:** <the gating checks and their state; "pending — coordinator merges only when every gating check is green">
 - **Standards touched:** <rule> ✅ · <rule> ❌→fixed in <sha>
 - **Standards not touched:** <rules>
 - **Reference used:** <none | book/paper + section, recorded in <ADR or brief>>
