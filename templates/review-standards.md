@@ -1,5 +1,7 @@
 # Review standards
 
+Lives at `docs/agents/review-standards.md`: `pr-review` reads only that path.
+
 Read by `pr-review` (author and gate) and by agents before they write code. Point at rules this repo
 already has; copy none.
 
