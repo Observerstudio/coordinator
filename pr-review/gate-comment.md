@@ -17,7 +17,7 @@ Every gate posts one comment in this shape, MERGE or CHANGES. Keep the labels as
 
 ### Checks
 - **Unit:** <what ran, the tail>
-- **CI:** <the gating checks and their state>
+- **CI:** <the gating checks and their state; "pending — coordinator merges only when green">
 - **Standards touched:** <rule> ✅ · <rule> ❌→fixed in <sha>
 - **Standards not touched:** <rules>
 - **Reference used:** <none | book/paper + section, recorded in <ADR or brief>>
