@@ -53,7 +53,7 @@ node does work a single loop could not, and the whole thing fits in one breath".
 | BRIEF | coordinator | One page per lane per `docs/lane-brief-template.md`, standards cited by number. | `briefs[]` |
 | LANE | lane | One brief in, one change out, one sentinel line. Never delegates. | `changes[]` (via sentinel) |
 | WATCH & CORRECT | coordinator | Reads the pane; answers the BLOCKED options; nudges a stalled lane. | `corrections[]` |
-| COLD REVIEW | coordinator | Read-only verifier at the exact SHA: rubric ×10, standards, own slot run, mutation check on money paths. | `verdicts[]` |
+| COLD REVIEW | coordinator | Read-only verifier at the exact SHA: `pr-review` gate mode (general + repo checks, standards), own slot run, mutation check on money paths. | `verdicts[]` |
 | MERGE | coordinator | Squash into the repo's default integration branch. Never further. | `merged[]` |
 | PROMOTE | human | Each rung of the branch ladder; production-side checks. | `promoted[]` |
 | LESSON | coordinator + human | What bit, as a `lessons[]` state-file entry, a memory entry, a dated note, and — if it is a rule — AGENTS.md / the standards. | `lessons[]` |
@@ -87,8 +87,8 @@ human, never an improvised route.
 
 | Outcome | Edge |
 |---|---|
-| Rubric 10/10, standards held, CI green, own slot run green, mutation check red on exactly the mutated case (money paths) | `pass` → MERGE |
-| Any rubric item fails, or a fixture is wrong, or a test does not bite | `reject: rework` → BRIEF, with the finding appended to `verdicts[]`; the SAME lane gets it as a follow-up, never an amend |
+| Gate verdict MERGE (no open finding), gating checks green, standards held, own slot run green, mutation check red on exactly the mutated case (money paths) | `pass` → MERGE |
+| Gate verdict CHANGES (an open finding), or a fixture is wrong, or a test does not bite | `reject: rework` → BRIEF, with the finding appended to `verdicts[]`; the SAME lane gets it as a follow-up, never an amend |
 | The finding is a design decision the brief reserved | `reject: decision` → DECIDE (human) |
 
 ## Bounded loop-backs

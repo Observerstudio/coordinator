@@ -32,7 +32,7 @@ Done when the gate comment is posted and the verdict is MERGE or CHANGES.
 2. Start the touched tests and `gh pr checks` in the background.
 3. Read the diff as devil's advocate: assume a defect exists. Score it against [`general-checks.md`](general-checks.md) plus the repo file's checks. A type-check or lint failure in `gh pr checks` is a finding.
 4. Run your own mutation per new guard, even when the PR pastes one. A PR whose tests were written after the code (no red run) gets this step in full.
-5. Verdict: MERGE only when every gating check is green and no finding is open. Checks still pending means CHANGES (or wait); never MERGE.
+5. Verdict: MERGE only when every check in the repo file's `## Gating checks` is green and no finding is open. Checks still pending means CHANGES (or wait); never MERGE.
 6. Post the comment in the shape of [`gate-comment.md`](gate-comment.md).
 
-One reviewer. A second reader joins only over ~800 changed lines or on money. Extras (`security-review`, the `pr-review-toolkit` agents) run only when the repo file names that kind of change.
+Reviewer count and the second-reader rule: [`docs/coordinator-playbook.md`](../docs/coordinator-playbook.md) "The gate". Extras (`security-review`, the `pr-review-toolkit` agents) run only when the repo file names that kind of change.

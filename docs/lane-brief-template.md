@@ -92,7 +92,7 @@ run red-first by the coordinator in the slot (the brief forbids the lane running
 `.feature` plus a `scenario → test file:line` table. A scenario with no test is a LANE-BLOCKED
 (missing fixture, no honest harness), never a silent skip. The lane never edits the `.feature`; a
 scenario that turns out wrong comes back as LANE-BLOCKED with the reason.
-Gate: rubric item 1 is scored against the `.feature`, not the issue prose — every scenario title
+Gate: `pr-review` general check 1 is scored against the `.feature`, not the issue prose — every scenario title
 greps to a green test, or the PR states the deferral.
 
 Example (one scenario is enough to show the shape):

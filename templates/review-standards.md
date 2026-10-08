@@ -16,6 +16,12 @@ Scored on top of the general checks, same PASS / FAIL / N/A shape.
 |------|----------|
 | <check name> | <what proves it held> |
 
+## Gating checks
+
+The CI checks that must be green for MERGE; any other check is informational.
+
+- <check name>
+
 ## Commands
 
 Run by author mode on the touched files; paste the output.

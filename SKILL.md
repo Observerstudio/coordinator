@@ -193,7 +193,7 @@ Invoke these by name when the moment fits; do not re-implement what they do.
 |--------|-------|-----|
 | Before diagnosing or dispatching | `claude-mem:mem-search` | Memory does not lag; the tracker and chat do. Cite the observation id. |
 | Writing any lane brief | `tdd` / `superpowers:test-driven-development` | Every implementation or rework brief carries a TDD section: the test is written and shown RED first, then the code; red + green output pasted in the report. A DIAG brief carries the failing case as evidence instead — it is forbidden to fix. |
-| Gating a PR | `ponytail:ponytail-review` | Named step of rubric item 10; its findings go in the PR body. |
+| Gating a PR | `ponytail:ponytail-review` | Named step of `pr-review` general check 6; its findings go in the PR body. |
 | Gating a PR | `code-review` (Standards + Spec axes) | Runs on every gate alongside cold review + ponytail-review — one reviewer's pass covering both axes, never a fan-out. |
 | Before accepting a lane's LANE-DONE | `superpowers:verification-before-completion` | Evidence before claims; lanes have faked completion with no commit. |
 | Before relaying an advisor's or reviewer's finding | `superpowers:verification-before-completion` | Trace every money/holdings claim end to end (reader → writer → stored column) and say CONFIRMED only for the hops you read. |
