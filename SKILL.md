@@ -66,14 +66,13 @@ state object that rides every edge. You follow it; you do not improvise a route.
    and `/ponytail-review` on the diff as named steps; **write their outputs into the PR body
    or a PR comment before merging** — a gate with no recorded review did not happen (a PR merged
    with neither on 2026-10-04). Every gate, every PR — not gated on size or money. ONE verdict,
-   yours: the three passes may run in ONE delegated read-only reviewer agent, whose prompt
-   **pastes** the 5–10 rules, rulings and file:line facts it needs and points it at the diff only
-   (never "go read AGENTS.md / the spec"). Never a fan-out, never one reader per dimension.
-   Pasted facts cut a money gate from 13–39 tool calls to 4–5 (selal-v2, 2026-10-21).
-2. `merge-risk` on the PR; its verdict (alignment, impact, verification, rollback, error
-   detection, level) goes in the gate comment. A medium or high names the cheapest step that
-   lowers it and does it before merging, or says why not. A screenshot of new wording is never
-   required; a real UI or flow change still needs one.
+   yours. The three passes run in you or in ONE delegated read-only reader whose prompt carries
+   the **pasted facts** (the 5–10 rules, rulings and file:line facts it needs) and the diff,
+   nothing to look up. Pasted facts cut a money gate from 13–39 tool calls to 4–5 (selal-v2,
+   2026-10-21). One reader, never a fan-out.
+2. `merge-risk` on the PR, verdict in the gate comment. A medium or high names the cheapest step
+   that lowers it and does it before merging, or says why not. Screenshot a real UI or flow
+   change; a wording change needs none.
 3. CI green: every check `pass` or `skipping`.
 4. YOUR own local run of the lane's touched integration suite; for a new test, a mutation
    proof (break the rule it guards → only that test goes red).
@@ -201,8 +200,8 @@ Invoke these by name when the moment fits; do not re-implement what they do.
 | Before diagnosing or dispatching | `claude-mem:mem-search` | Memory does not lag; the tracker and chat do. Cite the observation id. |
 | Writing any lane brief | `tdd` / `superpowers:test-driven-development` | Every implementation or rework brief carries a TDD section: the test is written and shown RED first, then the code; red + green output pasted in the report. A DIAG brief carries the failing case as evidence instead — it is forbidden to fix. |
 | Gating a PR | `ponytail:ponytail-review` | Named step of `pr-review` general check 6; its findings go in the PR body. |
-| Gating a PR | `code-review` (Standards + Spec axes) | Runs on every gate alongside cold review + ponytail-review — one reviewer's pass covering both axes (yours, or one delegated reader with the facts pasted), never a fan-out. |
-| Gating a PR, last step before merge | `merge-risk` | Rollback cost, error detection and unverified UI — what a code review misses. Verdict goes in the gate comment. |
+| Gating a PR | `code-review` (Standards + Spec axes) | Runs on every gate alongside cold review + ponytail-review — one reviewer's pass covering both axes, never a fan-out. |
+| Gating a PR | `merge-risk` | Gate step 2: rollback cost, error detection, unverified UI — what a code review misses. |
 | Before accepting a lane's LANE-DONE | `superpowers:verification-before-completion` | Evidence before claims; lanes have faked completion with no commit. |
 | Before relaying an advisor's or reviewer's finding | `superpowers:verification-before-completion` | Trace every money/holdings claim end to end (reader → writer → stored column) and say CONFIRMED only for the hops you read. |
 | A lane drafts its PR body | `pr` (`mattpocock-skills`) | Supersedes `writing-pr-bodies`: plain-English first section, door (one-way/two-way) and blast radius. |

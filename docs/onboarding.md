@@ -36,7 +36,7 @@ Your repo may add specifics in its own `docs/agents/` pages — read both.
 
 ## The rules that bite hardest
 
-1. **Cold-review every PR before merge**, with `pr-review` gate mode ([`pr-review/SKILL.md`](../pr-review/SKILL.md)) — one verdict (one delegated reader with the facts pasted is fine), not a fan-out; then `merge-risk`. Green checks are not readiness; unreviewed means unreviewed.
+1. **Cold-review every PR before merge**, with `pr-review` gate mode ([`pr-review/SKILL.md`](../pr-review/SKILL.md)) — one verdict, then `merge-risk`. Green checks are not readiness; unreviewed means unreviewed.
 2. **Never force-push.** Amended history → fresh ref + new PR.
 3. **One integration run** per machine at a time.
 4. **Never over-engineer** — build what the spec asks, nothing around it.
