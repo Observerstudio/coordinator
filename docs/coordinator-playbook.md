@@ -30,12 +30,12 @@ the edges so nothing is re-explained. The gate below is the VERDICT router's inp
 ## The gate (every PR, no exceptions)
 
 1. Cold review at the exact SHA, running `pr-review` gate mode
-   ([`pr-review/SKILL.md`](../pr-review/SKILL.md)) — ONE reviewer (you); a single second reader
-   only for a >800-line or money PR, never a fan-out.
+   ([`pr-review/SKILL.md`](../pr-review/SKILL.md)) — ONE verdict (yours), then `merge-risk`.
+   Who runs the passes: [`SKILL.md` § The gate](../SKILL.md#the-gate--every-pr-no-exceptions).
 2. CI green.
 3. The coordinator's **own** local run of the lane's integration suite (see
    [integration slot](#integration-slot)).
-4. Squash-merge (merge-commit for back-merges).
+4. Merge commit, always (`gh pr merge --merge`).
 
 - Green checks are NOT readiness: an empty `reviewDecision` means unreviewed.
 - A PR that conflicts with its base gets **NO CI run at all** — no suite, which looks
