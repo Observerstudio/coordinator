@@ -1,74 +1,43 @@
-# coordinator — a Claude Code skill
+# Observer skills
 
-Claude acts as a **track coordinator**: it diagnoses, writes lane briefs, gates every PR with a
-`pr-review` cold review, and merges, while implementation happens in lanes (OpenCode or Claude Code
-panes it drives through herdr). One session per track; the coordinator writes no feature code.
+Observer studio's agent skills, one folder per skill under `skills/`. They work with Claude Code, Codex, OpenCode and the other agents [skills.sh](https://www.skills.sh/) supports.
 
 ## Install
 
-```bash
-npx skills add Observerstudio/coordinator
-```
+Pick one way per agent; installing both gives you every skill twice.
 
-One command; works for Claude Code and other agents supported by [skills.sh](https://www.skills.sh/).
-
-Without the skills CLI:
+**Claude Code plugin (updates itself):**
 
 ```bash
-# macOS / Linux
-git clone https://github.com/Observerstudio/coordinator ~/.claude/skills/coordinator
-
-# Windows (PowerShell)
-git clone https://github.com/Observerstudio/coordinator "$env:USERPROFILE\.claude\skills\coordinator"
+claude plugin marketplace add Observerstudio/skills
+claude plugin install observer-skills@observer
 ```
 
-Only `SKILL.md` and `docs/` are used at runtime; Claude Code picks up skills from `~/.claude/skills/`.
+**skills.sh (copies the files; update with `npx skills update`):**
 
-Update: `npx skills update`, or `git -C ~/.claude/skills/coordinator pull`.
+```bash
+npx skills add Observerstudio/skills -g -y                            # every skill
+npx skills add Observerstudio/skills --skill promoting-a-release -g -y   # one skill
+```
 
-## What is in here
+## Skills
 
-| File | Purpose |
+| Skill | Use it to |
 |---|---|
-| `SKILL.md` | The skill: role, the gate, sentinel contract, one integration slot, pane discipline, OCH-as-ledger conventions, standing rules |
-| `docs/onboarding.md` | Start here as a new coordinator |
-| `docs/coordinator-playbook.md` | Full operating model with worked examples |
-| `writing-lane-briefs/brief-template.md` | The brief format lanes receive, plus the fixture contract (`docs/lane-brief-template.md` stays for its worked example) |
-| `pr-review/SKILL.md` | The review skill: author mode before a PR, gate mode at the gate; checks and gate-comment shape beside it |
-| `promoting-a-release/SKILL.md` | Promote a rung or ship a hotfix: every step rehearsed on a copy first; a repo adopts it with `templates/promotion.md` |
-| `docs/herdr-runbook.md` | Pane mechanics: split, boot, send/read, watch |
+| [`coordinator`](skills/coordinator/SKILL.md) | Run a work track: diagnose, brief lanes, gate PRs and merge, while lanes do the implementation. Start at [`docs/onboarding.md`](skills/coordinator/docs/onboarding.md). |
+| [`writing-lane-briefs`](skills/writing-lane-briefs/SKILL.md) | Write the brief a lane executes unattended: a plain-English part for the team, then the technical brief. |
+| [`pr-review`](skills/pr-review/SKILL.md) | Self-review before a PR (author mode), or gate a PR to MERGE or CHANGES (gate mode). A repo adopts it with [`review-standards-template.md`](skills/pr-review/review-standards-template.md). |
+| [`writing-pr-bodies`](skills/writing-pr-bodies/SKILL.md) | The PR body a lane hands back. Superseded by `pr` from mattpocock/skills; kept for briefs that still name it. |
+| [`promoting-a-release`](skills/promoting-a-release/SKILL.md) | Promote a branch rung or ship a hotfix, rehearsing each step on a copy first so no work is lost. A repo adopts it with [`promotion-template.md`](skills/promoting-a-release/promotion-template.md). |
 
-The skill triggers on coordinating multi-agent work, dispatching or briefing lanes, gating PRs, and
-"act as coordinator". Product repos pin their own specifics in their agent docs (`CLAUDE.md`), which
-the skill reads first.
+The coordinator is used with [OCH — Observer Coordination Hub](https://github.com/Observerstudio/observer-coordination-hub), where claims, messages and knowledge live on a hub that feeds every session.
 
-Used with [OCH — Observer Coordination Hub](https://github.com/Observerstudio/observer-coordination-hub),
-where claims, messages and knowledge live on a hub and the `och` plugin feeds them to every session.
+## Adding a skill
 
-## writing-lane-briefs — the brief contract
+1. Create `skills/<name>/SKILL.md`. Its frontmatter `name` matches the folder, and a `description` names when to use it. Write it with `writing-for-agents`.
+2. Add `./skills/<name>` to `.claude-plugin/plugin.json`, and add the skill to a grouping in `skills.sh.json`.
+3. Check it: `npm install --no-save yaml && node scripts/check-skills.mjs`. CI runs the same check on every PR.
 
-`writing-lane-briefs/` is the sibling skill the coordinator invokes for every brief (new, rework,
-diagnosis). It merges the lane contract (worktree, fixture contract, `.feature` gate, per-task
-sentinel, STOP conditions) with the plan disciplines of superpowers `writing-plans` (one-action
-red→green steps, interfaces, no placeholders) and `improve` plans (base-SHA drift check,
-current-state excerpts, machine-checkable done criteria). Two parts, always: **What changes for
-the team** first, then the technical brief. Its template supersedes `docs/lane-brief-template.md`.
+## Moved from `Observerstudio/coordinator`
 
-```bash
-npx skills add Observerstudio/coordinator --skill writing-lane-briefs
-```
-
-## writing-pr-bodies — the PR body a lane hands back
-
-> Superseded (2026-10-04): new briefs use `pr` from mattpocock/skills v1.3 (door + blast radius). The legacy instructions below apply only to briefs that still reference this skill; this folder stays until every repo's briefs have moved over.
-
-`writing-pr-bodies/` is the lane-side skill (install it under `~/.agents/skills/` so OpenCode /
-Codex panes can read it). Every brief names it; the lane writes `PR-BODY-<issue>.md` next to the
-brief — **What changes for the team** in plain English first, then the code, a Gate of pasted
-RED/GREEN output, Does NOT change, the ponytail-review findings, Deploy order when there is a
-migration or repair, `Part of #N` never `Closes`. The coordinator opens the PR with `--body-file`
-and corrects, never writes from scratch.
-
-```bash
-npx skills add Observerstudio/coordinator --skill writing-pr-bodies
-```
+This repo was `Observerstudio/coordinator`, and the old name still redirects. If you installed from the old layout, reinstall once with a line above. Skills moved from the root into `skills/<name>/`, so an old install can't update itself.

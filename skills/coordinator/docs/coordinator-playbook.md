@@ -30,7 +30,7 @@ the edges so nothing is re-explained. The gate below is the VERDICT router's inp
 ## The gate (every PR, no exceptions)
 
 1. Cold review at the exact SHA, running `pr-review` gate mode
-   ([`pr-review/SKILL.md`](../pr-review/SKILL.md)) — ONE verdict (yours), then `merge-risk`.
+   ([`pr-review/SKILL.md`](../../pr-review/SKILL.md)) — ONE verdict (yours), then `merge-risk`.
    Who runs the passes: [`SKILL.md` § The gate](../SKILL.md#the-gate--every-pr-no-exceptions).
 2. CI green.
 3. The coordinator's **own** local run of the lane's integration suite (see
