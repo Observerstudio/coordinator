@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Observer studio's agent skills: coordinate a work track, brief lanes, review and gate PRs, write PR bodies, promote a release.",
   "author": { "name": "Observer studio", "url": "https://github.com/Observerstudio" },
-  "repository": "https://github.com/Observerstudio/skills",
+  "repository": "https://github.com/Observerstudio/observer-skills",
   "keywords": ["coordination", "code-review", "release", "skills"],
   "skills": [
     "./skills/coordinator",
