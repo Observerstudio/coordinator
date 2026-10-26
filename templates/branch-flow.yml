@@ -1,0 +1,107 @@
+# Branch Flow — refuses a PR that skips a rung, or a promotion that would revert content
+# living only on the base (e.g. a hotfix shipped straight to master and not merged down).
+# Copy to .github/workflows/branch-flow.yml and make it a required check on every rung.
+# Rename the rungs below if this repo's are not development / staging / master.
+# Read by `promoting-a-release` step 2, which runs the same trial merge locally first.
+name: Branch Flow
+
+
+on:
+  pull_request:
+    branches: [development, staging, master]
+    # `edited` fires when someone retargets the PR's base — the ladder has to
+    # re-run then, or a PR opened against development and later pointed at
+    # master would keep its green tick.
+    types: [opened, synchronize, reopened, edited]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ladder:
+    name: Branch Flow
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Enforce development → staging → master
+        env:
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          THIS_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          fail() {
+            echo "::error title=Branch Flow::$1"
+            echo
+            echo "The ladder is:  feature/*  →  development  →  staging  →  master"
+            exit 1
+          }
+
+          case "$BASE" in
+            master)
+              case "$HEAD" in
+                staging) ;;                       # the normal promotion
+                hotfix/*)
+                  echo "::notice title=Branch Flow::Hotfix '$HEAD' -> master: ladder bypass allowed. The revert check still runs (a hotfix cannot drop content on master). AFTER it ships, merge master down into staging and development, or the next promotion will be refused."
+                  ;;
+                *)
+                  fail "Only 'staging', or a 'hotfix/*' branch, may go into master. This PR comes from '$HEAD'. Merge it into development first and let it climb, or name it 'hotfix/<slug>' if it is a client-blocking fix that must skip the ladder." ;;
+              esac
+              ;;
+            staging)
+              [ "$HEAD" = "development" ] \
+                || fail "Only 'development' may be promoted into staging. This PR comes from '$HEAD'. Open it against development instead."
+              ;;
+            development)
+              case "$HEAD" in
+                master|staging)
+                  fail "'$HEAD' flows DOWN into development only by merging it locally, never by PR — a PR from '$HEAD' here would let the upper rung's history leapfrog the lower one." ;;
+              esac
+              ;;
+            *)
+              # Not a rung; nothing to enforce.
+              exit 0 ;;
+          esac
+
+          # Promotion rungs only from here.
+          [ "$BASE" = "master" ] || [ "$BASE" = "staging" ] || exit 0
+
+          # A branch NAMED 'staging' on a fork is not our staging.
+          [ "$HEAD_REPO" = "$THIS_REPO" ] \
+            || fail "Promotions must come from this repository's own branch, not a fork ('$HEAD_REPO')."
+
+          git fetch --quiet origin "$BASE" "$HEAD"
+
+          # A trial merge in a throwaway worktree state. Nothing is pushed.
+          git config user.email "ci@branch-flow.invalid"
+          git config user.name "CI"
+          git checkout --quiet --detach "origin/$BASE"
+
+          if ! git merge --no-commit --no-ff "origin/$HEAD" >/dev/null 2>&1; then
+            echo "Conflicting paths:"
+            git diff --name-only --diff-filter=U | head -20
+            git merge --abort 2>/dev/null || true
+            fail "'$HEAD' does not merge cleanly into '$BASE'. Merge origin/$BASE into $HEAD first, resolve there, and push."
+          fi
+
+          MERGED_TREE="$(git write-tree)"
+          HEAD_TREE="$(git rev-parse "origin/$HEAD^{tree}")"
+          git merge --abort 2>/dev/null || true
+
+          if [ "$MERGED_TREE" != "$HEAD_TREE" ]; then
+            echo "Content on $BASE that $HEAD does not have:"
+            git diff --stat "origin/$HEAD" "$MERGED_TREE" | tail -25
+            echo
+            echo "Commits on $BASE not reachable from $HEAD:"
+            git log --oneline "origin/$HEAD..origin/$BASE" | head -20
+            fail "Promoting '$HEAD' into '$BASE' would REVERT content that exists only on '$BASE'. Merge origin/$BASE into $HEAD first (a merge commit), push, and this check will pass."
+          fi
+
+          echo "OK: merging $HEAD into $BASE yields $HEAD's tree exactly — nothing on $BASE is reverted."

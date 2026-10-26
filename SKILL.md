@@ -230,7 +230,7 @@ Invoke these by name when the moment fits; do not re-implement what they do.
 | The operator asks for an audit or a roadmap | `improve` (`quick`/`deep`/`next`) | Findings with evidence, plans for a stranger; not for briefing panes. |
 | A design question a sketch can settle | `mattpocock-skills:prototype` | Throwaway, labelled as such; the answer is the deliverable. |
 | Any new task or dispatch | `observer:task` + the repo's Jira project | Every task gets an Observer task **and** a Jira issue at creation; both move on dispatch and on merge (operator rules 2026-09-13, 2026-09-27). |
-| Rehearsing a promotion | `neon-postgres-branches` | Fork production, `migrate status`, build DB steps, delete fork, then merge. |
+| Promoting a rung or shipping a hotfix | `promoting-a-release` | Trial merge, tests, migrations on a database fork, build and env names, all rehearsed before the real merge, so nothing on the upper rung is lost. |
 
 ### Routing by situation — the default workflow (operator rule 2026-09-27)
 

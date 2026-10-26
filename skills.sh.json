@@ -10,6 +10,13 @@
         "pr-review",
         "writing-pr-bodies"
       ]
+    },
+    {
+      "title": "Release",
+      "description": "Promote a rung (development → staging → master) or ship a hotfix: rehearse the merge, migrations and build on copies first, so nothing on the upper rung is lost.",
+      "skills": [
+        "promoting-a-release"
+      ]
     }
   ]
 }
