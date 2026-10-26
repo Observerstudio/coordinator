@@ -35,6 +35,7 @@ Update: `npx skills update`, or `git -C ~/.claude/skills/coordinator pull`.
 | `docs/coordinator-playbook.md` | Full operating model with worked examples |
 | `writing-lane-briefs/brief-template.md` | The brief format lanes receive, plus the fixture contract (`docs/lane-brief-template.md` stays for its worked example) |
 | `pr-review/SKILL.md` | The review skill: author mode before a PR, gate mode at the gate; checks and gate-comment shape beside it |
+| `promoting-a-release/SKILL.md` | Promote a rung or ship a hotfix: every step rehearsed on a copy first; a repo adopts it with `templates/promotion.md` |
 | `docs/herdr-runbook.md` | Pane mechanics: split, boot, send/read, watch |
 
 The skill triggers on coordinating multi-agent work, dispatching or briefing lanes, gating PRs, and
