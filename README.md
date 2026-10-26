@@ -9,15 +9,15 @@ Pick one way per agent; installing both gives you every skill twice.
 **Claude Code plugin (updates itself):**
 
 ```bash
-claude plugin marketplace add Observerstudio/skills
+claude plugin marketplace add Observerstudio/observer-skills
 claude plugin install observer-skills@observer
 ```
 
 **skills.sh (copies the files; update with `npx skills update`):**
 
 ```bash
-npx skills add Observerstudio/skills -g -y                            # every skill
-npx skills add Observerstudio/skills --skill promoting-a-release -g -y   # one skill
+npx skills add Observerstudio/observer-skills -g -y                            # every skill
+npx skills add Observerstudio/observer-skills --skill promoting-a-release -g -y   # one skill
 ```
 
 ## Skills
@@ -40,4 +40,4 @@ The coordinator is used with [OCH — Observer Coordination Hub](https://github.
 
 ## Moved from `Observerstudio/coordinator`
 
-This repo was `Observerstudio/coordinator`, and the old name still redirects. If you installed from the old layout, reinstall once with a line above. Skills moved from the root into `skills/<name>/`, so an old install can't update itself.
+This repo was `Observerstudio/coordinator`; the old name still redirects. If you installed from the old layout, reinstall once with a line above. Skills moved from the root into `skills/<name>/`, so an old install can't update itself.
