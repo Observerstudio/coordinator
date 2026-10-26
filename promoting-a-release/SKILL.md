@@ -31,8 +31,6 @@ The skill rehearses and opens the PR. The merge itself is an outward action: con
    - Resolve the conflict there and push. Then rerun this step.
    - `git log --oneline origin/<head>..origin/<base>` names what would have been lost.
 
-   CI enforces the same check on every promotion PR ([`templates/branch-flow.yml`](../templates/branch-flow.yml)). Running it here finds the problem before the PR exists.
-
 3. **Rehearse the tests on the merged result.** Merge `origin/<head>` into a local copy of `origin/<base>`, and run the promotion file's `## Commands` on it: type check, unit tests, and integration tests where the repo has them. Done when every command exits 0, with the output pasted.
 
 4. **Rehearse the migrations on a fork of the target database.** Fork the `<base>` environment's database, using the provider named in the promotion file (e.g. `neon-postgres-branches`). Then run the migration status and deploy commands against the fork. Done when:
