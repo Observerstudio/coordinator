@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: Use before opening a PR (author mode: self-review so cheap misses never reach a reviewer) and when reviewing or gating a PR (gate mode: devil's-advocate pass ending in MERGE or CHANGES and a gate comment). Works in every Observer repo.
+description: "Use before opening a PR (author mode: self-review so cheap misses never reach a reviewer) and when reviewing or gating a PR (gate mode: devil's-advocate pass ending in MERGE or CHANGES and a gate comment). Works in every Observer repo."
 ---
 
 # pr-review
