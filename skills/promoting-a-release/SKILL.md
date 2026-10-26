@@ -7,7 +7,7 @@ description: Use when promoting one branch rung to the next (development → sta
 
 A promotion is **rehearsed before it is real**. Every step runs against a copy first: a local trial merge, a fork of the target database, a local build. The GitHub merge comes last, once each rehearsal has passed its check. Work gets lost when a promotion carries a lower rung over content that lives only on the upper one, such as a hotfix or a fix made on staging. The **trial merge** in step 2 is the guarantee against that.
 
-Read the repo's `docs/agents/promotion.md` first: it names the rungs, the commands, the database and the smoke check. When it is missing, say so out loud ("no promotion file; general steps only"), and run the steps with the repo's own scripts. A repo adopts the skill by copying [`templates/promotion.md`](../templates/promotion.md).
+Read the repo's `docs/agents/promotion.md` first: it names the rungs, the commands, the database and the smoke check. When it is missing, say so out loud ("no promotion file; general steps only"), and run the steps with the repo's own scripts. A repo adopts the skill by copying [`promotion-template.md`](promotion-template.md).
 
 The skill rehearses and opens the PR. The merge itself is an outward action: confirm it with the human, as for any merge.
 
